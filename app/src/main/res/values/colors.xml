@@ -11,10 +11,15 @@
     <!--    White mode colors   -->
 
     <!--    Night mode colors   -->
-    <color name="mainBlue">#FF4CA7AF</color>
-    <color name="previewBG">#FF282E33</color>
+    <color name="mainBlue">#FF5E81AC</color>
+    <color name="mainRed">#FFBF616A</color>
+    <color name="previewBG">#FF2E3440</color>
+    <color name="inputLoginCodeDark">#FF3B4252</color>
+    <color name="inputLoginBorderEntered">#FF8FBCBB</color>
     <color name="previewMainText">#FFEEEEEE</color>
     <color name="previewSecondaryText">#FF999999</color>
     <!--    Common colors       -->
+
+    <color name="transparent">#00000000</color>
 
 </resources>

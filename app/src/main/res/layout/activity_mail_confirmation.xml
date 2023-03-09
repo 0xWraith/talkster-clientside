@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".controllers.authorization.MailConfirmationActivity"
+    android:background="@color/previewBG">
+
+    <LinearLayout
+        android:id="@+id/loginHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/img_placeholder"
+            android:contentDescription="@string/logotype" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/enter_code"
+            android:textColor="@color/previewMainText"
+            android:textSize="38sp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/mailInfoText"
+            android:layout_width="207dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="We’ve sent a mail with activation code to your mail stestmail@stuba.sk"
+            android:textColor="@color/previewSecondaryText"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginHeader">
+
+        <EditText
+            android:id="@+id/codeInputFirst"
+            style="@style/LoginEditText"
+            android:background="@drawable/drawable_input_mail_code"
+            android:gravity="center"
+            android:maxLength="1"
+            app:layout_constraintStart_toStartOf="parent"
+            android:importantForAutofill="no" />
+
+        <EditText
+            android:id="@+id/codeInputSecond"
+            style="@style/LoginEditText"
+            android:background="@drawable/drawable_input_mail_code"
+            android:gravity="center"
+            android:maxLength="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+            android:importantForAutofill="no" />
+
+        <EditText
+            android:id="@+id/codeInputThird"
+            style="@style/LoginEditText"
+            android:background="@drawable/drawable_input_mail_code"
+            android:gravity="center"
+            android:maxLength="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+            android:importantForAutofill="no" />
+
+        <EditText
+            android:id="@+id/codeInputFourth"
+            style="@style/LoginEditText"
+            android:background="@drawable/drawable_input_mail_code"
+            android:gravity="center"
+            android:maxLength="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+            android:importantForAutofill="no" />
+
+        <EditText
+            android:id="@+id/codeInputFifth"
+            style="@style/LoginEditText"
+            android:background="@drawable/drawable_input_mail_code"
+            android:gravity="center"
+            android:maxLength="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+            android:importantForAutofill="no" />
+
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
