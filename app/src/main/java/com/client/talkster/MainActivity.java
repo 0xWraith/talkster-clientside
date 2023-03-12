@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import com.client.talkster.controllers.IntroductionScreenActivity;
+import com.client.talkster.utils.UserAccountManager;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -17,10 +19,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new Handler().postDelayed(() -> {
-            Intent intent = new Intent(MainActivity.this, IntroductionScreenActivity.class);
-            startActivity(intent);
-            finish();
-        }, 500);
+        UserAccountManager.getAccount(this);
     }
 }

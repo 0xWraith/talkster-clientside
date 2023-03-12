@@ -53,8 +53,8 @@
 
         <EditText
             android:id="@+id/emailAddressInput"
+            style="@style/LoginMailEditText"
             android:layout_width="247dp"
-            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_marginStart="47dp"
             android:layout_marginTop="0dp"

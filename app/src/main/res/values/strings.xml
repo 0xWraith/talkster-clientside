@@ -18,4 +18,6 @@
     <string name="title_notifications">Notifications</string>
     <string name="your_mail">Your mail</string>
     <string name="enter_code">Enter code</string>
+    <string name="profile_info">Profile info</string>
+    <string name="firs_name_required">Firs name (required)</string>
 </resources>

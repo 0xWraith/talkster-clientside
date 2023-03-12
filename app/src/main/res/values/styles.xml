@@ -19,5 +19,20 @@
         <item name="android:layout_height">45dp</item>
         <item name="android:inputType">numberDecimal</item>
         <item name="android:layout_marginStart">10dp</item>
+
+
+
     </style>
+
+    <style name="LoginMailEditText">
+        <item name="android:background">@drawable/drawable_input_mail</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorHint">@color/previewSecondaryText</item>
+        <item name="android:padding">13dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">#FFFFFF</item>
+        <item name="android:backgroundTint">@color/inputLoginCodeDark</item>
+    </style>
+
 </resources>
