@@ -56,7 +56,6 @@ public class APIHandler<T, V>
 
         okHttpClient.newCall(request).enqueue(new Callback()
         {
-
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
