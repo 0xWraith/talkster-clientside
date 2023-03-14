@@ -22,4 +22,6 @@
         android:gravity="center"
         android:textColor="@color/mainBlue"
         android:textSize="24sp" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,8 +32,8 @@ public class APIHandler<T, V>
 {
     private final V activity;
     private final OkHttpClient okHttpClient;
-//    private final String TALKSTER_SERVER_URL = "http://147.175.160.77:8000/api/v1";
-    private final String TALKSTER_SERVER_URL = "http://10.10.1.103:8000/api/v1";
+    private final String TALKSTER_SERVER_URL = "http://147.175.160.77:8000/api/v1";
+//    private final String TALKSTER_SERVER_URL = "http://10.10.1.103:8000/api/v1";
 
     private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
@@ -125,16 +125,16 @@ public class APIHandler<T, V>
                             return;
 
                         String body = response.body().string();
-                        Intent homeIntent = new Intent(context, HomeActivity.class);
 
                         UserJWT userJWT = new Gson().fromJson(body, UserJWT.class);
+                        Intent homeIntent = new Intent(context, HomeActivity.class);
+                        UserAccountManager.saveAccount(context, userJWT);
 
                         homeIntent.putExtra("userJWT", body);
 
-                        UserAccountManager.saveAccount(context, userJWT);
-
                         context.startActivity(homeIntent);
                         ((RegistrationActivity)activity).finish();
+                        break;
                     }
                     case APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_SESSION:
                     {
