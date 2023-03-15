@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <queries>
+        <package android:name="com.squareup.okhttp3" />
+    </queries>
 
     <application
         android:allowBackup="true"

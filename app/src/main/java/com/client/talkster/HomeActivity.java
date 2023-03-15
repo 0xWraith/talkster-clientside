@@ -1,7 +1,12 @@
 package com.client.talkster;
 
-import android.os.Bundle;
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import android.os.Bundle;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
@@ -15,8 +20,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
+
 public class HomeActivity extends AppCompatActivity implements IActivity
 {
+    private WebSocket webSocket;
     private ViewPager2 homeViewPager;
     private ArrayList<Fragment> fragments;
     private BottomNavigationView bottomNavigation;
@@ -36,7 +49,15 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         homeViewPager = findViewById(R.id.homeViewPager);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
+        initializeSocketConnection();
         initializeBottomNavigation();
+    }
+
+    private void initializeSocketConnection()
+    {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url("ws://147.175.160.77:8000/websocket").build();
+        webSocket = client.newWebSocket(request, new ChatWebSocketListener());
     }
 
     private void initializeBottomNavigation()
@@ -44,7 +65,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         fragments = new ArrayList<>();
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
 
-        fragments.add(new ChatsFragment());
+        fragments.add(new ChatsFragment(webSocket));
         fragments.add(new MapFragment());
         fragments.add(new PeoplesFragment());
 
@@ -90,5 +111,45 @@ public class HomeActivity extends AppCompatActivity implements IActivity
 
             return true;
         });
+    }
+
+    private static class ChatWebSocketListener extends WebSocketListener
+    {
+        @Override
+        public void onOpen(WebSocket webSocket, Response response)
+        {
+            Log.d("ERROR", "onOpen");
+            //webSocket.send("{\"command\":\"subscribe\",\"destination\":\"/user/queue/messages\"}");
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text)
+        {
+            Log.d("ERROR", "onMessage");
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, ByteString bytes)
+        {
+            Log.d("onMessage", bytes.toString());
+        }
+
+        @Override
+        public void onClosing(WebSocket webSocket, int code, String reason)
+        {
+            Log.d("ERROR", "onClosing");
+        }
+
+        @Override
+        public void onClosed(WebSocket webSocket, int code, String reason)
+        {
+            Log.d("ERROR", "onClosed");
+        }
+
+        @Override
+        public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response)
+        {
+            Log.d("ERROR", "onFailure " + webSocket + " " + t + " " + response);
+        }
     }
 }

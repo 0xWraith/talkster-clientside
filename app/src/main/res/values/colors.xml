@@ -18,6 +18,17 @@
     <color name="inputLoginBorderEntered">#FF8FBCBB</color>
     <color name="previewMainText">#FFEEEEEE</color>
     <color name="previewSecondaryText">#FF999999</color>
+
+    <color name="frost_1">#FF8FBCBB</color>
+    <color name="frost_2">#FF88C0D0</color>
+    <color name="frost_3">#FF81A1C1</color>
+    <color name="frost_4">#FF5E81AC</color>
+
+    <color name="aurora_1">#FFBF616A</color>
+    <color name="aurora_2">#FFD08770</color>
+    <color name="aurora_3">#FFEBCB8B</color>
+    <color name="aurora_4">#FFA3BE8C</color>
+    <color name="aurora_5"> #FFB48EAD</color>
     <!--    Common colors       -->
 
     <color name="transparent">#00000000</color>

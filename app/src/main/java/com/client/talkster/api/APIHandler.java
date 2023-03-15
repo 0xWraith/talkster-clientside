@@ -18,6 +18,8 @@ import com.client.talkster.dto.AuthenticationDTO;
 import com.client.talkster.utils.UserAccountManager;
 import com.google.gson.Gson;
 
+import org.java_websocket.client.WebSocketClient;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -31,7 +33,7 @@ import okhttp3.Response;
 public class APIHandler<T, V>
 {
     private final V activity;
-    private final OkHttpClient okHttpClient;
+    private OkHttpClient okHttpClient;
     private final String TALKSTER_SERVER_URL = "http://147.175.160.77:8000/api/v1";
 //    private final String TALKSTER_SERVER_URL = "http://10.10.1.103:8000/api/v1";
 
