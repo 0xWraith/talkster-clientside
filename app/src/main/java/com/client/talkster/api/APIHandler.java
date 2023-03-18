@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -17,8 +18,6 @@ import com.client.talkster.controllers.authorization.RegistrationActivity;
 import com.client.talkster.dto.AuthenticationDTO;
 import com.client.talkster.utils.UserAccountManager;
 import com.google.gson.Gson;
-
-import org.java_websocket.client.WebSocketClient;
 
 import java.io.IOException;
 
@@ -34,10 +33,7 @@ public class APIHandler<T, V>
 {
     private final V activity;
     private OkHttpClient okHttpClient;
-    private final String TALKSTER_SERVER_URL = "http://147.175.160.77:8000/api/v1";
-//    private final String TALKSTER_SERVER_URL = "http://10.10.1.103:8000/api/v1";
-
-    private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    public final String TALKSTER_SERVER_URL = APIConfig.TALKSTER_SERVER_INTERNET_PROTOCOL + APIConfig.TALKSTER_SERVER_IP + ":" + APIConfig.TALKSTER_SERVER_PORT;
 
     public APIHandler(V activity)
     {
@@ -47,7 +43,7 @@ public class APIHandler<T, V>
 
     public void apiPOST(String apiUrl, T object, String jwtToken, Context context)
     {
-        RequestBody body = RequestBody.create(JSON, new Gson().toJson(object));
+        RequestBody body = RequestBody.create(APIConfig.JSON, new Gson().toJson(object));
 
         Request request = new Request
                 .Builder()
@@ -141,14 +137,15 @@ public class APIHandler<T, V>
                     {
                         int responseCode = response.code();
 
+                        String JWTResponse = response.body().string();
+
                         if(responseCode == 200)
                         {
                             ((MainActivity)activity).runOnUiThread(() -> new Handler().postDelayed(() -> {
 
                                 Intent intent = new Intent(context, HomeActivity.class);
-
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                intent.putExtra("userJWT", response.body().string());
+                                intent.putExtra("userJWT", JWTResponse);
 
                                 context.startActivity(intent);
                                 ((MainActivity)activity).finish();

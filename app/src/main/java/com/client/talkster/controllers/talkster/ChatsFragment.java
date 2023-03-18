@@ -1,5 +1,6 @@
 package com.client.talkster.controllers.talkster;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,10 +13,15 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.client.talkster.R;
+import com.client.talkster.classes.MessageDTO;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.google.gson.Gson;
+
+import java.time.OffsetDateTime;
 
 import okhttp3.WebSocket;
+import ua.naiksoftware.stomp.client.StompClient;
 
 
 /**
@@ -26,8 +32,9 @@ import okhttp3.WebSocket;
 public class ChatsFragment extends Fragment implements IFragmentActivity
 {
 
-    private WebSocket webSocket;
+    public StompClient webSocket;
     private Button sendMessageButton;
+    private Button checkConnectionButton;
     private EditText sendMessageInput;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -39,7 +46,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
     private String mParam1;
     private String mParam2;
 
-    public ChatsFragment(WebSocket webSocket) {
+    public ChatsFragment(StompClient webSocket) {
         // Required empty public constructor
         this.webSocket = webSocket;
     }
@@ -87,10 +94,30 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
     {
         sendMessageInput = view.findViewById(R.id.sendMessageInput);
         sendMessageButton = view.findViewById(R.id.sendMessageButton);
+        checkConnectionButton = view.findViewById(R.id.checkConnectionButton);
 
         sendMessageButton.setOnClickListener(view1 -> {
+
+            MessageDTO messageDTO = new MessageDTO();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                messageDTO.setDate(OffsetDateTime.now().toString());
+            }
+
+            messageDTO.setMessage(sendMessageInput.getText().toString());
+            messageDTO.setReceivername("Dmytro");
+            messageDTO.setSendername("Dmytro 2");
+            webSocket.send("/app/message", new Gson().toJson(messageDTO)).subscribe();
             Log.d("sended", "sended");
-            webSocket.send(sendMessageInput.getText().toString());
+
         });
+
+        checkConnectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("SOCKET", "IsConnected:" + webSocket.isConnected() + " " + webSocket.isConnecting());
+            }
+        });
+
     }
 }
