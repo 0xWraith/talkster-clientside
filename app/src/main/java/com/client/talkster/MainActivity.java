@@ -10,6 +10,8 @@ import android.util.Log;
 import com.client.talkster.controllers.IntroductionScreenActivity;
 import com.client.talkster.utils.UserAccountManager;
 
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity
 {
 
@@ -18,6 +20,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d("UUID", UUID.randomUUID().toString());
 
         UserAccountManager.getAccount(this);
     }

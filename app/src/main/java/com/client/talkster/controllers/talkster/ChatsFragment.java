@@ -2,25 +2,24 @@ package com.client.talkster.controllers.talkster;
 
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import com.client.talkster.R;
-import com.client.talkster.classes.MessageDTO;
-import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.dto.PersonalMessageDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.client.talkster.utils.enums.MessageType;
 import com.google.gson.Gson;
 
 import java.time.OffsetDateTime;
 
-import okhttp3.WebSocket;
 import ua.naiksoftware.stomp.client.StompClient;
 
 
@@ -36,6 +35,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
     private Button sendMessageButton;
     private Button checkConnectionButton;
     private EditText sendMessageInput;
+    private EditText receiverInput;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -92,24 +92,30 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
     @Override
     public void getUIElements(View view)
     {
+        receiverInput = view.findViewById(R.id.receiverInput);
         sendMessageInput = view.findViewById(R.id.sendMessageInput);
         sendMessageButton = view.findViewById(R.id.sendMessageButton);
         checkConnectionButton = view.findViewById(R.id.checkConnectionButton);
 
         sendMessageButton.setOnClickListener(view1 -> {
 
-            MessageDTO messageDTO = new MessageDTO();
+            PersonalMessageDTO personalMessageDTO = new PersonalMessageDTO();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                messageDTO.setDate(OffsetDateTime.now().toString());
-            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                personalMessageDTO.setTimestamp(OffsetDateTime.now().toString());
 
-            messageDTO.setMessage(sendMessageInput.getText().toString());
-            messageDTO.setReceivername("Dmytro");
-            messageDTO.setSendername("Dmytro 2");
-            webSocket.send("/app/message", new Gson().toJson(messageDTO)).subscribe();
-            Log.d("sended", "sended");
+            personalMessageDTO.setMessage(sendMessageInput.getText().toString());
+            personalMessageDTO.setSenderid("server");
+            personalMessageDTO.setReceiverid(receiverInput.getText().toString());
+            personalMessageDTO.setMessagetype(MessageType.TEXT_MESSAGE);
 
+
+            Log.d("message", new Gson().toJson(personalMessageDTO));
+
+            if(receiverInput.getText().toString().length() == 0)
+                webSocket.send("/app/message", new Gson().toJson(personalMessageDTO)).subscribe();
+            else
+                webSocket.send("/app/private-message", new Gson().toJson(personalMessageDTO)).subscribe();
         });
 
         checkConnectionButton.setOnClickListener(new View.OnClickListener() {
@@ -119,5 +125,10 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
             }
         });
 
+    }
+
+    public void messageReceived(String payload)
+    {
+        Toast.makeText(getContext(), payload, Toast.LENGTH_SHORT).show();
     }
 }

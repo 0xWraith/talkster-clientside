@@ -8,17 +8,19 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.client.talkster.controllers.talkster.ChatsFragment;
+
 import rx.Subscriber;
 import ua.naiksoftware.stomp.client.StompMessage;
 
 public class WebSocketPrivateChatSubscriber extends Subscriber<StompMessage>
 {
-    private Context chatContext;
-    private final Fragment chatsFragment;
-    private FragmentActivity chatActivity;
+    private Context context;
+    private Fragment fragment;
+    private FragmentActivity fragmentActivity;
 
 
-    public WebSocketPrivateChatSubscriber(Fragment chatsFragment)
+    /*public WebSocketPrivateChatSubscriber(Fragment chatsFragment)
     {
         this.chatsFragment = chatsFragment;
 
@@ -27,6 +29,15 @@ public class WebSocketPrivateChatSubscriber extends Subscriber<StompMessage>
 
         chatContext = chatsFragment.getContext();
         chatActivity = chatsFragment.getActivity();
+    }*/
+
+    public WebSocketPrivateChatSubscriber setSubscriberFragment(Fragment fragment)
+    {
+        this.fragment = fragment;
+        this.context = fragment.getContext();
+        this.fragmentActivity = fragment.getActivity();
+
+        return this;
     }
 
     @Override
@@ -45,8 +56,8 @@ public class WebSocketPrivateChatSubscriber extends Subscriber<StompMessage>
     public void onNext(StompMessage stompMessage)
     {
         Log.d("Message", stompMessage.getPayload());
-        chatActivity.runOnUiThread(() -> {
-            Toast.makeText(chatsFragment.getActivity(), stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
-        });
+//        fragmentActivity.runOnUiThread(() -> {
+//            Toast.makeText(fragmentActivity, stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
+//        });
     }
 }

@@ -3,6 +3,8 @@ package com.client.talkster.api;
 
 import android.util.Log;
 
+import androidx.fragment.app.Fragment;
+
 import com.client.talkster.classes.UserJWT;
 
 import java.util.ArrayList;
@@ -30,10 +32,13 @@ public class APIStompWebSocket
         headers = new ArrayList<>();
         userTopics = new ArrayList<>();
         webSocketClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, TALKSTER_WEBSOCKET_URL);
-        webSocketClient.lifecycle().subscribe(new StompWebSocketLifeCycle<>());
     }
 
-    public void connect() { webSocketClient.connect(headers); }
+    public void connect()
+    {
+        webSocketClient.lifecycle().subscribe(new StompWebSocketLifeCycle<>());
+        webSocketClient.connect(headers);
+    }
 
     public List<StompHeader> getHeaders() { return headers; }
     public List<String> getUserTopics() { return userTopics; }
