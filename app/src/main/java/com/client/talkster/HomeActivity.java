@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.client.talkster.adapters.ViewPagerAdapter;
 import com.client.talkster.api.APIStompWebSocket;
+import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
@@ -20,9 +21,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import rx.Subscriber;
 import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompHeader;
 import ua.naiksoftware.stomp.client.StompClient;
 import ua.naiksoftware.stomp.client.StompMessage;
 
@@ -30,8 +33,13 @@ public class HomeActivity extends AppCompatActivity implements IActivity
 {
     private UserJWT userJWT;
     private StompClient client;
+
+
+    private MapFragment mapFragment;
     private ViewPager2 homeViewPager;
+    private ChatsFragment chatsFragment;
     private ArrayList<Fragment> fragments;
+    private PeoplesFragment peoplesFragment;
     private BottomNavigationView bottomNavigation;
 
     @Override
@@ -46,20 +54,24 @@ public class HomeActivity extends AppCompatActivity implements IActivity
     @Override
     public void getUIElements()
     {
+        userJWT = new Gson().fromJson(getIntent().getStringExtra("userJWT"), UserJWT.class);
+
+        mapFragment = new MapFragment(userJWT);
+        chatsFragment = new ChatsFragment(userJWT);
+        peoplesFragment = new PeoplesFragment();
+
         homeViewPager = findViewById(R.id.homeViewPager);
         bottomNavigation = findViewById(R.id.bottomNavigation);
-        userJWT = new Gson().fromJson(getIntent().getStringExtra("userJWT"), UserJWT.class);
 
         fragments = new ArrayList<>();
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
 
-        fragments.add(new ChatsFragment(client));
-        fragments.add(new MapFragment());
-        fragments.add(new PeoplesFragment());
+        fragments.add(chatsFragment);
+        fragments.add(mapFragment);
+        fragments.add(peoplesFragment);
 
         initializeBottomNavigation();
         initializeSocketConnection();
-
     }
 
     private void initializeSocketConnection()
@@ -90,16 +102,18 @@ public class HomeActivity extends AppCompatActivity implements IActivity
 
         client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, APIStompWebSocket.TALKSTER_WEBSOCKET_URL);
 
-        ((ChatsFragment)fragments.get(0)).webSocket = client;
+        mapFragment.webSocket = client;
 
         client.topic("/chatroom/public").subscribe(new Subscriber<StompMessage>() {
             @Override
-            public void onCompleted() {
+            public void onCompleted()
+            {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(Throwable e)
+            {
 
             }
 
@@ -114,19 +128,22 @@ public class HomeActivity extends AppCompatActivity implements IActivity
 
         client.topic("/user/"+ userJWT.getID() +"/private").subscribe(new Subscriber<StompMessage>() {
             @Override
-            public void onCompleted() {
+            public void onCompleted()
+            {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(Throwable e)
+            {
 
             }
 
             @Override
-            public void onNext(StompMessage stompMessage) {
+            public void onNext(StompMessage stompMessage)
+            {
                 runOnUiThread(() -> {
-                    Toast.makeText(HomeActivity.this, "Private message: " + stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
+                    chatsFragment.onUserReceivedMessage(stompMessage.getPayload());
                 });
             }
         });
@@ -198,4 +215,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity
             return true;
         });
     }
+
+    public void updateChatList(List<Chat> chatList) { chatsFragment.updateChatList(chatList); }
+
+    public void addNewChat(Chat chat) { chatsFragment.addNewChat(chat); }
 }

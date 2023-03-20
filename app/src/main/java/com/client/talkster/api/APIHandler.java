@@ -1,33 +1,31 @@
 package com.client.talkster.api;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Handler;
+import okhttp3.Call;
+import java.util.List;
+import okhttp3.Request;
 import android.util.Log;
-import android.widget.Toast;
-
+import okhttp3.Response;
+import okhttp3.Callback;
+import java.util.Arrays;
+import android.os.Handler;
+import java.util.ArrayList;
+import java.io.IOException;
+import okhttp3.RequestBody;
+import okhttp3.OkHttpClient;
+import com.google.gson.Gson;
+import android.content.Intent;
+import android.content.Context;
 import androidx.annotation.NonNull;
-
 import com.client.talkster.HomeActivity;
 import com.client.talkster.MainActivity;
+import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.dto.AuthenticationDTO;
+import com.client.talkster.utils.UserAccountManager;
 import com.client.talkster.controllers.IntroductionScreenActivity;
 import com.client.talkster.controllers.authorization.InputMailActivity;
 import com.client.talkster.controllers.authorization.MailConfirmationActivity;
 import com.client.talkster.controllers.authorization.RegistrationActivity;
-import com.client.talkster.dto.AuthenticationDTO;
-import com.client.talkster.utils.UserAccountManager;
-import com.google.gson.Gson;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class APIHandler<T, V>
 {
@@ -39,6 +37,70 @@ public class APIHandler<T, V>
     {
         this.activity = activity;
         okHttpClient = new OkHttpClient();
+    }
+
+    public void apiGET(String apiUrl, String jwtToken, Context context)
+    {
+        Request request = new Request
+                .Builder()
+                .url(TALKSTER_SERVER_URL + apiUrl)
+                .addHeader("Authorization", jwtToken)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                int responseCode = response.code();
+
+
+                if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT))
+                {
+
+                    String resp = response.body().string();
+                    Log.d("NewChat", "" + responseCode);
+
+                    if(responseCode != 200)
+                        return;
+
+                    Log.d("Chats", resp);
+                    HomeActivity homeActivity = ((HomeActivity)activity);
+                    Chat chat = new Gson().fromJson(resp, Chat.class);
+
+                    Log.d("NewChat", chat.toString());
+
+                    homeActivity.runOnUiThread (() -> homeActivity.addNewChat(chat));
+
+                    return;
+                }
+
+                switch(apiUrl)
+                {
+                    case APIEndpoints.TALKSTER_API_CHAT_GET_CHATS:
+                    {
+                        if(responseCode != 200)
+                            return;
+
+                        HomeActivity homeActivity = ((HomeActivity)activity);
+
+                        String resp = response.body().string();
+
+                        Chat[] chats = new Gson().fromJson(resp, Chat[].class);
+                        Log.d("Chats", Arrays.toString(chats));
+                        List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
+
+                        homeActivity.runOnUiThread (() -> homeActivity.updateChatList(chatList));
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     public void apiPOST(String apiUrl, T object, String jwtToken, Context context)
