@@ -7,107 +7,88 @@
     tools:context=".controllers.authorization.MailConfirmationActivity"
     android:background="@color/previewBG">
 
-    <LinearLayout
-        android:id="@+id/loginHeader"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:gravity="center"
-        android:orientation="vertical"
-        android:layout_marginTop="60dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:text="@string/enter_code"
+        android:textColor="@color/previewMainText"
+        android:textSize="38sp"
+        tools:ignore="HardcodedText"
+        tools:layout_editor_absoluteY="210dp" />
 
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:background="@drawable/img_placeholder"
-            android:contentDescription="@string/logotype" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/enter_code"
-            android:textColor="@color/previewMainText"
-            android:textSize="38sp"
-            tools:ignore="HardcodedText" />
-
-        <TextView
-            android:id="@+id/mailInfoText"
-            android:layout_width="207dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="We’ve sent a mail with activation code to your mail stestmail@stuba.sk"
-            android:textColor="@color/previewSecondaryText"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/mailInfoText"
+        android:layout_width="207dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="We’ve sent a mail with activation code to your mail stestmail@stuba.sk"
+        android:textColor="@color/previewSecondaryText"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="102dp"
+        tools:layout_editor_absoluteY="261dp" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:background="@drawable/img_placeholder"
+        android:contentDescription="@string/logotype"
+        tools:layout_editor_absoluteX="131dp"
+        tools:layout_editor_absoluteY="60dp" />
+
+    <EditText
+        android:id="@+id/codeInputFirst"
+        style="@style/LoginEditText"
+        android:background="@drawable/drawable_input_mail_code"
+        android:gravity="center"
+        android:importantForAutofill="no"
+        android:maxLength="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="80dp" />
+
+    <EditText
+        android:id="@+id/codeInputSecond"
+        style="@style/LoginEditText"
+        android:background="@drawable/drawable_input_mail_code"
+        android:gravity="center"
+        android:importantForAutofill="no"
+        android:maxLength="1"
+        app:layout_constraintBottom_toBottomOf="@+id/codeInputFirst"
+        app:layout_constraintTop_toTopOf="@+id/codeInputFirst"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="153dp" />
+
+    <EditText
+        android:id="@+id/codeInputThird"
+        style="@style/LoginEditText"
+        android:background="@drawable/drawable_input_mail_code"
+        android:gravity="center"
+        android:importantForAutofill="no"
+        android:maxLength="1"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="208dp" />
+
+    <EditText
+        android:id="@+id/codeInputFourth"
+        style="@style/LoginEditText"
+        android:background="@drawable/drawable_input_mail_code"
+        android:gravity="center"
+        android:importantForAutofill="no"
+        android:maxLength="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginHeader">
+        app:layout_constraintTop_toBottomOf="@+id/loginHeader" />
 
-        <EditText
-            android:id="@+id/codeInputFirst"
-            style="@style/LoginEditText"
-            android:background="@drawable/drawable_input_mail_code"
-            android:gravity="center"
-            android:maxLength="1"
-            app:layout_constraintStart_toStartOf="parent"
-            android:importantForAutofill="no" />
-
-        <EditText
-            android:id="@+id/codeInputSecond"
-            style="@style/LoginEditText"
-            android:background="@drawable/drawable_input_mail_code"
-            android:gravity="center"
-            android:maxLength="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-            android:importantForAutofill="no" />
-
-        <EditText
-            android:id="@+id/codeInputThird"
-            style="@style/LoginEditText"
-            android:background="@drawable/drawable_input_mail_code"
-            android:gravity="center"
-            android:maxLength="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-            android:importantForAutofill="no" />
-
-        <EditText
-            android:id="@+id/codeInputFourth"
-            style="@style/LoginEditText"
-            android:background="@drawable/drawable_input_mail_code"
-            android:gravity="center"
-            android:maxLength="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-            android:importantForAutofill="no" />
-
-        <EditText
-            android:id="@+id/codeInputFifth"
-            style="@style/LoginEditText"
-            android:background="@drawable/drawable_input_mail_code"
-            android:gravity="center"
-            android:maxLength="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-            android:importantForAutofill="no" />
-
-
-
-    </LinearLayout>
+    <EditText
+        android:id="@+id/codeInputFifth"
+        style="@style/LoginEditText"
+        android:background="@drawable/drawable_input_mail_code"
+        android:gravity="center"
+        android:importantForAutofill="no"
+        android:maxLength="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginHeader" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
