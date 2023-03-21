@@ -43,8 +43,10 @@
     <Button
         android:id="@+id/startMessagingButton"
         style="@style/wfButton"
-        android:layout_width="302dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
         android:layout_marginBottom="72dp"
         android:text="Start messaging"
         android:textStyle="bold"
