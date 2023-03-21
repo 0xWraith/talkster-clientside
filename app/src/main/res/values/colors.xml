@@ -31,6 +31,12 @@
     <color name="aurora_5"> #FFB48EAD</color>
     <!--    Common colors       -->
 
+    <color name="erie_black">#FF1E2529</color>
+    <color name="erie_black2">#FF22292E</color>
+    <color name="gunmetal">#FF252D32</color>
+    <color name="gunmetal2">#FF343F46</color>
+    <color name="aquamarine">#FF05F0B9</color>
+
     <color name="transparent">#00000000</color>
 
 </resources>
