@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controllers.authorization.RegistrationActivity"
-    android:background="@color/previewBG">
+    android:background="@color/erie_black"
+    tools:context=".controllers.authorization.RegistrationActivity">
 
     <EditText
         android:id="@+id/firstNameInput"
         style="@style/LoginMailEditText"
         android:layout_width="300dp"
-        android:layout_height="55dp"
+        android:layout_height="48dp"
         android:autofillHints="E-Mail"
         android:hint="@string/firs_name_required"
         android:inputType="textEmailAddress"
@@ -24,8 +24,8 @@
         android:id="@+id/lastNameInput"
         style="@style/LoginMailEditText"
         android:layout_width="300dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
         android:autofillHints="E-Mail"
         android:hint="Last name (optional)"
         android:inputType="textEmailAddress"
@@ -46,18 +46,24 @@
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
     <ImageView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:background="@drawable/img_placeholder"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:adjustViewBounds="true"
         android:contentDescription="@string/logotype"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/Talkster_mid"
+        tools:ignore="MissingConstraints"
         app:layout_constraintBottom_toTopOf="@+id/textView8"
         app:layout_constraintEnd_toEndOf="@+id/textView8"
-        app:layout_constraintStart_toStartOf="@+id/textView8" />
+        app:layout_constraintStart_toStartOf="@+id/textView8"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
         android:gravity="center"
         android:text="@string/profile_info"
         android:textColor="@color/previewMainText"
@@ -65,8 +71,6 @@
         app:layout_constraintBottom_toTopOf="@+id/firstNameInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.651"
         tools:ignore="HardcodedText" />
 
     <Button

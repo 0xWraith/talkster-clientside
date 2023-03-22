@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controllers.IntroductionScreenActivity"
-    android:background="@color/previewBG">
+    android:background="@color/erie_black"
+    tools:context=".controllers.IntroductionScreenActivity">
 
     <TextView
         android:layout_width="215dp"

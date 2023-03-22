@@ -19,7 +19,7 @@
     <string name="your_mail">Your mail</string>
     <string name="enter_code">Enter code</string>
     <string name="profile_info">Profile info</string>
-    <string name="firs_name_required">Firs name (required)</string>
+    <string name="firs_name_required">First name (required)</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

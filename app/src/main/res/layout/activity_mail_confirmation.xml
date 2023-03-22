@@ -4,54 +4,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/previewBG"
+    android:background="@color/erie_black"
     tools:context=".controllers.authorization.MailConfirmationActivity">
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
         android:gravity="center"
         android:text="@string/enter_code"
         android:textColor="@color/previewMainText"
         android:textSize="38sp"
+        app:layout_constraintBottom_toTopOf="@+id/codeInputFifth"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="HardcodedText"
-        tools:layout_editor_absoluteY="213dp" />
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/mailInfoText"
-        android:layout_width="207dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="We’ve sent a mail with activation code to your mail stestmail@stuba.sk"
         android:textColor="@color/previewSecondaryText"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/codeInputThird"
         app:layout_constraintEnd_toEndOf="@+id/textView5"
         app:layout_constraintHorizontal_bias="0.48"
         app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView5"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:background="@drawable/img_placeholder"
+        style="@style/aspectImage"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/logotype"
         app:layout_constraintBottom_toTopOf="@+id/textView5"
         app:layout_constraintEnd_toEndOf="@+id/textView5"
         app:layout_constraintStart_toStartOf="@+id/textView5"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:srcCompat="@drawable/Talkster_mid" />
 
     <EditText
         android:id="@+id/codeInputFirst"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail_code"
+        android:background="@drawable/drawable_input_mail"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -66,7 +65,7 @@
     <EditText
         android:id="@+id/codeInputSecond"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail_code"
+        android:background="@drawable/drawable_input_mail"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -80,7 +79,7 @@
     <EditText
         android:id="@+id/codeInputThird"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail_code"
+        android:background="@drawable/drawable_input_mail"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -94,7 +93,7 @@
     <EditText
         android:id="@+id/codeInputFourth"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail_code"
+        android:background="@drawable/drawable_input_mail"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -108,7 +107,7 @@
     <EditText
         android:id="@+id/codeInputFifth"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail_code"
+        android:background="@drawable/drawable_input_mail"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="wfButton" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="backgroundTint">@color/aquamarine</item>
+    <style name="wfButton" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@drawable/drawable_button_gradient</item>
         <item name="cornerRadius">5dp</item>
         <item name="android:textColorHint">@color/previewMainText</item>
         <item name="android:textColor">@color/previewMainText</item>
@@ -19,9 +19,12 @@
         <item name="android:layout_height">45dp</item>
         <item name="android:inputType">numberDecimal</item>
         <item name="android:layout_marginStart">10dp</item>
+    </style>
 
-
-
+    <style name="aspectImage">
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:scaleType">fitXY</item>
     </style>
 
     <style name="LoginMailEditText">
