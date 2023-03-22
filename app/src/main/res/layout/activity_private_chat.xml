@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".PrivateChatActivity"
+    android:background="@color/previewBG">
+
+    <LinearLayout
+        android:id="@+id/chatHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:background="@color/inputLoginCodeDark">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/userAvatarImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            app:shapeAppearanceOverlay="@style/circleImage"
+            android:src="@drawable/avatar_wireframe"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/drawable_chat_border"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/userNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/previewMainText"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/userStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/previewSecondaryText"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatMessagesList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/chatInputLayout"
+        android:layout_below="@+id/chatHeaderLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        app:reverseLayout="false"
+        app:stackFromEnd="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/component_chat_message_receiver" />
+
+    <LinearLayout
+        android:id="@+id/chatInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="@color/inputLoginCodeDark">
+
+        <EditText
+            android:id="@+id/chatInputText"
+            style="@style/LoginMailEditText"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
+            android:hint="@string/message"
+            android:inputType="text"
+            android:padding="8dp"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/chatSendButton"
+            style="@style/wfButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text=">"
+            android:textColor="@color/previewMainText"
+            android:textSize="18sp" />
+    </LinearLayout>
+</RelativeLayout>

@@ -1,8 +1,9 @@
 package com.client.talkster.classes;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Chat
+public class Chat implements Serializable
 {
     private long id;
     private long ownerID;
@@ -43,4 +44,6 @@ public class Chat
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';
     }
+
+    public String getReceiverName() { return receiverFirstname + " " + receiverLastname; }
 }

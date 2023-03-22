@@ -64,7 +64,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
         fragments = new ArrayList<>();
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
 
         fragments.add(chatsFragment);
         fragments.add(mapFragment);
@@ -171,15 +170,12 @@ public class HomeActivity extends AppCompatActivity implements IActivity
     {
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
-
         homeViewPager.setAdapter(viewPagerAdapter);
-        homeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-            {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-            }
 
+        homeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback()
+        {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { super.onPageScrolled(position, positionOffset, positionOffsetPixels); }
             @Override
             public void onPageSelected(int position)
             {

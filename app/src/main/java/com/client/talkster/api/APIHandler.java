@@ -47,7 +47,8 @@ public class APIHandler<T, V>
                 .addHeader("Authorization", jwtToken)
                 .build();
 
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        okHttpClient.newCall(request).enqueue(new Callback()
+        {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
@@ -63,20 +64,15 @@ public class APIHandler<T, V>
                 if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT))
                 {
 
-                    String resp = response.body().string();
-                    Log.d("NewChat", "" + responseCode);
-
                     if(responseCode != 200)
                         return;
 
-                    Log.d("Chats", resp);
+                    String resp = response.body().string();
+
                     HomeActivity homeActivity = ((HomeActivity)activity);
                     Chat chat = new Gson().fromJson(resp, Chat.class);
-
-                    Log.d("NewChat", chat.toString());
-
+                    Log.d("APIHandler", "onResponse: " + resp);
                     homeActivity.runOnUiThread (() -> homeActivity.addNewChat(chat));
-
                     return;
                 }
 
@@ -92,7 +88,6 @@ public class APIHandler<T, V>
                         String resp = response.body().string();
 
                         Chat[] chats = new Gson().fromJson(resp, Chat[].class);
-                        Log.d("Chats", Arrays.toString(chats));
                         List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
 
                         homeActivity.runOnUiThread (() -> homeActivity.updateChatList(chatList));

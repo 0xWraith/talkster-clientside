@@ -27,4 +27,5 @@
     <string name="saved_messages">Saved Messages</string>
     <string name="audio_message">Audio message</string>
     <string name="photo">Photo</string>
+    <string name="message">Message</string>
 </resources>

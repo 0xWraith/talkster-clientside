@@ -1,6 +1,7 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.ChatListAdapter;
 import com.client.talkster.api.APIEndpoints;
@@ -64,7 +66,24 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
     {
         welcomeBlock = view.findViewById(R.id.welcomeBlock);
         userChatList = view.findViewById(R.id.userChatList);
-        chatListAdapter = new ChatListAdapter(userJWT.getID(), new ArrayList<>(), getContext());
+        chatListAdapter = new ChatListAdapter(userJWT.getID(), new ArrayList<>(), getContext(), new ChatListAdapter.IChatClickListener() {
+            @Override
+            public void onItemClick(int position, View v)
+            {
+                Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
+
+                privateChatIntent.putExtra("userJWT", userJWT);
+                privateChatIntent.putExtra("chat", chatListAdapter.chatList.get(position));
+
+
+                startActivity(privateChatIntent);
+            }
+
+            @Override
+            public void onItemLongClick(int position, View v) {
+                Log.d("Heh", "onItemLongClick pos = " + position);
+            }
+        });
 
         userChatList.setAdapter(chatListAdapter);
         userChatList.setLayoutManager(new LinearLayoutManager(getContext()));
