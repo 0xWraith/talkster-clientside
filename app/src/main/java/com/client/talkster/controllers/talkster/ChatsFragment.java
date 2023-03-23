@@ -1,96 +1,170 @@
 package com.client.talkster.controllers.talkster;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.LinearLayout;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
-import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.adapters.ChatListAdapter;
+import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.Chat;
+import com.client.talkster.classes.Message;
+import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.authorization.InputMailActivity;
+import com.client.talkster.dto.AuthenticationDTO;
+import com.client.talkster.dto.EmptyDTO;
+import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.interfaces.IChatListener;
+import com.client.talkster.interfaces.IChatMessagesListener;
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.google.gson.Gson;
 
-import okhttp3.WebSocket;
+import org.modelmapper.ModelMapper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChatsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ChatsFragment extends Fragment implements IFragmentActivity
+public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener
 {
+    private final UserJWT userJWT;
+    private RecyclerView userChatList;
+    private LinearLayout welcomeBlock;
+    private ChatListAdapter chatListAdapter;
+    private IChatMessagesListener iChatMessagesListener;
 
-    private WebSocket webSocket;
-    private Button sendMessageButton;
-    private EditText sendMessageInput;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ChatsFragment(WebSocket webSocket) {
-        // Required empty public constructor
-        this.webSocket = webSocket;
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChatsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ChatsFragment newInstance(String param1, String param2) {
-        ChatsFragment fragment = new ChatsFragment(null);
-        Log.d("hope", "hope");
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public ChatsFragment(UserJWT userJWT)
+    {
+        this.userJWT = userJWT;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
-
         getUIElements(view);
+        reloadUserChats();
+
         return view;
     }
 
     @Override
     public void getUIElements(View view)
     {
-        sendMessageInput = view.findViewById(R.id.sendMessageInput);
-        sendMessageButton = view.findViewById(R.id.sendMessageButton);
+        welcomeBlock = view.findViewById(R.id.welcomeBlock);
+        userChatList = view.findViewById(R.id.userChatList);
+        chatListAdapter = new ChatListAdapter(userJWT.getID(), new ArrayList<>(), getContext(), new ChatListAdapter.IChatClickListener() {
+            @Override
+            public void onItemClick(int position, View v)
+            {
+                Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
 
-        sendMessageButton.setOnClickListener(view1 -> {
-            Log.d("sended", "sended");
-            webSocket.send(sendMessageInput.getText().toString());
+                privateChatIntent.putExtra("userJWT", userJWT);
+                privateChatIntent.putExtra("chat", chatListAdapter.chatList.get(position));
+
+                startActivity(privateChatIntent);
+            }
+
+            @Override
+            public void onItemLongClick(int position, View v) {
+                Log.d("Heh", "onItemLongClick pos = " + position);
+            }
         });
+
+        userChatList.setAdapter(chatListAdapter);
+        userChatList.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
+
+    private void reloadUserChats()
+    {
+        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getJWTToken(), getContext());
+    }
+
+    private void updateChatListVisibility()
+    {
+        if(chatListAdapter.chatList == null || chatListAdapter.chatList.size() == 0)
+        {
+            welcomeBlock.setVisibility(View.VISIBLE);
+            userChatList.setVisibility(View.INVISIBLE);
+            return;
+        }
+        welcomeBlock.setVisibility(View.INVISIBLE);
+        userChatList.setVisibility(View.VISIBLE);
+    }
+
+    private void onUserReceivedMessage(Message message)
+    {
+        boolean isChatExist = false;
+
+        for(int i = 0; i < chatListAdapter.chatList.size(); i++)
+        {
+            Chat chat = chatListAdapter.chatList.get(i);
+
+            if(chat.getId() != message.getChatID())
+                continue;
+
+            isChatExist = true;
+            chat.getMessages().add(message);
+            Collections.swap(chatListAdapter.chatList, i, 0);
+
+            chatListAdapter.notifyItemChanged(i);
+            chatListAdapter.notifyItemMoved(i, 0);
+
+            break;
+        }
+
+        if(!isChatExist)
+        {
+            APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getJWTToken(), getContext());
+        }
+    }
+
+    @Override
+    public void addChat(Chat chat)
+    {
+        chatListAdapter.chatList.add(0, chat);
+        updateChatListVisibility();
+
+        chatListAdapter.notifyItemInserted(0);
+        chatListAdapter.notifyItemChanged(0);
+    }
+
+    @Override
+    public void updateChatList(List<Chat> chatList)
+    {
+        chatListAdapter.chatList = chatList;
+
+        updateChatListVisibility();
+
+        if(chatList.size() > 0)
+            chatListAdapter.notifyItemChanged(0);
+    }
+
+    @Override
+    public void onMessageReceived(String messageRAW)
+    {
+        ModelMapper modelMapper = new ModelMapper();
+        Message message = modelMapper.map(new Gson().fromJson(messageRAW, MessageDTO.class), Message.class);
+
+        onUserReceivedMessage(message);
     }
 }

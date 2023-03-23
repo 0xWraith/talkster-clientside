@@ -1,37 +1,48 @@
 package com.client.talkster;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.client.talkster.adapters.ViewPagerAdapter;
+import com.client.talkster.api.APIStompWebSocket;
+import com.client.talkster.classes.Chat;
+import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
 import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.interfaces.IChatListener;
+import com.client.talkster.interfaces.IChatMessagesListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import okio.ByteString;
+import rx.Subscriber;
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompHeader;
+import ua.naiksoftware.stomp.client.StompClient;
+import ua.naiksoftware.stomp.client.StompMessage;
 
 public class HomeActivity extends AppCompatActivity implements IActivity
 {
-    private WebSocket webSocket;
+    private UserJWT userJWT;
+    private StompClient client;
+
+
+    private MapFragment mapFragment;
     private ViewPager2 homeViewPager;
+    private IChatListener iChatListener;
+    private ChatsFragment chatsFragment;
     private ArrayList<Fragment> fragments;
+    private PeoplesFragment peoplesFragment;
     private BottomNavigationView bottomNavigation;
 
     @Override
@@ -40,43 +51,132 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         getUIElements();
-
     }
 
     @Override
     public void getUIElements()
     {
+        userJWT = new Gson().fromJson(getIntent().getStringExtra("userJWT"), UserJWT.class);
+
+        mapFragment = new MapFragment(userJWT);
+        chatsFragment = new ChatsFragment(userJWT);
+        peoplesFragment = new PeoplesFragment();
+
         homeViewPager = findViewById(R.id.homeViewPager);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        initializeSocketConnection();
+        fragments = new ArrayList<>();
+
+        fragments.add(chatsFragment);
+        fragments.add(mapFragment);
+        fragments.add(peoplesFragment);
+
+        if(chatsFragment != null)
+            iChatListener = (IChatListener) chatsFragment;
+
         initializeBottomNavigation();
+        initializeSocketConnection();
     }
 
     private void initializeSocketConnection()
     {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url("ws://147.175.160.77:8000/websocket").build();
-        webSocket = client.newWebSocket(request, new ChatWebSocketListener());
+//        Subscriber<StompMessage> webSocketPrivateChatSubscriber = new WebSocketPrivateChatSubscriber().setSubscriberFragment(fragments.get(0));
+
+        /*APIStompWebSocket apiStompWebSocket = new APIStompWebSocket(userJWT);
+        apiStompWebSocket.addTopic("/chatroom/public", new Subscriber<StompMessage>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(StompMessage stompMessage) {
+                Toast.makeText(HomeActivity.this, stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
+            }
+        });*/
+//        apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", webSocketPrivateChatSubscriber);
+//        apiStompWebSocket.connect();
+
+//        ((ChatsFragment)fragments.get(0)).webSocket = apiStompWebSocket.getWebSocketClient();
+
+        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, APIStompWebSocket.TALKSTER_WEBSOCKET_URL);
+
+        mapFragment.webSocket = client;
+
+        client.topic("/chatroom/public").subscribe(new Subscriber<StompMessage>() {
+            @Override
+            public void onCompleted()
+            {
+
+            }
+
+            @Override
+            public void onError(Throwable e)
+            {
+
+            }
+
+            @Override
+            public void onNext(StompMessage stompMessage) {
+                Log.d("msg", stompMessage.getPayload());
+                runOnUiThread(() -> {
+                    Toast.makeText(HomeActivity.this, "" + stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
+                    iChatListener.onMessageReceived("funguje");
+                });
+            }
+        });
+
+        client.topic("/user/"+ userJWT.getID() +"/private").subscribe(new Subscriber<StompMessage>() {
+            @Override
+            public void onCompleted()
+            {
+
+            }
+
+            @Override
+            public void onError(Throwable e)
+            {
+
+            }
+
+            @Override
+            public void onNext(StompMessage stompMessage) { runOnUiThread(() -> iChatListener.onMessageReceived(stompMessage.getPayload())); }
+        });
+
+        client.lifecycle().subscribe(event -> {
+            switch (event.getType()) {
+
+                case OPENED:
+                    Log.d("OPENED", "Stomp connection opened");
+                    break;
+
+                case ERROR:
+                    Log.e("ERROR", "Error", event.getException());
+                    break;
+
+                case CLOSED:
+                    Log.d("CLOSED", "Stomp connection closed");
+                    break;
+            }
+        });
+        client.connect();
     }
 
     private void initializeBottomNavigation()
     {
-        fragments = new ArrayList<>();
+
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
-
-        fragments.add(new ChatsFragment(webSocket));
-        fragments.add(new MapFragment());
-        fragments.add(new PeoplesFragment());
-
         homeViewPager.setAdapter(viewPagerAdapter);
-        homeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-            {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-            }
 
+        homeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback()
+        {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { super.onPageScrolled(position, positionOffset, positionOffsetPixels); }
             @Override
             public void onPageSelected(int position)
             {
@@ -113,43 +213,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         });
     }
 
-    private static class ChatWebSocketListener extends WebSocketListener
-    {
-        @Override
-        public void onOpen(WebSocket webSocket, Response response)
-        {
-            Log.d("ERROR", "onOpen");
-            //webSocket.send("{\"command\":\"subscribe\",\"destination\":\"/user/queue/messages\"}");
-        }
+    public void updateChatList(List<Chat> chatList) { iChatListener.updateChatList(chatList); }
 
-        @Override
-        public void onMessage(WebSocket webSocket, String text)
-        {
-            Log.d("ERROR", "onMessage");
-        }
-
-        @Override
-        public void onMessage(WebSocket webSocket, ByteString bytes)
-        {
-            Log.d("onMessage", bytes.toString());
-        }
-
-        @Override
-        public void onClosing(WebSocket webSocket, int code, String reason)
-        {
-            Log.d("ERROR", "onClosing");
-        }
-
-        @Override
-        public void onClosed(WebSocket webSocket, int code, String reason)
-        {
-            Log.d("ERROR", "onClosed");
-        }
-
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response)
-        {
-            Log.d("ERROR", "onFailure " + webSocket + " " + t + " " + response);
-        }
-    }
+    public void addNewChat(Chat chat) { iChatListener.addChat(chat); }
 }

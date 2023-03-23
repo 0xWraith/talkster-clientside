@@ -38,4 +38,9 @@
 <!--        <item name="android:backgroundTint">@color/inputLoginCodeDark</item>-->
     </style>
 
+    <style name="circleImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

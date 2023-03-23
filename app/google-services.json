@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "861872725866",
+    "project_id": "talkster-7911f",
+    "storage_bucket": "talkster-7911f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861872725866:android:8dc85822c393ad1566cf13",
+        "android_client_info": {
+          "package_name": "com.client.talkster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "861872725866-vkcich43pfg331j1c2b1q28c7pd8rdrh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQb8ooeZSfveQRpSaSlslHUfzZnoKSXZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "861872725866-vkcich43pfg331j1c2b1q28c7pd8rdrh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

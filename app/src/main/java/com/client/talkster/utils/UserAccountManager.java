@@ -32,7 +32,7 @@ public class UserAccountManager
         userJWT.setID(settings.getLong("ID", 0));
         userJWT.setJWTToken(settings.getString("accessJWTToken", ""));
 
-        Log.d("debug-err", userJWT.toString());
+        Log.d("JWT", userJWT.toString());
 
         APIHandler<UserJWT, MainActivity> apiHandler = new APIHandler<>(mainActivity);
         apiHandler.apiPOST(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_SESSION, userJWT, userJWT.getJWTToken(), context);
