@@ -21,7 +21,7 @@
         app:layout_constraintEnd_toEndOf="@+id/textView2"
         app:layout_constraintStart_toStartOf="@+id/textView2"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/Talkster_mid"
+        app:srcCompat="@drawable/talkster_mid"
         tools:ignore="MissingConstraints" />
 
 
