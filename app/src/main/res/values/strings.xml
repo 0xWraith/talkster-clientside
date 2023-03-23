@@ -22,4 +22,10 @@
     <string name="firs_name_required">Firs name (required)</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome_to_talkster">Welcome to Talkster</string>
+    <string name="cleared_history">History was cleared</string>
+    <string name="saved_messages">Saved Messages</string>
+    <string name="audio_message">Audio message</string>
+    <string name="photo">Photo</string>
+    <string name="message">Message</string>
 </resources>
