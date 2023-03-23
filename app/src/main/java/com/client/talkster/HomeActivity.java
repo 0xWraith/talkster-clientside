@@ -5,44 +5,52 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.client.talkster.adapters.ViewPagerAdapter;
+import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIStompWebSocket;
+import com.client.talkster.api.WebSocketPrivateChatSubscriber;
+import com.client.talkster.api.WebSocketPublicChatSubscriber;
 import com.client.talkster.classes.Chat;
+import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
+import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IChatMessagesListener;
+import com.client.talkster.utils.BundleExtraNames;
+import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.Response;
 import rx.Subscriber;
 import ua.naiksoftware.stomp.Stomp;
-import ua.naiksoftware.stomp.StompHeader;
 import ua.naiksoftware.stomp.client.StompClient;
 import ua.naiksoftware.stomp.client.StompMessage;
 
-public class HomeActivity extends AppCompatActivity implements IActivity
+public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatMessagesListener
 {
     private UserJWT userJWT;
-    private StompClient client;
-
-
     private MapFragment mapFragment;
     private ViewPager2 homeViewPager;
     private IChatListener iChatListener;
-    private ChatsFragment chatsFragment;
     private ArrayList<Fragment> fragments;
-    private PeoplesFragment peoplesFragment;
+    private APIStompWebSocket apiStompWebSocket;
     private BottomNavigationView bottomNavigation;
 
     @Override
@@ -50,29 +58,23 @@ public class HomeActivity extends AppCompatActivity implements IActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        getBundleElements();
         getUIElements();
     }
 
     @Override
     public void getUIElements()
     {
-        userJWT = new Gson().fromJson(getIntent().getStringExtra("userJWT"), UserJWT.class);
-
         mapFragment = new MapFragment(userJWT);
-        chatsFragment = new ChatsFragment(userJWT);
-        peoplesFragment = new PeoplesFragment();
+        ChatsFragment chatsFragment = new ChatsFragment(userJWT);
+        PeoplesFragment peoplesFragment = new PeoplesFragment();
 
+        iChatListener = chatsFragment;
         homeViewPager = findViewById(R.id.homeViewPager);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        fragments = new ArrayList<>();
-
-        fragments.add(chatsFragment);
-        fragments.add(mapFragment);
-        fragments.add(peoplesFragment);
-
-        if(chatsFragment != null)
-            iChatListener = (IChatListener) chatsFragment;
+        fragments = new ArrayList<>(Arrays.asList(chatsFragment, mapFragment, peoplesFragment));
 
         initializeBottomNavigation();
         initializeSocketConnection();
@@ -80,91 +82,60 @@ public class HomeActivity extends AppCompatActivity implements IActivity
 
     private void initializeSocketConnection()
     {
-//        Subscriber<StompMessage> webSocketPrivateChatSubscriber = new WebSocketPrivateChatSubscriber().setSubscriberFragment(fragments.get(0));
+        apiStompWebSocket = new APIStompWebSocket();
+        mapFragment.apiStompWebSocket = apiStompWebSocket;
 
-        /*APIStompWebSocket apiStompWebSocket = new APIStompWebSocket(userJWT);
-        apiStompWebSocket.addTopic("/chatroom/public", new Subscriber<StompMessage>() {
-            @Override
-            public void onCompleted() {
+        apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
+        apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", new WebSocketPrivateChatSubscriber(this));
+        apiStompWebSocket.connect();
+    }
 
-            }
+    @Override
+    public void getBundleElements()
+    {
+        Bundle bundle = getIntent().getExtras();
 
-            @Override
-            public void onError(Throwable e) {
+        if(bundle.isEmpty())
+            return;
 
-            }
+        userJWT = bundle.getParcelable(BundleExtraNames.USER_JWT);
+    }
 
-            @Override
-            public void onNext(StompMessage stompMessage) {
-                Toast.makeText(HomeActivity.this, stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
-            }
-        });*/
-//        apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", webSocketPrivateChatSubscriber);
-//        apiStompWebSocket.connect();
+    @Override
+    public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
+    {
 
-//        ((ChatsFragment)fragments.get(0)).webSocket = apiStompWebSocket.getWebSocketClient();
+    }
 
-        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, APIStompWebSocket.TALKSTER_WEBSOCKET_URL);
+    @Override
+    public void onResponse(@NonNull Call call, @NonNull Response response, @NonNull String apiUrl)
+    {
+        try
+        {
+            if(response.body() == null)
+                throw new IOException("Unexpected response " + response);
 
-        mapFragment.webSocket = client;
+            int responseCode = response.code();
+            String responseBody = response.body().string();
 
-        client.topic("/chatroom/public").subscribe(new Subscriber<StompMessage>() {
-            @Override
-            public void onCompleted()
+            if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT))
             {
-
+                Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                runOnUiThread (() -> iChatListener.addChat(chat));
             }
-
-            @Override
-            public void onError(Throwable e)
+            else if(apiUrl.equals(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS))
             {
+                if(responseCode != 200)
+                    throw new UserUnauthorizedException("Unexpected response " + response);
 
+                Chat[] chats = new Gson().fromJson(responseBody, Chat[].class);
+                List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
+
+                runOnUiThread (() -> iChatListener.updateChatList(chatList));
             }
-
-            @Override
-            public void onNext(StompMessage stompMessage) {
-                Log.d("msg", stompMessage.getPayload());
-                runOnUiThread(() -> {
-                    Toast.makeText(HomeActivity.this, "" + stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
-                    iChatListener.onMessageReceived("funguje");
-                });
-            }
-        });
-
-        client.topic("/user/"+ userJWT.getID() +"/private").subscribe(new Subscriber<StompMessage>() {
-            @Override
-            public void onCompleted()
-            {
-
-            }
-
-            @Override
-            public void onError(Throwable e)
-            {
-
-            }
-
-            @Override
-            public void onNext(StompMessage stompMessage) { runOnUiThread(() -> iChatListener.onMessageReceived(stompMessage.getPayload())); }
-        });
-
-        client.lifecycle().subscribe(event -> {
-            switch (event.getType()) {
-
-                case OPENED:
-                    Log.d("OPENED", "Stomp connection opened");
-                    break;
-
-                case ERROR:
-                    Log.e("ERROR", "Error", event.getException());
-                    break;
-
-                case CLOSED:
-                    Log.d("CLOSED", "Stomp connection closed");
-                    break;
-            }
-        });
-        client.connect();
+        }
+        catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
+        catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster", "Failed to parse: " + exception.getMessage()); }
     }
 
     private void initializeBottomNavigation()
@@ -213,7 +184,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         });
     }
 
-    public void updateChatList(List<Chat> chatList) { iChatListener.updateChatList(chatList); }
-
-    public void addNewChat(Chat chat) { iChatListener.addChat(chat); }
+    @Override
+    public void onMessageReceived(String messageRAW) { iChatListener.onMessageReceived(messageRAW); }
 }

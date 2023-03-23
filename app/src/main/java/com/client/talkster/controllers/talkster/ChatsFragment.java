@@ -1,6 +1,5 @@
 package com.client.talkster.controllers.talkster;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,11 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.ChatListAdapter;
@@ -22,22 +23,26 @@ import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserJWT;
-import com.client.talkster.controllers.authorization.InputMailActivity;
-import com.client.talkster.dto.AuthenticationDTO;
-import com.client.talkster.dto.EmptyDTO;
 import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IChatMessagesListener;
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import org.modelmapper.ModelMapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener
 {
@@ -95,7 +100,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private void reloadUserChats()
     {
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getJWTToken(), getContext());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getJWTToken());
     }
 
     private void updateChatListVisibility()
@@ -134,7 +139,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         if(!isChatExist)
         {
             APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-            apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getJWTToken(), getContext());
+            apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getJWTToken());
         }
     }
 

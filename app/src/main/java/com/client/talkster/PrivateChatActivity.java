@@ -24,7 +24,7 @@ import org.modelmapper.ModelMapper;
 
 import java.time.OffsetDateTime;
 
-public class PrivateChatActivity extends AppCompatActivity implements IActivity, IChatMessagesListener
+public class PrivateChatActivity extends AppCompatActivity implements IActivity
 {
 
     private Chat chat;
@@ -34,6 +34,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     private EditText chatInputText;
     private TextView userStatusText;
     private RecyclerView chatMessagesList;
+    private LinearLayoutManager recyclerLayoutManager;
     private ChatMessagesAdapter chatMessagesAdapter;
 
     @Override
@@ -58,6 +59,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         chatSendButton = findViewById(R.id.chatSendButton);
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
+        recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
 
         userNameText.setText(chat.getReceiverName());
         userStatusText.setText("last seen at 12:35");
@@ -86,13 +88,14 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             Message newMessage = new ModelMapper().map(messageDTO, Message.class);
 
             chatMessagesAdapter.getMessages().add(newMessage);
-            chatMessagesAdapter.notifyItemInserted(chatMessagesAdapter.getMessages().size() - 1);
+            chatMessagesAdapter.notifyItemInserted(chatMessagesAdapter.getItemCount() - 1);
+            recyclerLayoutManager.scrollToPositionWithOffset(chatMessagesAdapter.getItemCount() - 1,0);
 
         });
     }
 
     @Override
-    public void onMessageReceived(Message message)
+    public void getBundleElements()
     {
 
     }

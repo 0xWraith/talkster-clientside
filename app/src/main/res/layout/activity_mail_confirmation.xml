@@ -27,7 +27,6 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="We’ve sent a mail with activation code to your mail stestmail@stuba.sk"
         android:textColor="@color/previewSecondaryText"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/textView5"

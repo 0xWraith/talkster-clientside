@@ -12,6 +12,7 @@ import android.widget.EditText;
 import androidx.fragment.app.Fragment;
 
 import com.client.talkster.R;
+import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
@@ -28,11 +29,10 @@ import ua.naiksoftware.stomp.client.StompClient;
 public class MapFragment extends Fragment implements IFragmentActivity
 {
     private UserJWT userJWT;
-    public StompClient webSocket;
-    private Button sendMessageButton;
-    private Button checkConnectionButton;
-    private EditText sendMessageInput;
     private EditText receiverInput;
+    private Button sendMessageButton;
+    private EditText sendMessageInput;
+    public APIStompWebSocket apiStompWebSocket;
 
     public MapFragment(UserJWT userJWT)
     {
@@ -60,7 +60,6 @@ public class MapFragment extends Fragment implements IFragmentActivity
         receiverInput = view.findViewById(R.id.receiverInput);
         sendMessageInput = view.findViewById(R.id.sendMessageInput);
         sendMessageButton = view.findViewById(R.id.sendMessageButton);
-        checkConnectionButton = view.findViewById(R.id.checkConnectionButton);
 
         sendMessageButton.setOnClickListener(view1 -> {
 
@@ -77,19 +76,11 @@ public class MapFragment extends Fragment implements IFragmentActivity
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
 
-            Log.d("message", new Gson().toJson(messageDTO));
-
             if(receiverInput.getText().toString().length() == 0)
-                webSocket.send("/app/message", new Gson().toJson(messageDTO)).subscribe();
+                apiStompWebSocket.getWebSocketClient().send("/app/message", new Gson().toJson(messageDTO)).subscribe();
             else
-                webSocket.send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
-        });
+                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
 
-        checkConnectionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("SOCKET", "IsConnected:" + webSocket.isConnected() + " " + webSocket.isConnecting());
-            }
         });
     }
 }

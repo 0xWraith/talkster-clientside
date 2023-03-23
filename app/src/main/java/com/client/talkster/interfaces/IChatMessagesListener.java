@@ -1,8 +1,7 @@
 package com.client.talkster.interfaces;
 
-import com.client.talkster.classes.Message;
-
+@FunctionalInterface
 public interface IChatMessagesListener
 {
-    void onMessageReceived(Message message);
+    void onMessageReceived(String messageRAW);
 }

@@ -20,20 +20,25 @@
         android:theme="@style/Theme.Talkster">
         <activity
             android:name=".PrivateChatActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="locked" />
         <activity
             android:name=".HomeActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="locked" />
         <activity
             android:name=".controllers.authorization.RegistrationActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="locked" />
         <activity
             android:name=".controllers.authorization.MailConfirmationActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="locked" />
         <activity
             android:name=".controllers.authorization.InputMailActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="locked" />
         <activity
             android:name=".controllers.IntroductionScreenActivity"
             android:exported="false"

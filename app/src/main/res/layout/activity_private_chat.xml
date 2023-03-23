@@ -5,20 +5,21 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".PrivateChatActivity"
-    android:background="@color/previewBG">
+    android:background="@color/erie_black">
 
     <LinearLayout
         android:id="@+id/chatHeaderLayout"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:orientation="horizontal"
-        android:background="@color/inputLoginCodeDark">
+        android:background="@color/gunmetal">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/userAvatarImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="8dp"
+            app:strokeColor="@null"
             app:shapeAppearanceOverlay="@style/circleImage"
             android:src="@drawable/avatar_wireframe"/>
 
@@ -69,7 +70,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:background="@color/inputLoginCodeDark">
+        android:background="@color/gunmetal">
 
         <EditText
             android:id="@+id/chatInputText"
@@ -81,19 +82,22 @@
             android:layout_marginBottom="8dp"
             android:layout_weight="1"
             android:hint="@string/message"
-            android:inputType="text"
+            android:inputType="textMultiLine"
+            android:scrollHorizontally="false"
             android:padding="8dp"
             android:textSize="18sp" />
 
         <Button
             android:id="@+id/chatSendButton"
             style="@style/wfButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:background="@drawable/drawable_button_gradient_round"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_gravity="center"
             android:text=">"
             android:textColor="@color/previewMainText"
             android:textSize="18sp" />

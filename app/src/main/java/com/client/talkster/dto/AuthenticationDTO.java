@@ -6,7 +6,10 @@ public class AuthenticationDTO
     protected String code;
     protected String mail;
 
-//    public Long getId() { return id; }
+    public AuthenticationDTO() {}
+    public AuthenticationDTO(String mail) { this.mail = mail; }
+
+    //    public Long getId() { return id; }
     public String getCode() { return code; }
     public String getMail() { return mail; }
 

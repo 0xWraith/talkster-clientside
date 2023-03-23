@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".controllers.talkster.ChatsFragment"
-    android:background="@color/previewBG">
+    android:background="@color/erie_black">
 
     <LinearLayout
         android:id="@+id/toolbarKinda"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/inputLoginCodeDark">
+        android:background="@color/gunmetal">
 
         <TextView
             android:layout_width="match_parent"

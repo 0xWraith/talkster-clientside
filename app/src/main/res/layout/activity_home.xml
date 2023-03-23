@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HomeActivity"
-    android:background="@color/previewBG">
+    android:background="@color/erie_black">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/homeViewPager"
@@ -20,7 +20,7 @@
         app:menu="@menu/menu_bottom_nav"
         app:labelVisibilityMode="unlabeled"
         app:itemIconTint="@color/menu_item_state"
-        android:background="@color/inputLoginCodeDark">
+        android:background="@color/gunmetal">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 

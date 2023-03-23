@@ -10,8 +10,8 @@
 <!--        <item name="colorSecondaryVariant">@color/teal_200</item>-->
 <!--        <item name="colorOnSecondary">@color/black</item>-->
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" >@color/previewBG</item>
-        <item name="android:navigationBarColor">@color/inputLoginCodeDark</item>
+        <item name="android:statusBarColor" >@color/gunmetal</item>
+        <item name="android:navigationBarColor">@color/gunmetal</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

@@ -1,20 +1,15 @@
 package com.client.talkster.controllers;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.client.talkster.R;
-import com.client.talkster.controllers.authorization.InputMailActivity;
+import android.widget.Button;
+import android.content.Intent;
+import androidx.appcompat.app.AppCompatActivity;
 import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.controllers.authorization.InputMailActivity;
 
 public class IntroductionScreenActivity extends AppCompatActivity implements IActivity
 {
-
-    private Button startMessagingButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -27,11 +22,15 @@ public class IntroductionScreenActivity extends AppCompatActivity implements IAc
     @Override
     public void getUIElements()
     {
-        startMessagingButton = findViewById(R.id.startMessagingButton);
+        Button startMessagingButton = findViewById(R.id.startMessagingButton);
 
-        startMessagingButton.setOnClickListener(view -> {
+        startMessagingButton.setOnClickListener(view ->
+        {
             startActivity(new Intent(IntroductionScreenActivity.this, InputMailActivity.class));
             finish();
         });
     }
+
+    @Override
+    public void getBundleElements() { }
 }
