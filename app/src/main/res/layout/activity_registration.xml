@@ -52,12 +52,12 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/logotype"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/Talkster_mid"
-        tools:ignore="MissingConstraints"
         app:layout_constraintBottom_toTopOf="@+id/textView8"
         app:layout_constraintEnd_toEndOf="@+id/textView8"
         app:layout_constraintStart_toStartOf="@+id/textView8"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/talkster_mid"
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/textView8"
