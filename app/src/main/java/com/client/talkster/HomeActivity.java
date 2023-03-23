@@ -17,6 +17,8 @@ import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
 import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.interfaces.IChatListener;
+import com.client.talkster.interfaces.IChatMessagesListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
@@ -37,6 +39,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity
 
     private MapFragment mapFragment;
     private ViewPager2 homeViewPager;
+    private IChatListener iChatListener;
     private ChatsFragment chatsFragment;
     private ArrayList<Fragment> fragments;
     private PeoplesFragment peoplesFragment;
@@ -48,7 +51,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         getUIElements();
-
     }
 
     @Override
@@ -68,6 +70,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         fragments.add(chatsFragment);
         fragments.add(mapFragment);
         fragments.add(peoplesFragment);
+
+        if(chatsFragment != null)
+            iChatListener = (IChatListener) chatsFragment;
 
         initializeBottomNavigation();
         initializeSocketConnection();
@@ -121,6 +126,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity
                 Log.d("msg", stompMessage.getPayload());
                 runOnUiThread(() -> {
                     Toast.makeText(HomeActivity.this, "" + stompMessage.getPayload(), Toast.LENGTH_SHORT).show();
+                    iChatListener.onMessageReceived("funguje");
                 });
             }
         });
@@ -139,12 +145,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity
             }
 
             @Override
-            public void onNext(StompMessage stompMessage)
-            {
-                runOnUiThread(() -> {
-                    chatsFragment.onUserReceivedMessage(stompMessage.getPayload());
-                });
-            }
+            public void onNext(StompMessage stompMessage) { runOnUiThread(() -> iChatListener.onMessageReceived(stompMessage.getPayload())); }
         });
 
         client.lifecycle().subscribe(event -> {
@@ -212,7 +213,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity
         });
     }
 
-    public void updateChatList(List<Chat> chatList) { chatsFragment.updateChatList(chatList); }
+    public void updateChatList(List<Chat> chatList) { iChatListener.updateChatList(chatList); }
 
-    public void addNewChat(Chat chat) { chatsFragment.addNewChat(chat); }
+    public void addNewChat(Chat chat) { iChatListener.addChat(chat); }
 }

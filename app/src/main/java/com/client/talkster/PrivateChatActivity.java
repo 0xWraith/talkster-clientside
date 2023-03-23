@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,13 +17,14 @@ import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.interfaces.IChatMessagesListener;
 import com.client.talkster.utils.enums.MessageType;
 
 import org.modelmapper.ModelMapper;
 
 import java.time.OffsetDateTime;
 
-public class PrivateChatActivity extends AppCompatActivity implements IActivity
+public class PrivateChatActivity extends AppCompatActivity implements IActivity, IChatMessagesListener
 {
 
     private Chat chat;
@@ -87,5 +89,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
             chatMessagesAdapter.notifyItemInserted(chatMessagesAdapter.getMessages().size() - 1);
 
         });
+    }
+
+    @Override
+    public void onMessageReceived(Message message)
+    {
+
     }
 }

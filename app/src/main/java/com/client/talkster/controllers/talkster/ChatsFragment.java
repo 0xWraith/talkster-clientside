@@ -26,6 +26,8 @@ import com.client.talkster.controllers.authorization.InputMailActivity;
 import com.client.talkster.dto.AuthenticationDTO;
 import com.client.talkster.dto.EmptyDTO;
 import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.interfaces.IChatListener;
+import com.client.talkster.interfaces.IChatMessagesListener;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.google.gson.Gson;
 
@@ -35,13 +37,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class ChatsFragment extends Fragment implements IFragmentActivity
+public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener
 {
     private final UserJWT userJWT;
     private RecyclerView userChatList;
     private LinearLayout welcomeBlock;
     private ChatListAdapter chatListAdapter;
+    private IChatMessagesListener iChatMessagesListener;
 
     public ChatsFragment(UserJWT userJWT)
     {
@@ -75,7 +79,6 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
                 privateChatIntent.putExtra("userJWT", userJWT);
                 privateChatIntent.putExtra("chat", chatListAdapter.chatList.get(position));
 
-
                 startActivity(privateChatIntent);
             }
 
@@ -95,35 +98,21 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getJWTToken(), getContext());
     }
 
-    public void updateChatList(List<Chat> chatList)
-    {
-        chatListAdapter.chatList = chatList;
-
-        updateChatListVisibility();
-
-        if(chatList.size() > 0)
-            chatListAdapter.notifyItemChanged(0);
-    }
-
     private void updateChatListVisibility()
     {
         if(chatListAdapter.chatList == null || chatListAdapter.chatList.size() == 0)
         {
             welcomeBlock.setVisibility(View.VISIBLE);
             userChatList.setVisibility(View.INVISIBLE);
+            return;
         }
-        else
-        {
-            welcomeBlock.setVisibility(View.INVISIBLE);
-            userChatList.setVisibility(View.VISIBLE);
-        }
+        welcomeBlock.setVisibility(View.INVISIBLE);
+        userChatList.setVisibility(View.VISIBLE);
     }
 
-    public void onUserReceivedMessage(String messageRAW)
+    private void onUserReceivedMessage(Message message)
     {
         boolean isChatExist = false;
-        ModelMapper modelMapper = new ModelMapper();
-        Message message = modelMapper.map(new Gson().fromJson(messageRAW, MessageDTO.class), Message.class);
 
         for(int i = 0; i < chatListAdapter.chatList.size(); i++)
         {
@@ -149,12 +138,33 @@ public class ChatsFragment extends Fragment implements IFragmentActivity
         }
     }
 
-    public void addNewChat(Chat chat)
+    @Override
+    public void addChat(Chat chat)
     {
         chatListAdapter.chatList.add(0, chat);
         updateChatListVisibility();
 
         chatListAdapter.notifyItemInserted(0);
         chatListAdapter.notifyItemChanged(0);
+    }
+
+    @Override
+    public void updateChatList(List<Chat> chatList)
+    {
+        chatListAdapter.chatList = chatList;
+
+        updateChatListVisibility();
+
+        if(chatList.size() > 0)
+            chatListAdapter.notifyItemChanged(0);
+    }
+
+    @Override
+    public void onMessageReceived(String messageRAW)
+    {
+        ModelMapper modelMapper = new ModelMapper();
+        Message message = modelMapper.map(new Gson().fromJson(messageRAW, MessageDTO.class), Message.class);
+
+        onUserReceivedMessage(message);
     }
 }
