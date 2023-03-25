@@ -1,6 +1,7 @@
 package com.client.talkster.classes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Chat implements Serializable
@@ -12,7 +13,7 @@ public class Chat implements Serializable
     private String receiverFirstname;
     private String updatedAt;
 
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     public Chat() { }
 

@@ -1,32 +1,33 @@
 package com.client.talkster.adapters;
 
-import java.util.List;
-import java.util.Locale;
-import android.view.View;
-import com.client.talkster.R;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import com.client.talkster.classes.Chat;
-import com.client.talkster.classes.Message;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.client.talkster.R;
+import com.client.talkster.classes.Chat;
+import com.client.talkster.classes.Message;
 import com.google.android.material.imageview.ShapeableImageView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>
 {
-    private final long userID;
     public List<Chat> chatList;
     private final Context context;
     private final IChatClickListener IChatClickListener;
 
-    public ChatListAdapter(long userID, List<Chat> chatList, Context context, IChatClickListener IChatClickListener)
+    public ChatListAdapter(Context context, IChatClickListener IChatClickListener)
     {
-        this.userID = userID;
         this.context = context;
-        this.chatList = chatList;
+        this.chatList = new ArrayList<>();
         this.IChatClickListener = IChatClickListener;
     }
 
@@ -65,7 +66,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
                 case TEXT_MESSAGE:
                 {
                     holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.previewSecondaryText));
-                    holder.chatPreviewText.setText(String.format(Locale.getDefault(), "%s: %s", userID == lastMessage.getSenderID() ? "You" : chat.getReceiverFirstname(), lastMessage.getMessageContent()));
+                    holder.chatPreviewText.setText(lastMessage.getMessageContent());
                     break;
                 }
                 case AUDIO_MESSAGE:

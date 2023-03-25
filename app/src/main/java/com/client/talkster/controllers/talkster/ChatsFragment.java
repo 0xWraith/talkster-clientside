@@ -1,5 +1,7 @@
 package com.client.talkster.controllers.talkster;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,10 +13,8 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.ChatListAdapter;
@@ -24,33 +24,25 @@ import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.MessageDTO;
-import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IChatListener;
-import com.client.talkster.interfaces.IChatMessagesListener;
 import com.client.talkster.interfaces.IFragmentActivity;
-import com.client.talkster.utils.exceptions.UserUnauthorizedException;
+import com.client.talkster.utils.BundleExtraNames;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import org.modelmapper.ModelMapper;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import okhttp3.Call;
-import okhttp3.Response;
 
 public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener
 {
     private final UserJWT userJWT;
     private RecyclerView userChatList;
     private LinearLayout welcomeBlock;
+    private HashMap<Long, Chat> chatHashMap;
     private ChatListAdapter chatListAdapter;
-    private IChatMessagesListener iChatMessagesListener;
 
     public ChatsFragment(UserJWT userJWT)
     {
@@ -64,6 +56,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
+
         getUIElements(view);
         reloadUserChats();
 
@@ -73,16 +66,19 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     @Override
     public void getUIElements(View view)
     {
+        chatHashMap = new HashMap<>();
         welcomeBlock = view.findViewById(R.id.welcomeBlock);
         userChatList = view.findViewById(R.id.userChatList);
-        chatListAdapter = new ChatListAdapter(userJWT.getID(), new ArrayList<>(), getContext(), new ChatListAdapter.IChatClickListener() {
+
+        chatListAdapter = new ChatListAdapter(getContext(), new ChatListAdapter.IChatClickListener() {
             @Override
             public void onItemClick(int position, View v)
             {
+
                 Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
 
-                privateChatIntent.putExtra("userJWT", userJWT);
-                privateChatIntent.putExtra("chat", chatListAdapter.chatList.get(position));
+                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
+                privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chatListAdapter.chatList.get(position));
 
                 startActivity(privateChatIntent);
             }
@@ -92,9 +88,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
                 Log.d("Heh", "onItemLongClick pos = " + position);
             }
         });
-
         userChatList.setAdapter(chatListAdapter);
-        userChatList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     private void reloadUserChats()
@@ -117,36 +111,36 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
     private void onUserReceivedMessage(Message message)
     {
-        boolean isChatExist = false;
+        long chatID = message.getChatID();
 
-        for(int i = 0; i < chatListAdapter.chatList.size(); i++)
+        if(chatHashMap.containsKey(chatID))
         {
-            Chat chat = chatListAdapter.chatList.get(i);
+            Chat chat = chatHashMap.get(chatID);
+            int chatIndex = chatListAdapter.chatList.indexOf(chat);
 
-            if(chat.getId() != message.getChatID())
-                continue;
-
-            isChatExist = true;
             chat.getMessages().add(message);
-            Collections.swap(chatListAdapter.chatList, i, 0);
+            Collections.swap(chatListAdapter.chatList, chatIndex, 0);
 
-            chatListAdapter.notifyItemChanged(i);
-            chatListAdapter.notifyItemMoved(i, 0);
+            chatListAdapter.notifyItemChanged(chatIndex);
+            chatListAdapter.notifyItemMoved(chatIndex, 0);
 
-            break;
+            Intent intent = new Intent(BundleExtraNames.CHAT_RECEIVE_BROADCAST + chatID);
+            intent.putExtra(BundleExtraNames.CHAT_NEW_MESSAGE, message);
+            getActivity().sendBroadcast(intent);
+
+            return;
         }
 
-        if(!isChatExist)
-        {
-            APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-            apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getJWTToken());
-        }
+        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+        apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getJWTToken());
     }
 
     @Override
     public void addChat(Chat chat)
     {
+        chatHashMap.put(chat.getId(), chat);
         chatListAdapter.chatList.add(0, chat);
+
         updateChatListVisibility();
 
         chatListAdapter.notifyItemInserted(0);
@@ -156,8 +150,10 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     @Override
     public void updateChatList(List<Chat> chatList)
     {
-        chatListAdapter.chatList = chatList;
+        chatHashMap.clear();
 
+        chatListAdapter.chatList = chatList;
+        chatList.forEach(chat -> chatHashMap.put(chat.getId(), chat));
         updateChatListVisibility();
 
         if(chatList.size() > 0)
@@ -171,5 +167,11 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         Message message = modelMapper.map(new Gson().fromJson(messageRAW, MessageDTO.class), Message.class);
 
         onUserReceivedMessage(message);
+    }
+
+    @Override
+    public void onSendPrivateMessage(Message message)
+    {
+
     }
 }

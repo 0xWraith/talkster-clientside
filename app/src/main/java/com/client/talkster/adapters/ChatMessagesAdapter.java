@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.client.talkster.R;
 import com.client.talkster.classes.Message;
-import com.client.talkster.interfaces.IActivity;
-
 import java.util.List;
 
 public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -52,6 +50,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Message message = messages.get(position);
         ChatMessageViewHolder chatMessageViewHolder = (ChatMessageViewHolder) holder;
 
+        chatMessageViewHolder.chatMessageTime.setText(message.getOnlineTime());
         chatMessageViewHolder.chatMessageText.setText(message.getMessageContent());
     }
 
@@ -71,10 +70,12 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private abstract class ChatMessageViewHolder extends RecyclerView.ViewHolder
     {
         protected TextView chatMessageText;
+        protected TextView chatMessageTime;
         public ChatMessageViewHolder(@NonNull View itemView)
         {
             super(itemView);
             chatMessageText = itemView.findViewById(R.id.chatMessageText);
+            chatMessageTime = itemView.findViewById(R.id.chatMessageTime);
         }
     }
 

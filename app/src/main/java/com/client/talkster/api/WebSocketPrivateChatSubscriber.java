@@ -1,16 +1,7 @@
 package com.client.talkster.api;
 
 import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-
-import com.client.talkster.HomeActivity;
-import com.client.talkster.controllers.talkster.ChatsFragment;
-import com.client.talkster.interfaces.IChatMessagesListener;
+import com.client.talkster.interfaces.IChatWebSocketHandler;
 
 import rx.Subscriber;
 import ua.naiksoftware.stomp.client.StompMessage;
@@ -37,8 +28,9 @@ public class WebSocketPrivateChatSubscriber extends Subscriber<StompMessage>
     public void onNext(StompMessage stompMessage)
     {
         activity.runOnUiThread(() -> {
-            if(activity instanceof IChatMessagesListener)
-                ((IChatMessagesListener) activity).onMessageReceived(stompMessage.getPayload());
+
+            if(activity instanceof IChatWebSocketHandler)
+                ((IChatWebSocketHandler) activity).onMessageReceived(stompMessage.getPayload());
         });
     }
 }

@@ -70,6 +70,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         tools:listitem="@layout/component_chat_item"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:visibility="invisible"/>
 
 </RelativeLayout>

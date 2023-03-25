@@ -1,9 +1,12 @@
 package com.client.talkster;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,10 +24,11 @@ import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
+import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IChatListener;
-import com.client.talkster.interfaces.IChatMessagesListener;
+import com.client.talkster.interfaces.IChatWebSocketHandler;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -38,12 +42,8 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
-import rx.Subscriber;
-import ua.naiksoftware.stomp.Stomp;
-import ua.naiksoftware.stomp.client.StompClient;
-import ua.naiksoftware.stomp.client.StompMessage;
 
-public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatMessagesListener
+public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler
 {
     private UserJWT userJWT;
     private MapFragment mapFragment;
@@ -51,6 +51,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private IChatListener iChatListener;
     private ArrayList<Fragment> fragments;
     private APIStompWebSocket apiStompWebSocket;
+    private BroadcastReceiver sendMessageReceiver;
     private BottomNavigationView bottomNavigation;
 
     @Override
@@ -99,6 +100,33 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             return;
 
         userJWT = bundle.getParcelable(BundleExtraNames.USER_JWT);
+
+        Log.d("Talkfster", "UserJWT: " + new Gson().toJson(userJWT));
+
+        sendMessageReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                if (!intent.getAction().equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
+                    return;
+
+                MessageDTO messageDTO = (MessageDTO) intent.getExtras().get(BundleExtraNames.CHAT_NEW_MESSAGE);
+
+                Log.d("Talkster", "Sending message: " + new Gson().toJson(messageDTO));
+
+                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+            }
+        };
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
+        registerReceiver(sendMessageReceiver, filter);
+        Log.d("Talkster", "Registered receiver");
     }
 
     @Override
@@ -186,4 +214,10 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
     @Override
     public void onMessageReceived(String messageRAW) { iChatListener.onMessageReceived(messageRAW); }
+
+    @Override
+    public void onSendPrivateMessage(Message message)
+    {
+        Log.d("Talkster", "onSendPrivateMessage: " + message.toString());
+    }
 }

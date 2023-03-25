@@ -1,5 +1,10 @@
 package com.client.talkster.classes;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import com.client.talkster.utils.enums.MessageType;
 
 import java.io.Serializable;
@@ -15,6 +20,12 @@ public class Message implements Serializable
     private String messageTimestamp;
 
     public Message() { }
+
+    public String getOnlineTime()
+    {
+        String[] time = messageTimestamp.split("T")[1].split("\\.")[0].split(":");
+        return time[0] + ":" + time[1];
+    }
 
     public long getId() { return id; }
     public long getChatID() { return chatID; }
@@ -44,4 +55,36 @@ public class Message implements Serializable
                 ", messageTimestamp='" + messageTimestamp + '\'' +
                 '}';
     }
+
+    /*@Override
+    public int describeContents() { return 0; }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i)
+    {
+        parcel.writeLong(id);
+        parcel.writeLong(chatID);
+        parcel.writeLong(senderID);
+        parcel.writeLong(receiverID);
+        parcel.writeString(messageType.name());
+        parcel.writeString(messageContent);
+        parcel.writeString(messageTimestamp);
+    }
+
+    private Message(Parcel in)
+    {
+        id = in.readLong();
+        chatID = in.readLong();
+        senderID = in.readLong();
+        receiverID = in.readLong();
+        messageType = MessageType.valueOf(in.readString());
+        messageContent = in.readString();
+        messageTimestamp = in.readString();
+    }
+
+    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>()
+    {
+        public Message[] newArray(int size) { return new Message[size]; }
+        public Message createFromParcel(Parcel in) { return new Message(in); }
+    };*/
 }

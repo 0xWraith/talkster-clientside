@@ -2,7 +2,9 @@ package com.client.talkster.dto;
 
 import com.client.talkster.utils.enums.MessageType;
 
-public class MessageDTO
+import java.io.Serializable;
+
+public class MessageDTO implements Serializable
 {
     private long id;
     private long chatid;
