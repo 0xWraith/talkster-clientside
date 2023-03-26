@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,7 +33,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
     private String CHAT_BROADCAST = BundleExtraNames.CHAT_RECEIVE_BROADCAST;
     private UserJWT userJWT;
     private TextView userNameText;
-    private Button chatSendButton;
+    private ImageButton chatSendButton;
     private EditText chatInputText;
     private TextView userStatusText;
     private RecyclerView chatMessagesList;
