@@ -52,7 +52,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         }
         else
         {
-            holder.userAvatarImage.setImageResource(R.drawable.avatar_wireframe);
+            holder.userAvatarImage.setImageResource(R.drawable.baseline_account_circle_64);
             holder.userNameText.setText(chat.getReceiverName());
         }
 

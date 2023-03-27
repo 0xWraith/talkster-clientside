@@ -1,24 +1,32 @@
 package com.client.talkster;
 
-import okhttp3.Call;
+import static com.google.firebase.messaging.Constants.TAG;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
-import okhttp3.Response;
 import android.os.Bundle;
 import android.os.Handler;
-import java.io.IOException;
-import com.google.gson.Gson;
-import android.content.Intent;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
-import com.google.gson.JsonSyntaxException;
-import com.client.talkster.classes.UserJWT;
 import androidx.appcompat.app.AppCompatActivity;
-import com.client.talkster.utils.BundleExtraNames;
-import com.client.talkster.utils.UserAccountManager;
+
+import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.IntroductionScreenActivity;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IMainActivityScreen;
-import com.client.talkster.controllers.IntroductionScreenActivity;
+import com.client.talkster.utils.BundleExtraNames;
+import com.client.talkster.utils.UserAccountManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements IMainActivityScreen, IAPIResponseHandler
 {
@@ -31,6 +39,24 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         setContentView(R.layout.activity_main);
 
         UserAccountManager.getAccount(this);
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        Log.d(TAG, token);
+                        //Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
