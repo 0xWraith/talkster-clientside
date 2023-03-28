@@ -1,6 +1,8 @@
 package com.client.talkster;
 
 
+import static com.google.firebase.messaging.Constants.TAG;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.client.talkster.adapters.ViewPagerAdapter;
 import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.api.WebSocketPrivateChatSubscriber;
 import com.client.talkster.api.WebSocketPublicChatSubscriber;
@@ -25,13 +28,17 @@ import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
 import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.dto.TokenDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IChatWebSocketHandler;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -39,6 +46,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -46,6 +54,7 @@ import okhttp3.Response;
 public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler
 {
     private UserJWT userJWT;
+    private String FCMToken;
     private MapFragment mapFragment;
     private ViewPager2 homeViewPager;
     private IChatListener iChatListener;
@@ -118,6 +127,42 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
             }
         };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getToken();
+    }
+
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        if (Objects.equals(token, FCMToken)){
+                            return;
+                        }
+                        FCMToken = token;
+                        putToken();
+                    }
+                });
+    }
+
+    private void putToken(){
+        TokenDTO tokenDTO = new TokenDTO();
+        APIHandler<TokenDTO, HomeActivity> apiHandler = new APIHandler<>(this);
+        tokenDTO.setToken(FCMToken);
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN,tokenDTO,userJWT.getJWTToken());
+        Log.d(TAG, FCMToken);
+        Log.d(TAG, "FCM Token Posted!");
     }
 
     @Override

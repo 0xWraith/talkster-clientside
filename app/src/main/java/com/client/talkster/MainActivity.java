@@ -46,33 +46,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         UserAccountManager.getAccount(this);
     }
 
-    private void getToken(){
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-                        FCMToken = token;
-                        postToken();
-                    }
-                });
-    }
-
-    private void postToken(){
-        TokenDTO tokenDTO = new TokenDTO();
-        APIHandler<TokenDTO, MainActivity> apiHandler = new APIHandler<>(this);
-        tokenDTO.setToken(FCMToken);
-        apiHandler.apiPOST(TALKSTER_API_NOTIFICATION_ADD_TOKEN,tokenDTO,userJWT.getJWTToken());
-        Log.d(TAG, FCMToken);
-        Log.d(TAG, "Posted!");
-    }
-
     @Override
     public void showHomeScreen(UserJWT userJWT)
     {
@@ -132,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
             }
             UserJWT userJWT = new Gson().fromJson(responseBody, UserJWT.class);
             this.userJWT = userJWT;
-            getToken();
             runOnUiThread(() -> showHomeScreen(userJWT));
         }
         catch (IOException e) { e.printStackTrace(); }
