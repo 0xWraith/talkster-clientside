@@ -1,5 +1,6 @@
 package com.client.talkster;
 
+import static com.client.talkster.api.APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN;
 import static com.google.firebase.messaging.Constants.TAG;
 
 import android.content.Intent;
@@ -11,8 +12,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.IntroductionScreenActivity;
+import com.client.talkster.dto.TokenDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IMainActivityScreen;
 import com.client.talkster.utils.BundleExtraNames;
@@ -31,6 +34,8 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements IMainActivityScreen, IAPIResponseHandler
 {
     private final int SPLASH_DISPLAY_LENGTH = 750;
+    private String FCMToken = "";
+    private UserJWT userJWT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,7 +44,9 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         setContentView(R.layout.activity_main);
 
         UserAccountManager.getAccount(this);
+    }
 
+    private void getToken(){
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
@@ -51,12 +58,19 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
 
                         // Get new FCM registration token
                         String token = task.getResult();
-
-                        // Log and toast
-                        Log.d(TAG, token);
-                        //Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                        FCMToken = token;
+                        postToken();
                     }
                 });
+    }
+
+    private void postToken(){
+        TokenDTO tokenDTO = new TokenDTO();
+        APIHandler<TokenDTO, MainActivity> apiHandler = new APIHandler<>(this);
+        tokenDTO.setToken(FCMToken);
+        apiHandler.apiPOST(TALKSTER_API_NOTIFICATION_ADD_TOKEN,tokenDTO,userJWT.getJWTToken());
+        Log.d(TAG, FCMToken);
+        Log.d(TAG, "Posted!");
     }
 
     @Override
@@ -117,6 +131,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
                 return;
             }
             UserJWT userJWT = new Gson().fromJson(responseBody, UserJWT.class);
+            this.userJWT = userJWT;
+            getToken();
             runOnUiThread(() -> showHomeScreen(userJWT));
         }
         catch (IOException e) { e.printStackTrace(); }
