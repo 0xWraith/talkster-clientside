@@ -1,5 +1,7 @@
 package com.client.talkster.api;
 
+import static android.content.Intent.getIntent;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,13 +10,17 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 import com.client.talkster.MainActivity;
 import com.client.talkster.R;
+import com.client.talkster.classes.UserJWT;
+import com.client.talkster.utils.BundleExtraNames;
 import com.google.firebase.messaging.Constants;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -27,7 +33,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(Constants.TAG, "From: " + remoteMessage.getFrom());
+        //Log.d(Constants.TAG, "From: " + remoteMessage.getFrom());
 
         // Check if message contains a data payload.
         int senderId = 0;
@@ -47,10 +53,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
-        sendNotification(remoteMessage.getNotification().getBody(), senderId);
+        sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), senderId);
     }
 
-    private void sendNotification(String messageBody, int senderId) {
+    private void sendNotification(String notificationTitle, String notificationBody, int senderId) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -61,8 +67,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setContentTitle("Talkster")
-                        .setContentText(messageBody)
+                        .setContentTitle(notificationTitle)
+                        .setContentText(notificationBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
