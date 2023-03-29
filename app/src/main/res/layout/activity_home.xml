@@ -11,16 +11,16 @@
         android:id="@+id/homeViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-    
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/menu_bottom_nav"
-        app:labelVisibilityMode="unlabeled"
+        android:background="@color/erie_black2"
         app:itemIconTint="@color/menu_item_state"
-        android:background="@color/gunmetal">
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/menu_bottom_nav">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
