@@ -13,9 +13,11 @@ import com.client.talkster.R;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.interfaces.IFragmentActivity;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -85,7 +87,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
     @Override
     public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        map.addMarker(new MarkerOptions().position(new LatLng(48.1455199955928, 17.1055677834188)).title("Kleeat").icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar)).snippet("Send Message"));
+        map.addMarker(new MarkerOptions().position(new LatLng(48.150271251537944, 17.078185120415593)).title("Anna").icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar2)).snippet("Send Message"));
         try {
             // Customise the styling of the base map using a JSON object defined
             // in a raw resource file.
@@ -99,6 +102,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         } catch (Resources.NotFoundException e) {
             Log.e("Google Maps", "Can't find style. Error: ", e);
         }
+        LatLng bratislava = new LatLng(48.14735128521539, 17.107046097922943);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(bratislava, 10.0f));
     }
 
     @Override
