@@ -56,6 +56,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private UserJWT userJWT;
     private String FCMToken;
     private MapFragment mapFragment;
+    private PeoplesFragment peoplesFragment;
     private ViewPager2 homeViewPager;
     private IChatListener iChatListener;
     private ArrayList<Fragment> fragments;
@@ -78,7 +79,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     {
         mapFragment = new MapFragment(userJWT);
         ChatsFragment chatsFragment = new ChatsFragment(userJWT);
-        PeoplesFragment peoplesFragment = new PeoplesFragment();
+        peoplesFragment = new PeoplesFragment(userJWT);
 
         iChatListener = chatsFragment;
         homeViewPager = findViewById(R.id.homeViewPager);
@@ -93,7 +94,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private void initializeSocketConnection()
     {
         apiStompWebSocket = new APIStompWebSocket();
-        mapFragment.apiStompWebSocket = apiStompWebSocket;
+        peoplesFragment.apiStompWebSocket = apiStompWebSocket;
 
         apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
         apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", new WebSocketPrivateChatSubscriber(this));

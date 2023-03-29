@@ -34,6 +34,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
     private UserJWT userJWT;
     private TextView userNameText;
     private ImageButton chatSendButton;
+    private ImageButton backButton;
     private EditText chatInputText;
     private TextView userStatusText;
     private RecyclerView chatMessagesList;
@@ -58,6 +59,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
         userNameText = findViewById(R.id.userNameText);
         chatInputText = findViewById(R.id.chatInputText);
         chatSendButton = findViewById(R.id.chatSendButton);
+        backButton = findViewById(R.id.backButton);
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
@@ -93,6 +95,13 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
             Intent intent = new Intent(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
             intent.putExtra(BundleExtraNames.CHAT_NEW_MESSAGE, messageDTO);
             sendBroadcast(intent);
+        });
+
+        backButton.setOnClickListener(view ->
+        {
+            Intent homeIntent = new Intent(PrivateChatActivity.this, HomeActivity.class);
+            homeIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
+           startActivity(homeIntent);
         });
     }
 

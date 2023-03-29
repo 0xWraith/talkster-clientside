@@ -29,10 +29,6 @@ import ua.naiksoftware.stomp.client.StompClient;
 public class MapFragment extends Fragment implements IFragmentActivity
 {
     private UserJWT userJWT;
-    private EditText receiverInput;
-    private Button sendMessageButton;
-    private EditText sendMessageInput;
-    public APIStompWebSocket apiStompWebSocket;
 
     public MapFragment(UserJWT userJWT)
     {
@@ -57,30 +53,6 @@ public class MapFragment extends Fragment implements IFragmentActivity
     @Override
     public void getUIElements(View view)
     {
-        receiverInput = view.findViewById(R.id.receiverInput);
-        sendMessageInput = view.findViewById(R.id.sendMessageInput);
-        sendMessageButton = view.findViewById(R.id.sendMessageButton);
 
-        sendMessageButton.setOnClickListener(view1 -> {
-
-            MessageDTO messageDTO = new MessageDTO();
-
-            messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getJWTToken());
-            messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
-            messageDTO.setmessagecontent(sendMessageInput.getText().toString());
-
-            if(receiverInput.getText().toString().length() > 0)
-                messageDTO.setreceiverid(Long.parseLong(receiverInput.getText().toString()));
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
-
-            if(receiverInput.getText().toString().length() == 0)
-                apiStompWebSocket.getWebSocketClient().send("/app/message", new Gson().toJson(messageDTO)).subscribe();
-            else
-                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
-
-        });
     }
 }
