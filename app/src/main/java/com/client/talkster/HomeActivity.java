@@ -1,20 +1,31 @@
 package com.client.talkster;
 
 
+import static com.google.firebase.messaging.Constants.TAG;
+
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.client.talkster.adapters.ViewPagerAdapter;
 import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.api.WebSocketPrivateChatSubscriber;
 import com.client.talkster.api.WebSocketPublicChatSubscriber;
@@ -25,13 +36,17 @@ import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
 import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.dto.TokenDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IChatWebSocketHandler;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -39,6 +54,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -46,13 +62,21 @@ import okhttp3.Response;
 public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler
 {
     private UserJWT userJWT;
+    private String FCMToken;
     private MapFragment mapFragment;
+    private ChatsFragment chatsFragment;
+    private PeoplesFragment peoplesFragment;
     private ViewPager2 homeViewPager;
     private IChatListener iChatListener;
     private ArrayList<Fragment> fragments;
     private APIStompWebSocket apiStompWebSocket;
     private BroadcastReceiver sendMessageReceiver;
     private BottomNavigationView bottomNavigation;
+    private FragmentManager fragmentManager;
+    private View rightPager;
+    private View leftPager;
+    private int currentPosition = 0, MIN_DISTANCE = 300;
+    private float x1, x2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -68,23 +92,27 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     public void getUIElements()
     {
         mapFragment = new MapFragment(userJWT);
-        ChatsFragment chatsFragment = new ChatsFragment(userJWT);
-        PeoplesFragment peoplesFragment = new PeoplesFragment();
+        chatsFragment = new ChatsFragment(userJWT);
+        peoplesFragment = new PeoplesFragment(userJWT);
 
         iChatListener = chatsFragment;
-        homeViewPager = findViewById(R.id.homeViewPager);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
+        leftPager = findViewById(R.id.leftPager);
+        rightPager = findViewById(R.id.rightPager);
+
         fragments = new ArrayList<>(Arrays.asList(chatsFragment, mapFragment, peoplesFragment));
+        fragmentManager = getSupportFragmentManager();
 
         initializeBottomNavigation();
+        initPager();
         initializeSocketConnection();
     }
 
     private void initializeSocketConnection()
     {
         apiStompWebSocket = new APIStompWebSocket();
-        mapFragment.apiStompWebSocket = apiStompWebSocket;
+        peoplesFragment.apiStompWebSocket = apiStompWebSocket;
 
         apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
         apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", new WebSocketPrivateChatSubscriber(this));
@@ -118,6 +146,42 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
             }
         };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getToken();
+    }
+
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        if (Objects.equals(token, FCMToken)){
+                            return;
+                        }
+                        FCMToken = token;
+                        putToken();
+                    }
+                });
+    }
+
+    private void putToken(){
+        TokenDTO tokenDTO = new TokenDTO();
+        APIHandler<TokenDTO, HomeActivity> apiHandler = new APIHandler<>(this);
+        tokenDTO.setToken(FCMToken);
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN,tokenDTO,userJWT.getJWTToken());
+        Log.d(TAG, FCMToken);
+        Log.d(TAG, "FCM Token Posted!");
     }
 
     @Override
@@ -168,49 +232,105 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
     private void initializeBottomNavigation()
     {
-
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
-        homeViewPager.setAdapter(viewPagerAdapter);
-
-        homeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback()
-        {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { super.onPageScrolled(position, positionOffset, positionOffsetPixels); }
-            @Override
-            public void onPageSelected(int position)
-            {
-                int ID = -1;
-                switch(position)
-                {
-                    case 0:
-                        ID = R.id.chatMenuID;
-                        break;
-                    case 1:
-                        ID = R.id.mapMenuID;
-                        break;
-                    case 2:
-                        ID = R.id.peoplesMenuID;
-                }
-                bottomNavigation.setSelectedItemId(ID);
-                super.onPageSelected(position);
-            }
-        });
+        replaceFragment(chatsFragment);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int ID = item.getItemId();
 
-            if(ID == R.id.chatMenuID)
-                homeViewPager.setCurrentItem(0);
-
-            else if(ID == R.id.mapMenuID)
-                homeViewPager.setCurrentItem(1);
-
-            else if(ID == R.id.peoplesMenuID)
-                homeViewPager.setCurrentItem(2);
-
+            if (ID == R.id.chatMenuID) {
+                currentPosition = 0;
+                replaceFragment(chatsFragment);
+            }
+            else if (ID == R.id.mapMenuID){
+                currentPosition = 1;
+                replaceFragment(mapFragment);
+            }
+            else if(ID == R.id.peoplesMenuID) {
+                currentPosition = 2;
+                replaceFragment(peoplesFragment);
+            }
             return true;
         });
     }
+
+    private void selectNavigationButton(){
+        switch (currentPosition){
+            case 0:
+                bottomNavigation.setSelectedItemId(R.id.chatMenuID);
+                break;
+            case 1:
+                bottomNavigation.setSelectedItemId(R.id.mapMenuID);
+                break;
+            case 2:
+                bottomNavigation.setSelectedItemId(R.id.peoplesMenuID);
+                break;
+
+        }
+    }
+
+    private void replaceFragment(Fragment fragment){
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentLayout,fragment);
+        fragmentTransaction.commit();
+    }
+
+    private void initPager(){
+        leftPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x2 - x1;
+                        if (deltaX > MIN_DISTANCE)
+                        {
+                            Toast.makeText(getApplicationContext(), "left2right swipe", Toast.LENGTH_SHORT).show ();
+                            currentPosition--;
+                            if(currentPosition <= 0){
+                                currentPosition = 0;
+                            }
+                            selectNavigationButton();
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
+        rightPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x1 - x2;
+                        if (deltaX > MIN_DISTANCE)
+                        {
+                            Toast.makeText(getApplicationContext(), "right2left swipe", Toast.LENGTH_SHORT).show ();
+                            currentPosition++;
+                            if(currentPosition >= 2){
+                                currentPosition = 2;
+                            }
+                            selectNavigationButton();
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
 
     @Override
     public void onMessageReceived(String messageRAW) { iChatListener.onMessageReceived(messageRAW); }

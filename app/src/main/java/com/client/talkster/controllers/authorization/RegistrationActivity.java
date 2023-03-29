@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
@@ -40,7 +41,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
 
     private UserJWT userJWT;
     private Vibrator vibrator;
-    private Button continueButton;
+    private ImageButton continueButton;
     private EditText lastNameInput;
     private EditText firstNameInput;
     private AuthenticationDTO authenticationDTO;

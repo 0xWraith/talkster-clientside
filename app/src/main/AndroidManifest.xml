@@ -18,6 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Talkster">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCwopNDQABzQ3EwvREKWwmArWhagFdf54k"></meta-data>
         <activity
             android:name=".PrivateChatActivity"
             android:exported="false"

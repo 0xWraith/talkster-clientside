@@ -1,47 +1,42 @@
 package com.client.talkster.controllers.talkster;
 
-import android.os.Build;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 
 import com.client.talkster.R;
-import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.UserJWT;
-import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
-import com.client.talkster.utils.enums.MessageType;
-import com.google.gson.Gson;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import ua.naiksoftware.stomp.StompHeader;
-import ua.naiksoftware.stomp.client.StompClient;
-
-public class MapFragment extends Fragment implements IFragmentActivity
+public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback
 {
     private UserJWT userJWT;
-    private EditText receiverInput;
-    private Button sendMessageButton;
-    private EditText sendMessageInput;
-    public APIStompWebSocket apiStompWebSocket;
+    private MapView mapView;
 
     public MapFragment(UserJWT userJWT)
     {
         this.userJWT = userJWT;
     }
-
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private Bundle mapViewBundle = null;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
     }
 
@@ -50,37 +45,82 @@ public class MapFragment extends Fragment implements IFragmentActivity
     {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         getUIElements(view);
-
+        initGooglemaps(savedInstanceState);
         return view;
+    }
+
+    private void initGooglemaps(Bundle savedInstanceState){
+        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
+        // objects or sub-Bundles.
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+
+        mapView.onCreate(mapViewBundle);
+
+        mapView.getMapAsync(this);
     }
 
     @Override
     public void getUIElements(View view)
     {
-        receiverInput = view.findViewById(R.id.receiverInput);
-        sendMessageInput = view.findViewById(R.id.sendMessageInput);
-        sendMessageButton = view.findViewById(R.id.sendMessageButton);
+        mapView = (MapView) view.findViewById(R.id.mapView);
+    }
 
-        sendMessageButton.setOnClickListener(view1 -> {
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
 
-            MessageDTO messageDTO = new MessageDTO();
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
 
-            messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getJWTToken());
-            messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
-            messageDTO.setmessagecontent(sendMessageInput.getText().toString());
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
 
-            if(receiverInput.getText().toString().length() > 0)
-                messageDTO.setreceiverid(Long.parseLong(receiverInput.getText().toString()));
+    @Override
+    public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(new LatLng(48.1455199955928, 17.1055677834188)).title("Kleeat").icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar)).snippet("Send Message"));
+        map.addMarker(new MarkerOptions().position(new LatLng(48.150271251537944, 17.078185120415593)).title("Anna").icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar2)).snippet("Send Message"));
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = map.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            getContext(), R.raw.style_light));
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
+            if (!success) {
+                Log.e("Google Maps", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("Google Maps", "Can't find style. Error: ", e);
+        }
+        LatLng bratislava = new LatLng(48.14735128521539, 17.107046097922943);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(bratislava, 10.0f));
+    }
 
-            if(receiverInput.getText().toString().length() == 0)
-                apiStompWebSocket.getWebSocketClient().send("/app/message", new Gson().toJson(messageDTO)).subscribe();
-            else
-                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+    @Override
+    public void onPause() {
+        mapView.onPause();
+        super.onPause();
+    }
 
-        });
+    @Override
+    public void onDestroy() {
+        mapView.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 }
