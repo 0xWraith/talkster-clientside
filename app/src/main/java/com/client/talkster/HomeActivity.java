@@ -72,10 +72,10 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private APIStompWebSocket apiStompWebSocket;
     private BroadcastReceiver sendMessageReceiver;
     private BottomNavigationView bottomNavigation;
-    private FragmentManager fragmentManager;
     private View rightPager;
     private View leftPager;
-    private int currentPosition = 0, MIN_DISTANCE = 300;
+    private int currentPosition = 0;
+    private final int MIN_DISTANCE = 300;
     private float x1, x2;
 
     @Override
@@ -96,13 +96,14 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         peoplesFragment = new PeoplesFragment(userJWT);
 
         iChatListener = chatsFragment;
+        homeViewPager = findViewById(R.id.homeViewPager);
+        homeViewPager.setUserInputEnabled(false);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
         leftPager = findViewById(R.id.leftPager);
         rightPager = findViewById(R.id.rightPager);
 
         fragments = new ArrayList<>(Arrays.asList(chatsFragment, mapFragment, peoplesFragment));
-        fragmentManager = getSupportFragmentManager();
 
         initializeBottomNavigation();
         initPager();
@@ -232,22 +233,23 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
     private void initializeBottomNavigation()
     {
-        replaceFragment(chatsFragment);
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, fragments);
+        homeViewPager.setAdapter(viewPagerAdapter);
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int ID = item.getItemId();
 
             if (ID == R.id.chatMenuID) {
                 currentPosition = 0;
-                replaceFragment(chatsFragment);
+                homeViewPager.setCurrentItem(0);
             }
             else if (ID == R.id.mapMenuID){
                 currentPosition = 1;
-                replaceFragment(mapFragment);
+                homeViewPager.setCurrentItem(1);
             }
             else if(ID == R.id.peoplesMenuID) {
                 currentPosition = 2;
-                replaceFragment(peoplesFragment);
+                homeViewPager.setCurrentItem(2);
             }
             return true;
         });
@@ -268,13 +270,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         }
     }
 
-    private void replaceFragment(Fragment fragment){
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentLayout,fragment);
-        fragmentTransaction.commit();
-    }
-
     private void initPager(){
         leftPager.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -288,15 +283,12 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                     case MotionEvent.ACTION_UP:
                         x2 = event.getX();
                         float deltaX = x2 - x1;
-                        if (deltaX > MIN_DISTANCE)
-                        {
-                            Toast.makeText(getApplicationContext(), "left2right swipe", Toast.LENGTH_SHORT).show ();
+                        if (deltaX > MIN_DISTANCE) {
                             currentPosition--;
                             if(currentPosition <= 0){
                                 currentPosition = 0;
                             }
-                            selectNavigationButton();
-                        }
+                            selectNavigationButton();}
                         break;
                 }
                 return true;
@@ -315,22 +307,18 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                     case MotionEvent.ACTION_UP:
                         x2 = event.getX();
                         float deltaX = x1 - x2;
-                        if (deltaX > MIN_DISTANCE)
-                        {
-                            Toast.makeText(getApplicationContext(), "right2left swipe", Toast.LENGTH_SHORT).show ();
+                        if (deltaX > MIN_DISTANCE) {
                             currentPosition++;
                             if(currentPosition >= 2){
                                 currentPosition = 2;
                             }
-                            selectNavigationButton();
-                        }
+                            selectNavigationButton();}
                         break;
                 }
                 return true;
             }
         });
     }
-
 
     @Override
     public void onMessageReceived(String messageRAW) { iChatListener.onMessageReceived(messageRAW); }
