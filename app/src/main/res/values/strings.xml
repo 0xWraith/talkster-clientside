@@ -29,5 +29,7 @@
     <string name="audio_message">Audio message</string>
     <string name="photo">Photo</string>
     <string name="message">Message</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
     <string name="mail_info">We’ve sent a mail with activation code to your mail \n %s</string>
 </resources>
