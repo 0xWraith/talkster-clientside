@@ -1,15 +1,28 @@
 package com.client.talkster;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +34,7 @@ import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.enums.MessageType;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import org.modelmapper.ModelMapper;
 
@@ -32,16 +46,15 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
     private Chat chat;
     private String CHAT_BROADCAST = BundleExtraNames.CHAT_RECEIVE_BROADCAST;
     private UserJWT userJWT;
-    private TextView userNameText;
-    private ImageButton chatSendButton;
-    private ImageButton backButton;
+    private TextView userNameText, userStatusText;
+    private ImageButton chatSendButton, backButton, mediaButton, closeMediaButton;
+    private Button galleryButton, cameraButton;
     private EditText chatInputText;
-    private TextView userStatusText;
     private RecyclerView chatMessagesList;
     private BroadcastReceiver messageReceiver;
     private ChatMessagesAdapter chatMessagesAdapter;
     private LinearLayoutManager recyclerLayoutManager;
-
+    private ConstraintLayout mediaChooserLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,6 +66,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
         getUIElements();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void getUIElements()
     {
@@ -60,9 +74,14 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
         chatInputText = findViewById(R.id.chatInputText);
         chatSendButton = findViewById(R.id.chatSendButton);
         backButton = findViewById(R.id.backButton);
+        mediaButton = findViewById(R.id.mediaButton);
+        closeMediaButton = findViewById(R.id.closeMediaButton);
+        galleryButton = findViewById(R.id.galleryButton);
+        cameraButton = findViewById(R.id.cameraButton);
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
+        mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
 
         userNameText.setText(chat.getReceiverName());
         userStatusText.setText("last seen at 12:35");
@@ -103,6 +122,34 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
             homeIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
            startActivity(homeIntent);
         });
+
+        mediaButton.setOnClickListener(view ->
+        {
+            mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
+        });
+
+        closeMediaButton.setOnClickListener(view -> {
+            mediaChooserLayout.animate().translationY(0).setDuration(250);
+        });
+
+        cameraButton.setOnClickListener(view -> {
+            mediaChooserLayout.animate().translationY(0).setDuration(250);
+            ImagePicker.Companion.with(PrivateChatActivity.this)
+                    .cameraOnly()
+                    .cropSquare()
+                    .maxResultSize(1024,1024)
+                    .start();
+        });
+
+        galleryButton.setOnClickListener(view -> {
+            mediaChooserLayout.animate().translationY(0).setDuration(250);
+            ImagePicker.Companion.with(PrivateChatActivity.this)
+                    .galleryOnly()
+                    .cropSquare()
+                    .maxResultSize(1024,1024)
+                    .start();
+        });
+        
     }
 
     private void addMessage(Message message)
