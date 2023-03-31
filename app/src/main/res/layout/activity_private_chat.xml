@@ -8,6 +8,74 @@
     android:background="@color/erie_black"
     tools:context=".PrivateChatActivity">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatMessagesList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view3"
+        app:reverseLayout="false"
+        app:stackFromEnd="true"
+        tools:listitem="@layout/component_chat_message_receiver">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mediaChooserLayout"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        android:background="@drawable/drawable_rounded_top"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chatMessagesList">
+
+        <ImageButton
+            android:id="@+id/closeMediaButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/close_24"
+            app:tint="@android:color/white" />
+
+        <Button
+            android:id="@+id/cameraButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:drawableTop="@drawable/camera_48"
+            android:drawableTint="@android:color/white"
+            android:text="@string/camera"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/galleryButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/galleryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:drawableTop="@drawable/image_48"
+            android:drawableTint="@android:color/white"
+            android:text="@string/gallery"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/cameraButton"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <View
         android:id="@+id/view"
         android:layout_width="0dp"
@@ -39,21 +107,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chatSendButton"
         app:layout_constraintStart_toEndOf="@+id/mediaButton" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chatMessagesList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view3"
-        app:reverseLayout="false"
-        app:stackFromEnd="true"
-        tools:listitem="@layout/component_chat_message_receiver">
-
-    </androidx.recyclerview.widget.RecyclerView>
 
     <View
         android:id="@+id/view3"

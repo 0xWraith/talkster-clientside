@@ -38,6 +38,19 @@
     <color name="aquamarine">#FF05F0B9</color>
     <color name="aquamarine_dark">#FF04C89A</color>
 
+    <color name="ucrop_color_toolbar">@color/gunmetal</color>
+    <color name="ucrop_color_statusbar">@color/gunmetal</color>
+    <color name="ucrop_color_widget_active">@color/aquamarine_dark</color>
+    <color name="ucrop_color_widget_text">@color/gunmetal</color>
+    <color name="ucrop_color_active_controls_color">@color/aquamarine_dark</color>
+    <color name="ucrop_color_toolbar_widget">@android:color/white</color>
+    <color name="ucrop_color_widget_rotate_mid_line">@color/gunmetal</color>
+    <color name="ucrop_color_widget_background">@color/gunmetal</color>
+    <color name="ucrop_color_crop_background">@color/erie_black2</color>
+    <color name="ucrop_color_inactive_controls_color">@android:color/white</color>
+    <color name="ucrop_color_progress_wheel_line">@android:color/white</color>
+    <color name="ucrop_color_white">@color/gunmetal</color>
+
     <color name="transparent">#00000000</color>
 
 </resources>
