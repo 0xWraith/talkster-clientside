@@ -95,6 +95,9 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
                 throw new IOException("Unexpected response " + response);
 
             String responseBody = response.body().string();
+
+            Log.d("Talkster", "Response body: " + responseBody);
+
             UserJWT userJWT = new Gson().fromJson(responseBody, UserJWT.class);
             Intent mailConfirmationIntent = new Intent(this, MailConfirmationActivity.class);
 
