@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -234,7 +236,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             fileContent.setContent(FileUtils.getBytes(uri, cr));
             fileContent.setType(FileUtils.getType(uri, cr));
             fileContent.setFilename(FileUtils.getFilename(uri, cr));
-            apiHandler.apiMultipartPUT(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE,fileContent,userJWT.getJWTToken());
+            apiHandler.apiMultipartPUT(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE,fileContent, userJWT.getAccessToken());
         } catch (IOException e){
             System.out.println("This Exception was thrown inside the sendImage method");
             e.printStackTrace();

@@ -102,7 +102,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
     private void getProfilePicture(){
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE, userJWT.getJWTToken());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE, userJWT.getAccessToken());
     }
 
     public void setProfilePicture(Bitmap bitmap){
