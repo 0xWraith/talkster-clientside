@@ -34,7 +34,6 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements IMainActivityScreen, IAPIResponseHandler
 {
     private final int SPLASH_DISPLAY_LENGTH = 750;
-    private String FCMToken = "";
     private UserJWT userJWT;
 
     @Override
