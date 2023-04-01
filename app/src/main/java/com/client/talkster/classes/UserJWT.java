@@ -3,28 +3,24 @@ package com.client.talkster.classes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-
-import java.io.Serializable;
-
 public class UserJWT implements Parcelable
 {
     private long id;
-    private String jwttoken;
-    private String refresh_token;
+    private String accessToken;
+    private String refreshToken;
 
     private UserJWT(Parcel in)
     {
         id = in.readLong();
-        jwttoken = in.readString();
-        refresh_token = in.readString();
+        accessToken = in.readString();
+        refreshToken = in.readString();
     }
 
-    public UserJWT(long id, String jwttoken, String refresh_token)
+    public UserJWT(long id, String accessToken, String refreshToken)
     {
         this.id = id;
-        this.jwttoken = jwttoken;
-        this.refresh_token = refresh_token;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     public static final Parcelable.Creator<UserJWT> CREATOR = new Parcelable.Creator<UserJWT>()
@@ -37,28 +33,27 @@ public class UserJWT implements Parcelable
     public void writeToParcel(Parcel dest, int flags)
     {
         dest.writeLong(id);
-        dest.writeString(jwttoken);
-        dest.writeString(refresh_token);
+        dest.writeString(accessToken);
+        dest.writeString(refreshToken);
     }
 
     @Override
     public int describeContents() { return 0; }
 
     public long getID() { return id; }
-    public String getJWTToken() { return jwttoken; }
+    public String getAccessToken() { return accessToken; }
+    public String getRefreshToken() { return refreshToken; }
 
-    public String getRefreshToken() { return refresh_token; }
     public void setID(long id) { this.id = id; }
-    public void setJWTToken(String jwttoken) { this.jwttoken = jwttoken; }
-
-    public void setRefreshToken(String refresh_token) { this.refresh_token = refresh_token; }
+    public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
+    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
 
     @Override
     public String toString() {
         return "UserJWT{" +
                 "id=" + id +
-                ", jwttoken='" + jwttoken + '\'' +
-                ", refreshToken='" + refresh_token + '\'' +
+                ", access_token='" + accessToken + '\'' +
+                ", refreshToken='" + refreshToken + '\'' +
                 '}';
     }
 }

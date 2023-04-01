@@ -48,7 +48,6 @@ public class APIHandler<T, V>
                 if(activity instanceof IAPIResponseHandler)
                     responseHandler = (IAPIResponseHandler) activity;
 
-                Log.d("APIHandler", "onFailure: " + e.getMessage());
                 responseHandler.onFailure(call, e, apiUrl);
             }
 
@@ -58,7 +57,6 @@ public class APIHandler<T, V>
                 if(activity instanceof IAPIResponseHandler)
                     responseHandler = (IAPIResponseHandler) activity;
 
-                Log.d("APIHandler", apiUrl + " onResponse: " + response);
                 responseHandler.onResponse(call, response, apiUrl);
             }
         });
@@ -85,7 +83,6 @@ public class APIHandler<T, V>
                 if(activity instanceof IAPIResponseHandler)
                     responseHandler = (IAPIResponseHandler) activity;
 
-                Log.d("APIHandler", "onFailure: " + e.getMessage());
                 responseHandler.onFailure(call, e, apiUrl);
             }
 
@@ -95,7 +92,6 @@ public class APIHandler<T, V>
                 if(activity instanceof IAPIResponseHandler)
                     responseHandler = (IAPIResponseHandler) activity;
 
-                Log.d("APIHandler", apiUrl + " onResponse: " + response);
                 responseHandler.onResponse(call, response, apiUrl);
             }
         });
@@ -163,7 +159,6 @@ public class APIHandler<T, V>
                 if(activity instanceof IAPIResponseHandler)
                     responseHandler = (IAPIResponseHandler) activity;
 
-                Log.d("APIHandler", "onFailure: " + e.getMessage());
                 responseHandler.onFailure(call, e, apiUrl);
             }
 
@@ -173,7 +168,6 @@ public class APIHandler<T, V>
                 if(activity instanceof IAPIResponseHandler)
                     responseHandler = (IAPIResponseHandler) activity;
 
-                Log.d("APIHandler", apiUrl + " onResponse: " + response);
                 responseHandler.onResponse(call, response, apiUrl);
             }
         });

@@ -78,7 +78,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
             MessageDTO messageDTO = new MessageDTO();
 
             messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getJWTToken());
+            messageDTO.setjwttoken(userJWT.getAccessToken());
             messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
             messageDTO.setmessagecontent(sendMessageInput.getText().toString());
 

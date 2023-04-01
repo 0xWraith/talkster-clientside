@@ -1,8 +1,7 @@
 package com.client.talkster;
 
 
-import static com.google.firebase.messaging.Constants.TAG;
-
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,19 +9,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.client.talkster.adapters.ViewPagerAdapter;
@@ -31,22 +26,27 @@ import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.api.WebSocketPrivateChatSubscriber;
 import com.client.talkster.api.WebSocketPublicChatSubscriber;
+import com.client.talkster.api.WebSocketPublicMapSubscriber;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
+import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
+import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.dto.TokenDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IChatWebSocketHandler;
+import com.client.talkster.interfaces.IMapGPSPositionUpdate;
+import com.client.talkster.interfaces.IMapWebSocketHandler;
+import com.client.talkster.services.LocationService;
 import com.client.talkster.utils.BundleExtraNames;
+import com.client.talkster.utils.PermissionChecker;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -63,8 +63,9 @@ import java.util.Objects;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler
+public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler, IMapWebSocketHandler
 {
+    private User user;
     private UserJWT userJWT;
     private String FCMToken;
     private MapFragment mapFragment;
@@ -72,6 +73,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private PeoplesFragment peoplesFragment;
     private ViewPager2 homeViewPager;
     private IChatListener iChatListener;
+    private IMapGPSPositionUpdate iMapGPSPositionUpdate;
     private ArrayList<Fragment> fragments;
     private APIStompWebSocket apiStompWebSocket;
     private BroadcastReceiver sendMessageReceiver;
@@ -100,6 +102,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         peoplesFragment = new PeoplesFragment(userJWT);
 
         iChatListener = chatsFragment;
+        iMapGPSPositionUpdate = mapFragment;
+
         homeViewPager = findViewById(R.id.homeViewPager);
         homeViewPager.setUserInputEnabled(false);
         bottomNavigation = findViewById(R.id.bottomNavigation);
@@ -112,6 +116,11 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         initializeBottomNavigation();
         initPager();
         initializeSocketConnection();
+
+        Intent intent = new Intent(this, LocationService.class);
+        intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
+        startService(intent);
+
     }
 
     private void initializeSocketConnection()
@@ -121,6 +130,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
         apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", new WebSocketPrivateChatSubscriber(this));
+        apiStompWebSocket.addTopic("/map/public", new WebSocketPublicMapSubscriber(this));
+
         apiStompWebSocket.connect();
     }
 
@@ -132,70 +143,72 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         if(bundle.isEmpty())
             return;
 
+        user = bundle.getParcelable(BundleExtraNames.USER);
         userJWT = bundle.getParcelable(BundleExtraNames.USER_JWT);
-
-        Log.d("Talkfster", "UserJWT: " + new Gson().toJson(userJWT));
 
         sendMessageReceiver = new BroadcastReceiver()
         {
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                if (!intent.getAction().equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
-                    return;
+                String action = intent.getAction();
 
-                MessageDTO messageDTO = (MessageDTO) intent.getExtras().get(BundleExtraNames.CHAT_NEW_MESSAGE);
+                if(action.equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
+                {
+                    MessageDTO messageDTO = (MessageDTO) intent.getExtras().get(BundleExtraNames.CHAT_NEW_MESSAGE);
+                    apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+                }
+                else if(action.equals(BundleExtraNames.LOCATION_SERVICE_BROADCAST))
+                {
+                    Location location = (Location) intent.getExtras().get(BundleExtraNames.LOCATION_SERVICE_POSITION);
 
-                Log.d("Talkster", "Sending message: " + new Gson().toJson(messageDTO));
+                    iMapGPSPositionUpdate.onMapGPSPositionUserUpdate(location);
 
-                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+                    LocationDTO locationDTO = new LocationDTO(userJWT.getID(), user.getFullName(), userJWT.getAccessToken(), location);
+                    apiStompWebSocket.getWebSocketClient().send("/app/map", new Gson().toJson(locationDTO)).subscribe();
+                }
             }
         };
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
         getToken();
     }
 
-    private void getToken(){
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
+    private void getToken()
+    {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task ->
+        {
+            if (!task.isSuccessful())
+                return;
 
-                        // Get new FCM registration token
-                        String token = task.getResult();
-                        if (Objects.equals(token, FCMToken)){
-                            return;
-                        }
-                        FCMToken = token;
-                        putToken();
-                    }
-                });
+            String token = task.getResult();
+
+            if (Objects.equals(token, FCMToken))
+                return;
+
+            FCMToken = token;
+            putToken();
+        });
     }
 
-    private void putToken(){
+    private void putToken()
+    {
         TokenDTO tokenDTO = new TokenDTO();
         APIHandler<TokenDTO, HomeActivity> apiHandler = new APIHandler<>(this);
         tokenDTO.setToken(FCMToken);
-        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN,tokenDTO,userJWT.getJWTToken());
-        Log.d(TAG, FCMToken);
-        Log.d(TAG, "FCM Token Posted!");
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN, tokenDTO, userJWT.getAccessToken());
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        IntentFilter filter = new IntentFilter(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
-        registerReceiver(sendMessageReceiver, filter);
-        Log.d("Talkster", "Registered receiver");
+        registerReceiver(sendMessageReceiver, new IntentFilter(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST));
+        registerReceiver(sendMessageReceiver, new IntentFilter(BundleExtraNames.LOCATION_SERVICE_BROADCAST));
     }
 
     @Override
@@ -338,8 +351,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     public void onMessageReceived(String messageRAW) { iChatListener.onMessageReceived(messageRAW); }
 
     @Override
-    public void onSendPrivateMessage(Message message)
-    {
-        Log.d("Talkster", "onSendPrivateMessage: " + message.toString());
-    }
+    @Deprecated
+    public void onSendPrivateMessage(Message message) { }
+
+    @Override
+    public void onMapMessageReceived(String locationRAW) { iMapGPSPositionUpdate.onMapGPSPositionUpdate(locationRAW); }
 }

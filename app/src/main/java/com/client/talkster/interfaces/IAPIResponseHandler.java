@@ -9,6 +9,6 @@ import okhttp3.Response;
 
 public interface IAPIResponseHandler
 {
-    void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl);
     void onResponse(@NonNull Call call, @NonNull Response response, @NonNull String apiUrl);
+    void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl);
 }
