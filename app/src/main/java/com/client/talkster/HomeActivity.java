@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,7 +52,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -221,11 +225,13 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             if(response.body() == null)
                 throw new IOException("Unexpected response " + response);
 
+
             int responseCode = response.code();
-            String responseBody = response.body().string();
+
 
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT))
             {
+                String responseBody = response.body().string();
                 Chat chat = new Gson().fromJson(responseBody, Chat.class);
                 runOnUiThread (() -> iChatListener.addChat(chat));
             }
@@ -233,11 +239,19 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             {
                 if(responseCode != 200)
                     throw new UserUnauthorizedException("Unexpected response " + response);
-
+                String responseBody = response.body().string();
                 Chat[] chats = new Gson().fromJson(responseBody, Chat[].class);
                 List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
 
                 runOnUiThread (() -> iChatListener.updateChatList(chatList));
+            }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
+            {
+                if (responseCode != 200){
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                }
+                Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                runOnUiThread (() -> peoplesFragment.setProfilePicture(bitmap));
             }
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }

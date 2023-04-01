@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
 {
     private final int SPLASH_DISPLAY_LENGTH = 750;
 
+    private UserJWT userJWT;
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState)

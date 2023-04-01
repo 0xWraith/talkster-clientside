@@ -15,4 +15,5 @@ public class APIConfig
     public static final String TALKSTER_SERVER_INTERNET_PROTOCOL = "http://";
     public static final String TALKSTER_SERVER_WEBSOCKET_ENDPOINT = "/websocket/websocket";
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    public static final MediaType MULTIPART = MediaType.get("multipart/form-data");
 }
