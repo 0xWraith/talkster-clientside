@@ -23,6 +23,15 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
+    <View
+        android:id="@+id/chatView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/chatMessagesList"
+        app:layout_constraintEnd_toEndOf="@+id/chatMessagesList"
+        app:layout_constraintStart_toStartOf="@+id/chatMessagesList"
+        app:layout_constraintTop_toTopOf="@+id/chatMessagesList" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mediaChooserLayout"
         android:layout_width="0dp"

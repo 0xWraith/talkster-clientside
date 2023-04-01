@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Space;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +41,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
     private Button galleryButton, cameraButton;
     private EditText chatInputText;
     private RecyclerView chatMessagesList;
+    private View chatView;
     private BroadcastReceiver messageReceiver;
     private ShapeableImageView userAvatarImage;
     private ChatMessagesAdapter chatMessagesAdapter;
@@ -70,6 +72,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
         cameraButton = findViewById(R.id.cameraButton);
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
+        chatView = findViewById(R.id.chatView);
         userAvatarImage = findViewById(R.id.userAvatarImage);
         recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
@@ -134,7 +137,16 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
                     .maxResultSize(1024,1024)
                     .start();
         });
-        
+
+        chatView.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                mediaChooserLayout.animate().translationY(0).setDuration(250);
+                return false;
+            }
+        });
+
     }
 
     private void addMessage(Message message)
