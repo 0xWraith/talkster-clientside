@@ -20,8 +20,10 @@ import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.AuthenticationDTO;
+import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.utils.BundleExtraNames;
@@ -64,7 +66,7 @@ public class MailConfirmationActivity extends AppCompatActivity implements IActi
         if(direction == 1 && currentInputField == codeInput.length - 1)
         {
             authenticationDTO.setCode(secretCode);
-            apiHandler.apiPOST(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_USER, authenticationDTO, userJWT.getJWTToken());
+            apiHandler.apiPOST(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_USER, authenticationDTO, userJWT.getAccessToken());
             return;
         }
 
@@ -162,7 +164,8 @@ public class MailConfirmationActivity extends AppCompatActivity implements IActi
             Intent intent;
             int responseCode = response.code();
             String responseBody = response.body().string();
-            UserJWT userJWT = new Gson().fromJson(responseBody, UserJWT.class);
+
+            UserJWT userJWT;
 
             switch (responseCode)
             {
@@ -172,11 +175,18 @@ public class MailConfirmationActivity extends AppCompatActivity implements IActi
 
                 case 200:
                     intent = new Intent(this, HomeActivity.class);
+                    VerifiedUserDTO verifiedUserDTO = new Gson().fromJson(responseBody, VerifiedUserDTO.class);
+
+                    User user = verifiedUserDTO.getUser();
+                    userJWT = verifiedUserDTO.getUserJWT();
+
+                    intent.putExtra(BundleExtraNames.USER, user);
                     UserAccountManager.saveAccount(this, userJWT);
                     break;
 
                 case 202:
                     intent = new Intent(this, RegistrationActivity.class);
+                    userJWT = new Gson().fromJson(responseBody, UserJWT.class);
                     intent.putExtra(BundleExtraNames.USER_MAIL, authenticationDTO.getMail());
                     break;
 

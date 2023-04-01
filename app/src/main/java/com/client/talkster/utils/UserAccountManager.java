@@ -29,14 +29,14 @@ public class UserAccountManager
         {
             userJWT = new Gson().fromJson(context.getSharedPreferences("TalksterUser", 0).getString("account_data", ""), UserJWT.class);
 
-            if(userJWT == null)
+            if(userJWT == null || userJWT.getAccessToken() == null)
             {
                 ((IMainActivityScreen)mainActivity).showIntroductionScreen();
                 return;
             }
 
             APIHandler<UserJWT, MainActivity> apiHandler = new APIHandler<>(mainActivity);
-            apiHandler.apiPOST(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_SESSION, userJWT, userJWT.getJWTToken());
+            apiHandler.apiPOST(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_SESSION, userJWT, userJWT.getAccessToken());
         }
         catch (IllegalStateException | JsonSyntaxException exception) { ((IMainActivityScreen)mainActivity).showIntroductionScreen(); }
     }

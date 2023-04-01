@@ -1,30 +1,34 @@
 package com.client.talkster.controllers.authorization;
 
-import okhttp3.Call;
-import android.util.Log;
-import okhttp3.Response;
-import android.os.Bundle;
-import android.os.Vibrator;
-import java.io.IOException;
-import com.google.gson.Gson;
-import com.client.talkster.R;
-import android.widget.Button;
-import android.content.Intent;
-import java.util.regex.Pattern;
-import android.widget.EditText;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.VibrationEffect;
-import androidx.annotation.NonNull;
-import com.client.talkster.api.APIHandler;
-import com.google.gson.JsonSyntaxException;
-import com.client.talkster.classes.UserJWT;
-import com.client.talkster.api.APIEndpoints;
+import android.os.Vibrator;
+import android.util.Log;
 import android.view.animation.AnimationUtils;
-import com.client.talkster.interfaces.IActivity;
+import android.widget.EditText;
+import android.widget.ImageButton;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.client.talkster.R;
+import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.AuthenticationDTO;
-import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.interfaces.IAPIResponseHandler;
+import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.utils.BundleExtraNames;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class InputMailActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler
 {
@@ -46,7 +50,7 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
     @Override
     public void getUIElements()
     {
-        Button continueButton;
+        ImageButton continueButton;
 
         continueButton = findViewById(R.id.continueButton);
         emailAddressInput = findViewById(R.id.emailAddressInput);
@@ -91,6 +95,9 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
                 throw new IOException("Unexpected response " + response);
 
             String responseBody = response.body().string();
+
+            Log.d("Talkster", "Response body: " + responseBody);
+
             UserJWT userJWT = new Gson().fromJson(responseBody, UserJWT.class);
             Intent mailConfirmationIntent = new Intent(this, MailConfirmationActivity.class);
 

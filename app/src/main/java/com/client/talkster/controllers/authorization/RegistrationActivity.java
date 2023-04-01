@@ -6,20 +6,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.AuthenticationDTO;
 import com.client.talkster.dto.RegistrationDTO;
@@ -40,7 +37,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
 
     private UserJWT userJWT;
     private Vibrator vibrator;
-    private Button continueButton;
+    private ImageButton continueButton;
     private EditText lastNameInput;
     private EditText firstNameInput;
     private AuthenticationDTO authenticationDTO;
@@ -88,7 +85,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
             registrationDTO.setFirstname(firstName);
             registrationDTO.setMail(authenticationDTO.getMail());
 
-            apiHandler.apiPOST(TALKSTER_API_AUTH_ENDPOINT_REGISTER_USER, registrationDTO, userJWT.getJWTToken());
+            apiHandler.apiPOST(TALKSTER_API_AUTH_ENDPOINT_REGISTER_USER, registrationDTO, userJWT.getAccessToken());
 
         });
     }

@@ -20,6 +20,7 @@
     <string name="enter_code">Enter code</string>
     <string name="profile_info">Profile info</string>
     <string name="firs_name_required">First name (required)</string>
+    <string name="search">Search</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="welcome_to_talkster">Welcome to Talkster</string>
@@ -28,5 +29,7 @@
     <string name="audio_message">Audio message</string>
     <string name="photo">Photo</string>
     <string name="message">Message</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
     <string name="mail_info">We’ve sent a mail with activation code to your mail \n %s</string>
 </resources>

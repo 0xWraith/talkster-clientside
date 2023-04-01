@@ -1,50 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout4"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@drawable/drawable_chat_border"
+    android:minHeight="66dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="horizontal">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/userAvatarImage"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_margin="8dp"
-            app:strokeColor="@null"
-            app:shapeAppearanceOverlay="@style/circleImage"
-            android:src="@drawable/avatar_wireframe"/>
+    <TextView
+        android:id="@+id/userNameText"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/previewMainText"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
+        app:layout_constraintTop_toTopOf="@+id/userAvatarImage" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:background="@drawable/drawable_chat_border"
-            android:orientation="vertical">
+    <TextView
+        android:id="@+id/chatPreviewText"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:singleLine="true"
+        android:textColor="@color/previewSecondaryText"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/userAvatarImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/userAvatarImage" />
 
-            <TextView
-                android:id="@+id/userNameText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/previewMainText"
-                android:textSize="18sp"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold" />
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/userAvatarImage"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/account_circle_64"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/circleImage"
+        app:strokeColor="@null" />
 
-            <TextView
-                android:id="@+id/chatPreviewText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/previewSecondaryText"
-                android:textSize="16sp"/>
 
-        </LinearLayout>
-
-    </LinearLayout>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -73,14 +73,15 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="HardcodedText" />
 
-    <Button
+    <ImageButton
         android:id="@+id/continueButton"
         style="@style/wfButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="72dp"
-        android:text=">"
+        app:srcCompat="@drawable/arrow_forward_24"
+        app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
