@@ -5,23 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Space;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,8 +26,7 @@ import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.enums.MessageType;
 import com.github.dhaval2404.imagepicker.ImagePicker;
-
-import org.modelmapper.ModelMapper;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.time.OffsetDateTime;
 
@@ -54,6 +43,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
     private RecyclerView chatMessagesList;
     private View chatView;
     private BroadcastReceiver messageReceiver;
+    private ShapeableImageView userAvatarImage;
     private ChatMessagesAdapter chatMessagesAdapter;
     private LinearLayoutManager recyclerLayoutManager;
     private ConstraintLayout mediaChooserLayout;
@@ -83,10 +73,19 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         chatView = findViewById(R.id.chatView);
+        userAvatarImage = findViewById(R.id.userAvatarImage);
         recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
 
-        userNameText.setText(chat.getReceiverName());
+        if(userJWT.getID() == chat.getReceiverID())
+        {
+            userNameText.setText("Saved messages");
+            userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
+
+        }
+        else
+            userNameText.setText(chat.getReceiverName());
+
         userStatusText.setText("last seen at 12:35");
 
         chatMessagesAdapter = new ChatMessagesAdapter(chat.getMessages(), userJWT.getID(), this);
@@ -107,33 +106,19 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity
             messageDTO.setchatid(chat.getId());
             messageDTO.setmessagecontent(message);
             messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getJWTToken());
+            messageDTO.setjwttoken(userJWT.getAccessToken());
             messageDTO.setreceiverid(chat.getReceiverID());
             messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
             messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
-
-            Message newMessage = new ModelMapper().map(messageDTO, Message.class);
 
             Intent intent = new Intent(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
             intent.putExtra(BundleExtraNames.CHAT_NEW_MESSAGE, messageDTO);
             sendBroadcast(intent);
         });
 
-        backButton.setOnClickListener(view ->
-        {
-            Intent homeIntent = new Intent(PrivateChatActivity.this, HomeActivity.class);
-            homeIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
-           startActivity(homeIntent);
-        });
-
-        mediaButton.setOnClickListener(view ->
-        {
-            mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
-        });
-
-        closeMediaButton.setOnClickListener(view -> {
-            mediaChooserLayout.animate().translationY(0).setDuration(250);
-        });
+        backButton.setOnClickListener(view -> finish());
+        closeMediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(0).setDuration(250));
+        mediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250));
 
         cameraButton.setOnClickListener(view -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);

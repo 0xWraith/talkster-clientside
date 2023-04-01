@@ -1,6 +1,7 @@
 package com.client.talkster.controllers.talkster;
 
-import android.content.res.Resources;
+import android.annotation.SuppressLint;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,117 +11,186 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import com.client.talkster.R;
+import com.client.talkster.adapters.LocationAdapter;
+import com.client.talkster.classes.TalksterMapIcon;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
-
+import com.client.talkster.interfaces.IMapGPSPositionUpdate;
+import com.client.talkster.utils.BundleExtraNames;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.gson.Gson;
 
-public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback
+import java.util.HashMap;
+
+public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate
 {
+    private GoogleMap map;
     private UserJWT userJWT;
     private MapView mapView;
-
-    public MapFragment(UserJWT userJWT)
-    {
-        this.userJWT = userJWT;
-    }
-    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private final float ZOOM_LEVEL = 15.0f;
     private Bundle mapViewBundle = null;
+    private LocationAdapter userLastLocation;
+
+
+    private Marker userMarker;
+    private HashMap<Long, Marker> userMarkers = new HashMap<>();
+
+    public MapFragment(UserJWT userJWT) { this.userJWT = userJWT; }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-    }
+    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+
         getUIElements(view);
-        initGooglemaps(savedInstanceState);
+        initGoogleMaps(savedInstanceState);
+
         return view;
     }
 
-    private void initGooglemaps(Bundle savedInstanceState){
-        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
-        // objects or sub-Bundles.
-        if (savedInstanceState != null) {
-            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
-        }
+    private void initGoogleMaps(Bundle savedInstanceState)
+    {
+
+        if (savedInstanceState != null)
+            mapViewBundle = savedInstanceState.getBundle(BundleExtraNames.MAPVIEW_BUNDLE_KEY);
 
         mapView.onCreate(mapViewBundle);
-
         mapView.getMapAsync(this);
+    }
+
+    private void moveCameraToUserLocation(LocationAdapter locationAdapter)
+    {
+        if(locationAdapter == null || map == null)
+            return;
+
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), ZOOM_LEVEL));
     }
 
     @Override
     public void getUIElements(View view)
     {
-        mapView = (MapView) view.findViewById(R.id.mapView);
+        mapView = view.findViewById(R.id.mapView);
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
         mapView.onResume();
     }
 
     @Override
-    public void onStart() {
+    public void onStart()
+    {
         super.onStart();
         mapView.onStart();
     }
 
     @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
         mapView.onStop();
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
-    public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(48.1455199955928, 17.1055677834188)).title("Kleeat").icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar)).snippet("Send Message"));
-        map.addMarker(new MarkerOptions().position(new LatLng(48.150271251537944, 17.078185120415593)).title("Anna").icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar2)).snippet("Send Message"));
-        try {
-            // Customise the styling of the base map using a JSON object defined
-            // in a raw resource file.
-            boolean success = map.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            getContext(), R.raw.style_light));
+    public void onMapReady(GoogleMap map)
+    {
+        this.map = map;
 
-            if (!success) {
-                Log.e("Google Maps", "Style parsing failed.");
-            }
-        } catch (Resources.NotFoundException e) {
-            Log.e("Google Maps", "Can't find style. Error: ", e);
-        }
-        LatLng bratislava = new LatLng(48.14735128521539, 17.107046097922943);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(bratislava, 10.0f));
+        map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.style_night));
+
+        map.getUiSettings().setMapToolbarEnabled(false);
+        map.getUiSettings().setMyLocationButtonEnabled(false);
+        map.getUiSettings().setCompassEnabled(false);
+
+        map.setOnMarkerClickListener(marker -> {
+
+            LatLng latLng = marker.getPosition();
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(latLng)
+                    .zoom(ZOOM_LEVEL)
+                    .tilt(30)
+                    .build();
+
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            marker.showInfoWindow();
+            return true;
+        });
+
+        map.setOnInfoWindowClickListener(marker -> {
+            Log.d("MapFragment", "onInfoWindowClick: " + marker.getTitle());
+        });
+
+        moveCameraToUserLocation(userLastLocation);
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         mapView.onPause();
         super.onPause();
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         mapView.onDestroy();
         super.onDestroy();
     }
 
     @Override
-    public void onLowMemory() {
+    public void onLowMemory()
+    {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    @Override
+    public void onMapGPSPositionUserUpdate(Location location)
+    {
+        LocationAdapter locationAdapter = userLastLocation = new LocationAdapter(location);
+
+        if(map == null)
+            return;
+
+        if(userMarker != null)
+            userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
+        else
+            userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude())).getMarkerOptions());
+    }
+
+    @Override
+    public void onMapGPSPositionUpdate(String locationRAW)
+    {
+        if(map == null)
+            return;
+
+        long id = 0;
+        LocationDTO locationDTO = new Gson().fromJson(locationRAW, LocationDTO.class);
+        LocationAdapter locationAdapter = new LocationAdapter(locationDTO);
+
+        id = locationDTO.getuserid();
+
+        if(id == userJWT.getID())
+            return;
+
+        if(userMarkers.containsKey(id))
+            userMarkers.get(id).setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
+        else
+            userMarkers.put(id, map.addMarker(new TalksterMapIcon(locationDTO.getUsername(), new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude())).getMarkerOptions()));
+
     }
 }

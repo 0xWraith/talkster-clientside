@@ -15,8 +15,8 @@ public class StompWebSocketLifeCycle<T> implements Action1<T>
 
         LifecycleEvent event = (LifecycleEvent)t;
 
-        switch (event.getType()) {
-
+        switch (event.getType())
+        {
             case OPENED:
                 Log.d("OPENED", "Stomp connection opened");
                 break;

@@ -1,16 +1,12 @@
 package com.client.talkster.controllers.talkster;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -85,7 +81,6 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
             @Override
             public void onItemLongClick(int position, View v) {
-                Log.d("Heh", "onItemLongClick pos = " + position);
             }
         });
         userChatList.setAdapter(chatListAdapter);
@@ -94,7 +89,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private void reloadUserChats()
     {
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getJWTToken());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getAccessToken());
     }
 
     private void updateChatListVisibility()
@@ -126,13 +121,15 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
             Intent intent = new Intent(BundleExtraNames.CHAT_RECEIVE_BROADCAST + chatID);
             intent.putExtra(BundleExtraNames.CHAT_NEW_MESSAGE, message);
-            getActivity().sendBroadcast(intent);
+
+            if(getActivity() != null)
+                getActivity().sendBroadcast(intent);
 
             return;
         }
 
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-        apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getJWTToken());
+        apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getAccessToken());
     }
 
     @Override
