@@ -1,5 +1,7 @@
 package com.client.talkster.classes;
 
+import android.graphics.Bitmap;
+
 import com.client.talkster.R;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;

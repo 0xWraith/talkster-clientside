@@ -27,6 +27,7 @@ import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.MessageType;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.google.gson.Gson;
@@ -49,6 +50,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     private Button sendMessageButton, profileButton;
     private ImageView profileImageView;
     private EditText sendMessageInput;
+    private FileUtils fileUtils = new FileUtils();
     public APIStompWebSocket apiStompWebSocket;
 
     public PeoplesFragment(UserJWT userJWT) { this.userJWT = userJWT; }
@@ -106,6 +108,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     }
 
     public void setProfilePicture(Bitmap bitmap){
+        bitmap = FileUtils.getMarker(bitmap, getActivity().getApplicationContext());
         profileImageView.setImageBitmap(bitmap);
     }
 }
