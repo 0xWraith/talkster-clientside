@@ -169,7 +169,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         if(userMarker != null)
             userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
         else
-            userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude())).getMarkerOptions());
+            userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT).getMarkerOptions());
     }
 
     @Override

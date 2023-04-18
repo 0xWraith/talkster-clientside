@@ -14,15 +14,24 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
+import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserJWT;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.utils.exceptions.UserUnauthorizedException;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +41,29 @@ import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.Response;
 
-public class FileUtils extends AppCompatActivity implements IActivity, IAPIResponseHandler {
+public class FileUtils implements IActivity, IAPIResponseHandler {
+
+    //extends AppCompatActivity
+    private UserJWT userJWT;
+    private boolean imageReceived;
+    private Bitmap image;
+
+
+    public FileUtils(UserJWT userJWT) {this.userJWT = userJWT;}
+
+    public Bitmap getProfilePicture(){
+        APIHandler<Object, FileUtils> apiHandler = new APIHandler<>(this);
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE, userJWT.getAccessToken());
+        imageReceived = false;
+        while(!imageReceived) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return image;
+    }
 
     public static byte[] getBytes(Uri uri, ContentResolver cr) throws IOException {
         InputStream inputStream = cr.openInputStream(uri);
@@ -59,13 +90,13 @@ public class FileUtils extends AppCompatActivity implements IActivity, IAPIRespo
         return uri.getLastPathSegment();
     }
 
-    public static Bitmap getMarker(Bitmap bitmap, Context context){
+    public static Bitmap getMarker(Bitmap bitmap){
         BitmapFactory.Options bfo = new BitmapFactory.Options();
         bfo.inScaled = false;
-        Bitmap marker = BitmapFactory.decodeResource(context.getResources(),
+        Bitmap marker = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
                 R.drawable.marker, bfo);
         bitmap = circleCrop(bitmap);
-        System.out.println(marker.getWidth() + " " + marker.getHeight());
+        bitmap = Bitmap.createScaledBitmap(bitmap, 128, 128, true);
         Bitmap bmOverlay = Bitmap.createBitmap(marker.getWidth(), marker.getHeight(), marker.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(bitmap, new Matrix(), null);
@@ -102,7 +133,25 @@ public class FileUtils extends AppCompatActivity implements IActivity, IAPIRespo
 
     @Override
     public void onResponse(@NonNull Call call, @NonNull Response response, @NonNull String apiUrl) {
+        try {
+            if(response.body() == null)
+                throw new IOException("Unexpected response " + response);
+            int responseCode = response.code();
 
+            // profilePicture response
+            if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
+            {
+                if (responseCode != 200){
+                    image = null;
+                    imageReceived = true;
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                }
+                image = BitmapFactory.decodeStream(response.body().byteStream());
+                imageReceived = true;
+            }
+        }
+        catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
+        catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster", "Failed to parse: " + exception.getMessage()); }
     }
 
     @Override
@@ -111,12 +160,8 @@ public class FileUtils extends AppCompatActivity implements IActivity, IAPIRespo
     }
 
     @Override
-    public void getUIElements() {
-
-    }
+    public void getUIElements() {}
 
     @Override
-    public void getBundleElements() {
-
-    }
+    public void getBundleElements() {}
 }

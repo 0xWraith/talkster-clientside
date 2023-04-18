@@ -99,7 +99,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     {
         mapFragment = new MapFragment(userJWT);
         chatsFragment = new ChatsFragment(userJWT);
-        peoplesFragment = new PeoplesFragment(userJWT);
+        peoplesFragment = new PeoplesFragment(userJWT, user);
 
         iChatListener = chatsFragment;
         iMapGPSPositionUpdate = mapFragment;
