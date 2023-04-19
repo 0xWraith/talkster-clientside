@@ -96,6 +96,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/chatInputText" />
 
+
     <EditText
         android:id="@+id/chatInputText"
         style="@style/LoginMailEditText"
