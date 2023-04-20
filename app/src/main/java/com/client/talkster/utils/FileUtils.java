@@ -51,9 +51,9 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
 
     public FileUtils(UserJWT userJWT) {this.userJWT = userJWT;}
 
-    public Bitmap getProfilePicture(){
+    public Bitmap getProfilePicture(long userID){
         APIHandler<Object, FileUtils> apiHandler = new APIHandler<>(this);
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE, userJWT.getAccessToken());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE+"/"+userID, userJWT.getAccessToken());
         imageReceived = false;
         while(!imageReceived) {
             try {
@@ -95,8 +95,8 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
         bfo.inScaled = false;
         Bitmap marker = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
                 R.drawable.marker, bfo);
-        bitmap = circleCrop(bitmap);
         bitmap = Bitmap.createScaledBitmap(bitmap, 128, 128, true);
+        bitmap = circleCrop(bitmap);
         Bitmap bmOverlay = Bitmap.createBitmap(marker.getWidth(), marker.getHeight(), marker.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(bitmap, new Matrix(), null);
@@ -142,12 +142,20 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
             {
                 if (responseCode != 200){
-                    image = null;
+                    if (responseCode == 404){
+                        BitmapFactory.Options bfo = new BitmapFactory.Options();
+                        bfo.inScaled = false;
+                        image = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
+                                R.drawable.blank_profile, bfo);
+                        imageReceived = true;
+                    }
+                    else {
+                        throw new UserUnauthorizedException("Unexpected response " + response);
+                    }
+                } else {
+                    image = BitmapFactory.decodeStream(response.body().byteStream());
                     imageReceived = true;
-                    throw new UserUnauthorizedException("Unexpected response " + response);
                 }
-                image = BitmapFactory.decodeStream(response.body().byteStream());
-                imageReceived = true;
             }
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }

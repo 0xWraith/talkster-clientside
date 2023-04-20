@@ -1,12 +1,17 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
@@ -18,16 +23,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.Chat;
+import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.MessageDTO;
@@ -46,6 +55,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -56,13 +66,17 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     private User user;
     private EditText receiverInput;
     private Button sendMessageButton, galleryButton, cameraButton;
-    private ImageButton imageEditButton, closeMediaButton;
+    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
+    private ImageButton lastNameEditButton, lastNameSaveButton;
     private ImageView profileImageView;
     private EditText sendMessageInput;
-    private View profileView;
-    private ConstraintLayout mediaChooserLayout;
+    private View profileView, leftPager;
+    private ConstraintLayout mediaChooserLayout, firstNameLayout, firstNameEditLayout, lastNameLayout, lastNameEditLayout;
     private FileUtils fileUtils;
     public APIStompWebSocket apiStompWebSocket;
+
+    private final int MIN_DISTANCE = 300;
+    private float x1,x2;
 
     public PeoplesFragment(UserJWT userJWT, User user) { this.userJWT = userJWT; this.user = user;}
 
@@ -77,7 +91,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     {
         View view = inflater.inflate(R.layout.fragment_peoples, container, false);
         getUIElements(view);
-        setProfilePicture(fileUtils.getProfilePicture());
+        updateProfilePicture();
         return view;
     }
 
@@ -94,6 +108,20 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         closeMediaButton = view.findViewById(R.id.closeMediaButton);
         mediaChooserLayout = view.findViewById(R.id.mediaChooserLayout);
         profileView = view.findViewById(R.id.profileView);
+
+        firstNameLayout = view.findViewById(R.id.firstNameLayout);
+        firstNameEditLayout = view.findViewById(R.id.firstNameEditLayout);
+        firstNameEditButton = view.findViewById(R.id.firstNameEditButton);
+        firstNameSaveButton = view.findViewById(R.id.firstNameSaveButton);
+
+        lastNameLayout = view.findViewById(R.id.lastNameLayout);
+        lastNameEditLayout = view.findViewById(R.id.lastNameEditLayout);
+        lastNameEditButton = view.findViewById(R.id.lastNameEditButton);
+        lastNameSaveButton = view.findViewById(R.id.lastNameSaveButton);
+
+        leftPager = view.findViewById(R.id.leftPager);
+
+        initPager();
 
         sendMessageButton.setOnClickListener(view1 -> {
 
@@ -128,7 +156,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
         cameraButton.setOnClickListener(view1 -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
-            ImagePicker.Companion.with(PeoplesFragment.this)
+            ImagePicker.Companion.with(getActivity())
                     .cameraOnly()
                     .cropSquare()
                     .maxResultSize(256,256)
@@ -137,12 +165,33 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
         galleryButton.setOnClickListener(view1 -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
-            ImagePicker.Companion.with(PeoplesFragment.this)
+            ImagePicker.Companion.with(getActivity())
                     .galleryOnly()
                     .cropSquare()
                     .maxResultSize(256,256)
                     .start(101);
         });
+
+        firstNameEditButton.setOnClickListener(view1 -> {
+            firstNameLayout.setVisibility(View.INVISIBLE);
+            firstNameEditLayout.setVisibility(View.VISIBLE);
+        });
+
+        firstNameSaveButton.setOnClickListener(view1 -> {
+            firstNameLayout.setVisibility(View.VISIBLE);
+            firstNameEditLayout.setVisibility(View.INVISIBLE);
+        });
+
+        lastNameEditButton.setOnClickListener(view1 -> {
+            lastNameLayout.setVisibility(View.INVISIBLE);
+            lastNameEditLayout.setVisibility(View.VISIBLE);
+        });
+
+        lastNameSaveButton.setOnClickListener(view1 -> {
+            lastNameLayout.setVisibility(View.VISIBLE);
+            lastNameEditLayout.setVisibility(View.INVISIBLE);
+        });
+
 
         profileView.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -154,7 +203,36 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         });
     }
 
-    public void setProfilePicture(Bitmap bitmap){
-        profileImageView.setImageBitmap(bitmap);
+    private void initPager(){
+        leftPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x2 - x1;
+                        if (deltaX > MIN_DISTANCE) {
+                            ((HomeActivity)getActivity()).selectNavigationButton(1);}
+                        break;
+                }
+                return true;
+            }
+        });
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        updateProfilePicture();
+    }
+
+    public void updateProfilePicture(){
+        profileImageView.setImageBitmap(fileUtils.getProfilePicture(user.getId()));
+    }
+
 }

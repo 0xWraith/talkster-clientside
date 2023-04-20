@@ -21,6 +21,16 @@
         <item name="android:layout_marginStart">10dp</item>
     </style>
 
+    <style name="EditText">
+        <item name="android:background">@drawable/drawable_input</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorHint">@color/previewSecondaryText</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">#FFFFFF</item>
+    </style>
+
     <style name="aspectImage">
         <item name="android:layout_centerInParent">true</item>
         <item name="android:adjustViewBounds">true</item>
@@ -28,10 +38,10 @@
     </style>
 
     <style name="LoginMailEditText">
-        <item name="android:background">@drawable/drawable_input_mail</item>
+        <item name="android:background">@drawable/drawable_input</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">@color/previewSecondaryText</item>
-        <item name="android:padding">13dp</item>
+        <item name="android:padding">12dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:drawableTint">#FFFFFF</item>

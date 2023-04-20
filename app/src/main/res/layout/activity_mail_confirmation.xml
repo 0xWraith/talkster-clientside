@@ -49,7 +49,7 @@
     <EditText
         android:id="@+id/codeInputFirst"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -64,7 +64,7 @@
     <EditText
         android:id="@+id/codeInputSecond"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -78,7 +78,7 @@
     <EditText
         android:id="@+id/codeInputThird"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -92,7 +92,7 @@
     <EditText
         android:id="@+id/codeInputFourth"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
@@ -106,7 +106,7 @@
     <EditText
         android:id="@+id/codeInputFifth"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"

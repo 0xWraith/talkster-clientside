@@ -30,11 +30,11 @@ public class TalksterMapIcon
                 .snippet("Send Message");
     }
 
-    public TalksterMapIcon(String title, LatLng position, UserJWT userJWT)
+    public TalksterMapIcon(String title, LatLng position, UserJWT userJWT, long userID)
     {
         FileUtils fileUtils = new FileUtils(userJWT);
         BitmapDescriptor icon;
-        Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture());
+        Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userID));
         if (bitmap != null) {
             icon = BitmapDescriptorFactory.fromBitmap(bitmap);
         } else {

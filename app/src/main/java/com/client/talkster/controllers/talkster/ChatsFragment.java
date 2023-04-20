@@ -1,16 +1,21 @@
 package com.client.talkster.controllers.talkster;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.ChatListAdapter;
@@ -36,9 +41,13 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 {
     private final UserJWT userJWT;
     private RecyclerView userChatList;
-    private LinearLayout welcomeBlock;
+    private ConstraintLayout welcomeBlock;
     private HashMap<Long, Chat> chatHashMap;
     private ChatListAdapter chatListAdapter;
+    private View rightPager;
+
+    private final int MIN_DISTANCE = 300;
+    private float x1,x2;
 
     public ChatsFragment(UserJWT userJWT)
     {
@@ -65,6 +74,10 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         chatHashMap = new HashMap<>();
         welcomeBlock = view.findViewById(R.id.welcomeBlock);
         userChatList = view.findViewById(R.id.userChatList);
+
+        rightPager = view.findViewById(R.id.rightPager);
+
+        initPager();
 
         chatListAdapter = new ChatListAdapter(getContext(), new ChatListAdapter.IChatClickListener() {
             @Override
@@ -130,6 +143,28 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getAccessToken());
+    }
+
+    private void initPager(){
+        rightPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x1 - x2;
+                        if (deltaX > MIN_DISTANCE) {
+                            ((HomeActivity)getActivity()).selectNavigationButton(1);}
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override

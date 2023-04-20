@@ -32,4 +32,5 @@
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="mail_info">We’ve sent a mail with activation code to your mail \n %s</string>
+    <string name="welcome_message">Looks like you have no messages.\nAdd your friends and start your journey on Talkster.</string>
 </resources>

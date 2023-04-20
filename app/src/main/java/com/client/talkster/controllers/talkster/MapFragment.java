@@ -1,27 +1,38 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
+import com.client.talkster.HomeActivity;
+import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.LocationAdapter;
+import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.TalksterMapIcon;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
 import com.client.talkster.utils.BundleExtraNames;
+import com.client.talkster.utils.FileUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -38,9 +49,11 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     private final float ZOOM_LEVEL = 15.0f;
     private Bundle mapViewBundle = null;
     private LocationAdapter userLastLocation;
-
-
     private Marker userMarker;
+
+    private View rightPager, leftPager;
+    private final int MIN_DISTANCE = 300;
+    private float x1,x2;
     private HashMap<Long, Marker> userMarkers = new HashMap<>();
 
     public MapFragment(UserJWT userJWT) { this.userJWT = userJWT; }
@@ -81,6 +94,11 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     public void getUIElements(View view)
     {
         mapView = view.findViewById(R.id.mapView);
+
+        rightPager = view.findViewById(R.id.rightPager);
+        leftPager = view.findViewById(R.id.leftPager);
+
+        initPager();
     }
 
     @Override
@@ -88,6 +106,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     {
         super.onResume();
         mapView.onResume();
+        updateMarkerIcons();
     }
 
     @Override
@@ -131,7 +150,10 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         });
 
         map.setOnInfoWindowClickListener(marker -> {
-            Log.d("MapFragment", "onInfoWindowClick: " + marker.getTitle());
+            long id = (long) marker.getTag();
+            Log.d("MapFragment", "onInfoWindowClick: " + id);
+            APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, userJWT.getAccessToken());
         });
 
         moveCameraToUserLocation(userLastLocation);
@@ -168,8 +190,10 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         if(userMarker != null)
             userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
-        else
-            userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT).getMarkerOptions());
+        else {
+            userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, userJWT.getID()).getMarkerOptions());
+            userMarker.setTag(userJWT.getID());
+        }
     }
 
     @Override
@@ -189,8 +213,64 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         if(userMarkers.containsKey(id))
             userMarkers.get(id).setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
-        else
-            userMarkers.put(id, map.addMarker(new TalksterMapIcon(locationDTO.getUsername(), new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude())).getMarkerOptions()));
-
+        else {
+            userMarkers.put(id, map.addMarker(new TalksterMapIcon(locationDTO.getUsername(), new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, id).getMarkerOptions()));
+            userMarkers.get(id).setTag(id);
+        }
     }
+
+    public void updateMarkerIcons(){
+        FileUtils fileUtils = new FileUtils(userJWT);
+        Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userJWT.getID()));
+        if (userMarker != null) {
+            userMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+        }
+        for (Long id : userMarkers.keySet()){
+            bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(id));
+            userMarkers.get(id).setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+        }
+    }
+
+    private void initPager(){
+        leftPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x2 - x1;
+                        if (deltaX > MIN_DISTANCE) {
+                            ((HomeActivity)getActivity()).selectNavigationButton(0);}
+                        break;
+                }
+                return true;
+            }
+        });
+
+        rightPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x1 - x2;
+                        if (deltaX > MIN_DISTANCE) {
+                            ((HomeActivity)getActivity()).selectNavigationButton(2);}
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
 }
