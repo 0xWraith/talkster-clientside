@@ -68,7 +68,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         getUIElements(view);
         initGoogleMaps(savedInstanceState);
-
+        //new Thread(() -> ).start();
         return view;
     }
 
