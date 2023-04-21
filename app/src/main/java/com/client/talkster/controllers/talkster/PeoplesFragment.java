@@ -247,6 +247,13 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     private void updateUserName(){
         String first = firstNameEditText.getText().toString();
         String last = lastNameEditText.getText().toString();
+        if (first.isBlank()){
+            Toast.makeText(getContext(), "First name can't be empty!", Toast.LENGTH_LONG).show();
+            firstNameEditText.setText(firstNameView.getText());
+            return;
+        }
+        user.setFirstname(first);
+        user.setLastname(last);
         firstNameView.setText(first);
         if (!last.isBlank()){
             lastNameView.setText(last);

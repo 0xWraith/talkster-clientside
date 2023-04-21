@@ -238,17 +238,17 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             {
                 if(responseCode != 200){
                     if(responseCode == 409){
-                        runOnUiThread(() -> Toast.makeText(this, "Friend already added!", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(this, "Friend already added!", Toast.LENGTH_LONG).show());
                     }
                     if(responseCode == 404){
-                        runOnUiThread(() -> Toast.makeText(this, "Friend not found!", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(this, "Friend not found!", Toast.LENGTH_LONG).show());
                     }
                     else{throw new UserUnauthorizedException("Unexpected response " + response);}
                 }
                 else{
                     String responseBody = response.body().string();
                     Chat chat = new Gson().fromJson(responseBody, Chat.class);
-                    runOnUiThread(() -> Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(this, "Friend added!", Toast.LENGTH_LONG).show());
                     runOnUiThread (() -> iChatListener.addChat(chat));
                 }
             }
