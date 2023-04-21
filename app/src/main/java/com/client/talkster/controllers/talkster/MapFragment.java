@@ -188,8 +188,9 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         if(map == null)
             return;
 
-        if(userMarker != null)
+        if(userMarker != null) {
             userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
+        }
         else {
             userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, userJWT.getID()).getMarkerOptions());
             userMarker.setTag(userJWT.getID());
@@ -211,8 +212,10 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         if(id == userJWT.getID())
             return;
 
-        if(userMarkers.containsKey(id))
+        if(userMarkers.containsKey(id)) {
             userMarkers.get(id).setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
+            userMarkers.get(id).setTitle(locationDTO.getUsername());
+        }
         else {
             userMarkers.put(id, map.addMarker(new TalksterMapIcon(locationDTO.getUsername(), new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, id).getMarkerOptions()));
             userMarkers.get(id).setTag(id);

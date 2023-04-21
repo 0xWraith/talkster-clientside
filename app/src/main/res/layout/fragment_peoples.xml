@@ -27,43 +27,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/sendMessageInput"
-        style="@style/LoginMailEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Message"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view" />
-
-    <EditText
-        android:id="@+id/receiverInput"
-        style="@style/LoginMailEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="ID"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendMessageInput" />
-
-    <Button
-        android:id="@+id/sendMessageButton"
-        style="@style/wfButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Send"
-        app:layout_constraintEnd_toEndOf="@+id/receiverInput"
-        app:layout_constraintStart_toStartOf="@+id/receiverInput"
-        app:layout_constraintTop_toBottomOf="@+id/receiverInput" />
-
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profileImageView"
         android:layout_width="100dp"
@@ -130,7 +93,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginEnd="48dp"
             android:text="First name"
-            android:textColor="@android:color/white"
+            android:textColor="@color/previewMainText"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -194,12 +157,12 @@
             android:layout_marginStart="24dp"
             android:layout_marginEnd="48dp"
             android:text="Last name"
-            android:textColor="@android:color/white"
+            android:textColor="@color/previewMainText"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textSize="18sp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/lastNameEditButton"
@@ -232,11 +195,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="48dp"
+            android:hint="@string/last_name_placeholder"
             android:text="Last name"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:textSize="18sp" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
             android:id="@+id/lastNameSaveButton"
@@ -298,10 +262,10 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:background="@color/transparent"
-            app:srcCompat="@drawable/close_24"
-            app:tint="@android:color/white"
             app:layout_constraintEnd_toEndOf="@+id/mediaChooserLayout"
-            app:layout_constraintTop_toTopOf="@+id/mediaChooserLayout" />
+            app:layout_constraintTop_toTopOf="@+id/mediaChooserLayout"
+            app:srcCompat="@drawable/close_24"
+            app:tint="@android:color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
@@ -313,5 +277,49 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/view" />
+
+    <EditText
+        android:id="@+id/mailEditText"
+        style="@style/LoginMailEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="48dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:autofillHints="E-Mail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:textColor="@color/previewMainText"
+        android:textSize="18sp"
+        android:text="Add Friends"
+        app:layout_constraintStart_toStartOf="@+id/mailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
+
+    <Button
+        android:id="@+id/addFriendButton"
+        style="@style/wfButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:text="Add Friend"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:drawableRight="@drawable/person_add_24"
+        android:drawableTint="@android:color/white"
+        android:drawablePadding="0dp"
+        android:paddingRight="48dp"
+        android:paddingLeft="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/mailEditText"
+        app:layout_constraintStart_toStartOf="@+id/mailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/mailEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

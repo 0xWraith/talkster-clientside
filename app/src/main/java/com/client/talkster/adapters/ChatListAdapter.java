@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.client.talkster.R;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
+import com.client.talkster.utils.FileUtils;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
@@ -23,12 +24,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     public List<Chat> chatList;
     private final Context context;
     private final IChatClickListener IChatClickListener;
+    private final FileUtils fileUtils;
 
-    public ChatListAdapter(Context context, IChatClickListener IChatClickListener)
+    public ChatListAdapter(Context context, IChatClickListener IChatClickListener, FileUtils fileUtils)
     {
         this.context = context;
         this.chatList = new ArrayList<>();
         this.IChatClickListener = IChatClickListener;
+        this.fileUtils = fileUtils;
     }
 
     @NonNull
@@ -48,11 +51,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         if(chat.getReceiverID() == chat.getOwnerID())
         {
             holder.userNameText.setText(R.string.saved_messages);
+            //holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
             holder.userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
         }
         else
         {
-            holder.userAvatarImage.setImageResource(R.drawable.account_circle_64);
+            holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
             holder.userNameText.setText(chat.getReceiverName());
         }
 
@@ -84,8 +88,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             }
             return;
         }
-        holder.chatPreviewText.setText(R.string.cleared_history);
-        holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aurora_1));
+        holder.chatPreviewText.setText(context.getString(R.string.empty_chat, chat.getReceiverFirstname()));
+        holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aquamarine_dark));
     }
 
     @Override

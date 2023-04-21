@@ -14,7 +14,8 @@
         android:layout_height="60dp"
         android:background="@color/erie_black2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="match_parent"
@@ -28,66 +29,77 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/welcomeBlock"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/rightPager"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/chatRefreshLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbarKinda">
 
-        <ImageView
-            android:id="@+id/imageView8"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:contentDescription="@string/logotype"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/userChatList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView11"
-            app:srcCompat="@drawable/paper_plane" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/component_chat_item" />
 
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/welcomeBlock"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/welcome_message"
-            android:textColor="@color/previewSecondaryText"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/imageView8"
-            app:layout_constraintStart_toStartOf="@+id/imageView8"
-            app:layout_constraintTop_toBottomOf="@+id/textView10" />
-
-        <TextView
-            android:id="@+id/textView10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/welcome_to_talkster"
-            android:textColor="@color/previewMainText"
-            android:textSize="32sp"
+            android:orientation="vertical"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textView11"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/imageView8"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:contentDescription="@string/logotype"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/paper_plane" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/userChatList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="invisible"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarKinda"
-        tools:listitem="@layout/component_chat_item" />
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/welcome_message"
+                android:textColor="@color/previewSecondaryText"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/imageView8"
+                app:layout_constraintEnd_toEndOf="@+id/imageView8"
+                app:layout_constraintStart_toStartOf="@+id/imageView8" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/welcome_to_talkster"
+                android:textColor="@color/previewMainText"
+                android:textSize="32sp"
+                app:layout_constraintBottom_toTopOf="@+id/textView11"
+                app:layout_constraintEnd_toEndOf="@+id/textView11"
+                app:layout_constraintStart_toStartOf="@+id/textView11" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <View
         android:id="@+id/rightPager"

@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.client.talkster.HomeActivity;
@@ -39,7 +40,10 @@ import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.dto.ChatCreateDTO;
 import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.dto.NameDTO;
+import com.client.talkster.dto.TokenDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.utils.FileUtils;
@@ -64,13 +68,13 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 {
     private UserJWT userJWT;
     private User user;
-    private EditText receiverInput;
-    private Button sendMessageButton, galleryButton, cameraButton;
+    private Button galleryButton, cameraButton, addFriendButton;
     private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
     private ImageButton lastNameEditButton, lastNameSaveButton;
     private ImageView profileImageView;
-    private EditText sendMessageInput;
     private View profileView, leftPager;
+    private EditText firstNameEditText, lastNameEditText, mailEditText;
+    private TextView firstNameView, lastNameView;
     private ConstraintLayout mediaChooserLayout, firstNameLayout, firstNameEditLayout, lastNameLayout, lastNameEditLayout;
     private FileUtils fileUtils;
     public APIStompWebSocket apiStompWebSocket;
@@ -98,9 +102,6 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     @Override
     public void getUIElements(View view)
     {
-        receiverInput = view.findViewById(R.id.receiverInput);
-        sendMessageInput = view.findViewById(R.id.sendMessageInput);
-        sendMessageButton = view.findViewById(R.id.sendMessageButton);
         profileImageView = view.findViewById(R.id.profileImageView);
         imageEditButton = view.findViewById(R.id.imageEditButton);
         galleryButton = view.findViewById(R.id.galleryButton);
@@ -119,30 +120,37 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         lastNameEditButton = view.findViewById(R.id.lastNameEditButton);
         lastNameSaveButton = view.findViewById(R.id.lastNameSaveButton);
 
+        firstNameView = view.findViewById(R.id.firstNameView);
+        lastNameView = view.findViewById(R.id.lastNameView);
+        firstNameEditText = view.findViewById(R.id.firstNameEditText);
+        lastNameEditText = view.findViewById(R.id.lastNameEditText);
+
+        firstNameView.setText(user.getFirstname());
+        firstNameEditText.setText(user.getFirstname());
+        String lastname = user.getLastname();
+        if (lastname.isBlank()){
+            lastNameView.setText(R.string.last_name_placeholder);
+            lastNameView.setTextColor(getResources().getColor(R.color.previewSecondaryText));
+            lastNameEditText.setText("");
+        }
+        else {
+            lastNameView.setText(lastname);
+            lastNameEditText.setText(lastname);
+        }
+
+        addFriendButton = view.findViewById(R.id.addFriendButton);
+        mailEditText = view.findViewById(R.id.mailEditText);
+
         leftPager = view.findViewById(R.id.leftPager);
 
         initPager();
 
-        sendMessageButton.setOnClickListener(view1 -> {
-
-            MessageDTO messageDTO = new MessageDTO();
-
-            messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getAccessToken());
-            messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
-            messageDTO.setmessagecontent(sendMessageInput.getText().toString());
-
-            if(receiverInput.getText().toString().length() > 0)
-                messageDTO.setreceiverid(Long.parseLong(receiverInput.getText().toString()));
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
-
-            if(receiverInput.getText().toString().length() == 0)
-                apiStompWebSocket.getWebSocketClient().send("/app/message", new Gson().toJson(messageDTO)).subscribe();
-            else
-                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
-
+        addFriendButton.setOnClickListener(view1 -> {
+            ChatCreateDTO chatCreateDTO = new ChatCreateDTO();
+            APIHandler<ChatCreateDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            chatCreateDTO.setSenderID(userJWT.getID());
+            chatCreateDTO.setReceiverEmail(mailEditText.getText().toString());
+            apiHandler.apiPOST(APIEndpoints.TALKSTER_API_CHAT_CREATE, chatCreateDTO, userJWT.getAccessToken());
         });
 
         imageEditButton.setOnClickListener(view1 -> {
@@ -151,7 +159,6 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
         closeMediaButton.setOnClickListener(view1 -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
-            System.out.println("close button pushed");
         });
 
         cameraButton.setOnClickListener(view1 -> {
@@ -178,6 +185,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         });
 
         firstNameSaveButton.setOnClickListener(view1 -> {
+            updateUserName();
             firstNameLayout.setVisibility(View.VISIBLE);
             firstNameEditLayout.setVisibility(View.INVISIBLE);
         });
@@ -188,6 +196,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         });
 
         lastNameSaveButton.setOnClickListener(view1 -> {
+            updateUserName();
             lastNameLayout.setVisibility(View.VISIBLE);
             lastNameEditLayout.setVisibility(View.INVISIBLE);
         });
@@ -233,6 +242,25 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
     public void updateProfilePicture(){
         profileImageView.setImageBitmap(fileUtils.getProfilePicture(user.getId()));
+    }
+
+    private void updateUserName(){
+        String first = firstNameEditText.getText().toString();
+        String last = lastNameEditText.getText().toString();
+        firstNameView.setText(first);
+        if (!last.isBlank()){
+            lastNameView.setText(last);
+            lastNameView.setTextColor(getResources().getColor(R.color.previewMainText));
+        } else {
+            lastNameView.setText(R.string.last_name_placeholder);
+            lastNameView.setTextColor(getResources().getColor(R.color.previewSecondaryText));
+            lastNameEditText.setText("");
+        }
+        NameDTO nameDTO = new NameDTO();
+        APIHandler<NameDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+        nameDTO.setFirstName(first);
+        nameDTO.setLastName(last);
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_USER_UPDATE_NAME, nameDTO, userJWT.getAccessToken());
     }
 
 }

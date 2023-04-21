@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
@@ -28,6 +29,7 @@ import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.utils.BundleExtraNames;
+import com.client.talkster.utils.FileUtils;
 import com.google.gson.Gson;
 
 import org.modelmapper.ModelMapper;
@@ -45,6 +47,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private HashMap<Long, Chat> chatHashMap;
     private ChatListAdapter chatListAdapter;
     private View rightPager;
+    private SwipeRefreshLayout chatRefreshLayout;
 
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
@@ -76,6 +79,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         userChatList = view.findViewById(R.id.userChatList);
 
         rightPager = view.findViewById(R.id.rightPager);
+        chatRefreshLayout = view.findViewById(R.id.chatRefreshLayout);
 
         initPager();
 
@@ -95,8 +99,18 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             @Override
             public void onItemLongClick(int position, View v) {
             }
-        });
+        }, new FileUtils(userJWT));
         userChatList.setAdapter(chatListAdapter);
+
+        chatRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        reloadUserChats();
+                        chatRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
     }
 
     private void reloadUserChats()

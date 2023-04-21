@@ -99,8 +99,10 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
 
         }
-        else
+        else {
             userNameText.setText(chat.getReceiverName());
+            userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
+        }
 
         userStatusText.setText("last seen at 12:35");
 

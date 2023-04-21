@@ -234,6 +234,24 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 Chat chat = new Gson().fromJson(responseBody, Chat.class);
                 runOnUiThread (() -> iChatListener.addChat(chat));
             }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_CREATE))
+            {
+                if(responseCode != 200){
+                    if(responseCode == 409){
+                        runOnUiThread(() -> Toast.makeText(this, "Friend already added!", Toast.LENGTH_SHORT).show());
+                    }
+                    if(responseCode == 404){
+                        runOnUiThread(() -> Toast.makeText(this, "Friend not found!", Toast.LENGTH_SHORT).show());
+                    }
+                    else{throw new UserUnauthorizedException("Unexpected response " + response);}
+                }
+                else{
+                    String responseBody = response.body().string();
+                    Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                    runOnUiThread(() -> Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show());
+                    runOnUiThread (() -> iChatListener.addChat(chat));
+                }
+            }
             else if(apiUrl.equals(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS))
             {
                 if(responseCode != 200)
