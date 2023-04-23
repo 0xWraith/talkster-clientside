@@ -1,22 +1,16 @@
 package com.client.talkster;
 
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,6 +31,7 @@ import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
@@ -52,7 +47,6 @@ import com.client.talkster.interfaces.IMapWebSocketHandler;
 import com.client.talkster.services.LocationService;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
-import com.client.talkster.utils.PermissionChecker;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -60,14 +54,13 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import io.github.muddz.styleabletoast.StyleableToast;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -95,6 +88,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         getBundleElements();
         getUIElements();
+        bottomNavigation.setSelectedItemId(R.id.mapMenuID);
     }
 
     @Override
@@ -213,7 +207,11 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
     {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -234,21 +232,31 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 Chat chat = new Gson().fromJson(responseBody, Chat.class);
                 runOnUiThread (() -> iChatListener.addChat(chat));
             }
+            if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO))
+            {
+                if(responseCode != 200)
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                String responseBody = response.body().string();
+                Chat[] chats = new Gson().fromJson(responseBody, Chat[].class);
+                List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
+
+                runOnUiThread (() -> chatsFragment.updateChatListInfo(chatList));
+            }
             else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_CREATE))
             {
                 if(responseCode != 200){
                     if(responseCode == 409){
-                        runOnUiThread(() -> Toast.makeText(this, "Friend already added!", Toast.LENGTH_LONG).show());
+                        runOnUiThread(() -> StyleableToast.makeText(this, "Friend already added!", R.style.friendAlreadyAdded).show());
                     }
                     if(responseCode == 404){
-                        runOnUiThread(() -> Toast.makeText(this, "Friend not found!", Toast.LENGTH_LONG).show());
+                        runOnUiThread(() -> StyleableToast.makeText(this, "Friend not found!", R.style.friendNotFound).show());
                     }
                     else{throw new UserUnauthorizedException("Unexpected response " + response);}
                 }
                 else{
                     String responseBody = response.body().string();
                     Chat chat = new Gson().fromJson(responseBody, Chat.class);
-                    runOnUiThread(() -> Toast.makeText(this, "Friend added!", Toast.LENGTH_LONG).show());
+                    runOnUiThread(() -> StyleableToast.makeText(this, "Friend added!", R.style.friendAdded).show());
                     runOnUiThread (() -> iChatListener.addChat(chat));
                 }
             }
@@ -280,6 +288,13 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 if (responseCode != 200){
                     throw new UserUnauthorizedException("Unexpected response " + response);
                 }
+                runOnUiThread (() -> peoplesFragment.updateProfilePicture());
+            }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_DELETE_PROFILE)) {
+                if (responseCode != 200){
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                }
+                runOnUiThread(() -> StyleableToast.makeText(this, "Profile picture deleted!", R.style.pictureRemoved).show());
                 runOnUiThread (() -> peoplesFragment.updateProfilePicture());
             }
         }
@@ -333,7 +348,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Request code:"+requestCode+" result code:"+resultCode, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Request code:"+requestCode+" result code:"+resultCode, Toast.LENGTH_SHORT).show();
         }
     }
 

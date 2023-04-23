@@ -1,9 +1,6 @@
 package com.client.talkster.utils;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,19 +11,15 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
-import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
@@ -142,7 +135,7 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
             {
                 if (responseCode != 200){
-                    if (responseCode == 404){
+                    if (responseCode == 404 || responseCode == 500){
                         BitmapFactory.Options bfo = new BitmapFactory.Options();
                         bfo.inScaled = false;
                         image = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),

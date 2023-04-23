@@ -4,21 +4,19 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
 
     <queries>
         <package android:name="com.squareup.okhttp3" />
     </queries>
-
-
 
     <application
         android:name="com.client.talkster.MyApplication"
@@ -29,44 +27,39 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Talkster">
-
-
+        <activity
+            android:name=".controllers.OfflineActivity"
+            android:exported="false" />
         <activity
             android:name=".PrivateChatActivity"
             android:exported="false"
             android:screenOrientation="locked" />
-
         <activity
             android:name=".HomeActivity"
             android:exported="false"
             android:screenOrientation="locked" />
-
         <activity
             android:name=".utils.FileUtils"
             android:exported="false"
             android:screenOrientation="locked" />
-
         <activity
             android:name=".controllers.authorization.RegistrationActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="locked" />
-
+            android:screenOrientation="locked"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".controllers.authorization.MailConfirmationActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false"
             android:screenOrientation="locked" />
-
         <activity
             android:name=".controllers.authorization.InputMailActivity"
             android:exported="false"
             android:screenOrientation="locked" />
-
         <activity
             android:name=".controllers.IntroductionScreenActivity"
             android:exported="false"
             android:screenOrientation="locked" />
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -78,20 +71,24 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCwopNDQABzQ3EwvREKWwmArWhagFdf54k" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCwopNDQABzQ3EwvREKWwmArWhagFdf54k" />
 
-        <service android:name=".api.MyFirebaseMessagingService" android:exported="false">
+        <service
+            android:name=".api.MyFirebaseMessagingService"
+            android:exported="false">
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@mipmap/ic_launcher_round" />
+
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <service android:name=".services.LocationService" android:foregroundServiceType="location" />
-
+        <service
+            android:name=".services.LocationService"
+            android:foregroundServiceType="location" />
     </application>
-
 
 </manifest>

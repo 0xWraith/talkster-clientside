@@ -31,6 +31,7 @@ import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
@@ -89,7 +90,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         chatView = findViewById(R.id.chatView);
-        userAvatarImage = findViewById(R.id.userAvatarImage);
+        userAvatarImage = findViewById(R.id.circularBackground);
         recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
 
@@ -243,7 +244,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl) {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        startActivity(intent);
+        finish();
     }
 
     @Override

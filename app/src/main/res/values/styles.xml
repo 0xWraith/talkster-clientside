@@ -53,4 +53,28 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="customToast">
+        <item name="stColorBackground">@color/aquamarine</item>
+        <item name="stTextColor">@android:color/white</item>
+        <item name="stTextBold">true</item>
+        <item name="stRadius">10dp</item>
+        <item name="stLength">LONG</item>
+    </style>
+
+    <style name="pictureRemoved" parent="customToast">
+        <item name="stIconStart">@drawable/delete_24</item>
+    </style>
+
+    <style name="friendAdded" parent="customToast">
+        <item name="stIconStart">@drawable/person_add_24</item>
+    </style>
+
+    <style name="friendAlreadyAdded" parent="customToast">
+        <item name="stIconStart">@drawable/check_24</item>
+    </style>
+
+    <style name="friendNotFound" parent="customToast">
+        <item name="stIconStart">@drawable/close_24</item>
+    </style>
+
 </resources>

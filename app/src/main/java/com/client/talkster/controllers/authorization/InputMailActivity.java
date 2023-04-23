@@ -6,17 +6,21 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.AuthenticationDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
@@ -35,6 +39,7 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
 
     private Vibrator vibrator;
     private EditText emailAddressInput;
+    private ProgressBar mailProgressbar;
     private AuthenticationDTO authenticationDTO;
     private final Pattern mailPattern = Pattern.compile("(?:[a-z\\d!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z\\d!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z\\d](?:[a-z\\d-]*[a-z\\d])?\\.)+[a-z\\d](?:[a-z\\d-]*[a-z\\d])?|\\[(?:(2(5[0-5]|[0-4]\\d)|1\\d\\d|[1-9]?\\d)\\.){3}(?:(2(5[0-5]|[0-4]\\d)|1\\d\\d|[1-9]?\\d)|[a-z\\d-]*[a-z\\d]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)])");
 
@@ -54,6 +59,7 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
 
         continueButton = findViewById(R.id.continueButton);
         emailAddressInput = findViewById(R.id.emailAddressInput);
+        mailProgressbar = findViewById(R.id.mailProgressBar);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         continueButton.setOnClickListener(view -> {
@@ -67,6 +73,7 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
             {
                 vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
                 emailAddressInput.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_mail_input_error));
+                emailAddressInput.setText("");
                 return;
             }
 
@@ -74,6 +81,8 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
             APIHandler<AuthenticationDTO, InputMailActivity> apiHandler = new APIHandler<>(this);
 
             apiHandler.apiPOST(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_FIND_USER, authenticationDTO, "");
+            mailProgressbar.setVisibility(View.VISIBLE);
+            MyApplication.hideKeyboard(this);
         });
     }
 
@@ -83,7 +92,11 @@ public class InputMailActivity extends AppCompatActivity implements IActivity, I
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
     {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        startActivity(intent);
+        finish();
     }
 
     @Override

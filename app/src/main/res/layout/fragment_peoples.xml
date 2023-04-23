@@ -33,11 +33,13 @@
         android:layout_height="100dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:padding="3dp"
         android:src="@drawable/blank_profile"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view"
         app:shapeAppearanceOverlay="@style/circleImage"
-        app:strokeColor="@null" />
+        app:strokeColor="@color/gunmetal2"
+        app:strokeWidth="3dp" />
 
     <ImageButton
         android:id="@+id/imageEditButton"
@@ -215,12 +217,68 @@
             app:tint="@android:color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <EditText
+        android:id="@+id/mailEditText"
+        style="@style/LoginMailEditText"
+        android:inputType="textEmailAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="48dp"
+        android:ems="10"
+        android:hint="e-mail"
+        android:autofillHints="E-mail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:textColor="@color/previewMainText"
+        android:textSize="18sp"
+        android:text="Add Friends"
+        app:layout_constraintStart_toStartOf="@+id/mailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
+
+    <Button
+        android:id="@+id/addFriendButton"
+        style="@style/wfButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:text="Add Friend"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:drawableRight="@drawable/person_add_24"
+        android:drawableTint="@android:color/white"
+        android:drawablePadding="0dp"
+        android:paddingRight="48dp"
+        android:paddingLeft="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/mailEditText"
+        app:layout_constraintStart_toStartOf="@+id/mailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/mailEditText" />
+
+    <View
+        android:id="@+id/profileView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/mediaChooserLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mediaChooserLayout"
         android:layout_width="0dp"
         android:layout_height="96dp"
         android:background="@drawable/drawable_rounded_top"
         android:visibility="visible"
+        android:elevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent">
@@ -286,58 +344,5 @@
             app:tint="@android:color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
-        android:id="@+id/profileView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/mediaChooserLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view" />
-
-    <EditText
-        android:id="@+id/mailEditText"
-        style="@style/LoginMailEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="48dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:autofillHints="E-Mail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:textColor="@color/previewMainText"
-        android:textSize="18sp"
-        android:text="Add Friends"
-        app:layout_constraintStart_toStartOf="@+id/mailEditText"
-        app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
-
-    <Button
-        android:id="@+id/addFriendButton"
-        style="@style/wfButton"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:text="Add Friend"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:drawableRight="@drawable/person_add_24"
-        android:drawableTint="@android:color/white"
-        android:drawablePadding="0dp"
-        android:paddingRight="48dp"
-        android:paddingLeft="48dp"
-        app:layout_constraintEnd_toEndOf="@+id/mailEditText"
-        app:layout_constraintStart_toStartOf="@+id/mailEditText"
-        app:layout_constraintTop_toBottomOf="@+id/mailEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

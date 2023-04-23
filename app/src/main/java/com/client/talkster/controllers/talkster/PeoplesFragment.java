@@ -1,28 +1,11 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -30,45 +13,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import com.client.talkster.HomeActivity;
-import com.client.talkster.PrivateChatActivity;
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
-import com.client.talkster.classes.Chat;
-import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.ChatCreateDTO;
-import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.dto.NameDTO;
-import com.client.talkster.dto.TokenDTO;
-import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.utils.FileUtils;
-import com.client.talkster.utils.enums.MessageType;
-import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import okhttp3.Call;
-import okhttp3.Response;
 
 public class PeoplesFragment extends Fragment implements IFragmentActivity
 {
     private UserJWT userJWT;
     private User user;
-    private Button galleryButton, cameraButton, addFriendButton;
+    private Button galleryButton, cameraButton, addFriendButton, deleteButton;
     private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
     private ImageButton lastNameEditButton, lastNameSaveButton;
     private ImageView profileImageView;
@@ -106,6 +74,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         imageEditButton = view.findViewById(R.id.imageEditButton);
         galleryButton = view.findViewById(R.id.galleryButton);
         cameraButton = view.findViewById(R.id.cameraButton);
+        deleteButton = view.findViewById(R.id.deleteButton);
         closeMediaButton = view.findViewById(R.id.closeMediaButton);
         mediaChooserLayout = view.findViewById(R.id.mediaChooserLayout);
         profileView = view.findViewById(R.id.profileView);
@@ -147,10 +116,12 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
         addFriendButton.setOnClickListener(view1 -> {
             ChatCreateDTO chatCreateDTO = new ChatCreateDTO();
+            MyApplication.hideKeyboard((AppCompatActivity) getActivity());
             APIHandler<ChatCreateDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
             chatCreateDTO.setSenderID(userJWT.getID());
             chatCreateDTO.setReceiverEmail(mailEditText.getText().toString());
             apiHandler.apiPOST(APIEndpoints.TALKSTER_API_CHAT_CREATE, chatCreateDTO, userJWT.getAccessToken());
+            mailEditText.setText("");
         });
 
         imageEditButton.setOnClickListener(view1 -> {
@@ -177,6 +148,12 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
                     .cropSquare()
                     .maxResultSize(256,256)
                     .start(101);
+        });
+
+        deleteButton.setOnClickListener(view1 -> {
+            mediaChooserLayout.animate().translationY(0).setDuration(250);
+            APIHandler<ChatCreateDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            apiHandler.apiDELETE(APIEndpoints.TALKSTER_API_FILE_DELETE_PROFILE, userJWT.getAccessToken());
         });
 
         firstNameEditButton.setOnClickListener(view1 -> {
@@ -245,6 +222,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
     }
 
     private void updateUserName(){
+        MyApplication.hideKeyboard((AppCompatActivity) getActivity());
         String first = firstNameEditText.getText().toString();
         String last = lastNameEditText.getText().toString();
         if (first.isBlank()){

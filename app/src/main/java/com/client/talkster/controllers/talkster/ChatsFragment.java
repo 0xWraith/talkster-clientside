@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -51,6 +49,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
+    private boolean doReload = false;
 
     public ChatsFragment(UserJWT userJWT)
     {
@@ -72,6 +71,21 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(doReload){
+            updateUserChats();
+            System.out.println("On Resume Run");
+        }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        doReload = true;
+    }
+
+    @Override
     public void getUIElements(View view)
     {
         chatHashMap = new HashMap<>();
@@ -87,7 +101,6 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             @Override
             public void onItemClick(int position, View v)
             {
-
                 Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
 
                 privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
@@ -103,12 +116,9 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         userChatList.setAdapter(chatListAdapter);
 
         chatRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        reloadUserChats();
-                        chatRefreshLayout.setRefreshing(false);
-                    }
+                () -> {
+                    reloadUserChats();
+                    chatRefreshLayout.setRefreshing(false);
                 }
         );
     }
@@ -117,6 +127,11 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     {
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getAccessToken());
+    }
+
+    private void updateUserChats(){
+        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO, userJWT.getAccessToken());
     }
 
     private void updateChatListVisibility()
@@ -134,6 +149,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private void onUserReceivedMessage(Message message)
     {
         long chatID = message.getChatID();
+        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
 
         if(chatHashMap.containsKey(chatID))
         {
@@ -155,7 +171,6 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             return;
         }
 
-        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getAccessToken());
     }
 
@@ -193,6 +208,30 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         chatListAdapter.notifyItemChanged(0);
     }
 
+    public void updateChat(Chat chat){
+        long chatID = chat.getId();
+
+        if (chatHashMap.containsKey(chatID)) {
+            Chat oldChat = chatHashMap.get(chatID);
+            int chatIndex = chatListAdapter.chatList.indexOf(oldChat);
+
+            oldChat.setReceiverFirstname(chat.getReceiverFirstname());
+            oldChat.setReceiverLastname(chat.getReceiverLastname());
+
+            if (chat.getOwnerID() != userJWT.getID()){
+                ChatListAdapter.ChatViewHolder holder = chatListAdapter.viewHashMap.get(chatID);
+                FileUtils fileUtils = new FileUtils(userJWT);
+                holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
+            }
+
+            chatListAdapter.notifyItemChanged(chatIndex);
+        }
+        else {
+            APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT+"/"+chatID+"/"+userJWT.getID(), userJWT.getAccessToken());
+        }
+    }
+
     @Override
     public void updateChatList(List<Chat> chatList)
     {
@@ -202,8 +241,11 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         chatList.forEach(chat -> chatHashMap.put(chat.getId(), chat));
         updateChatListVisibility();
 
-        if(chatList.size() > 0)
-            chatListAdapter.notifyItemChanged(0);
+        chatListAdapter.notifyDataSetChanged();
+    }
+
+    public void updateChatListInfo(List<Chat> chatList){
+        chatList.forEach(this::updateChat);
     }
 
     @Override

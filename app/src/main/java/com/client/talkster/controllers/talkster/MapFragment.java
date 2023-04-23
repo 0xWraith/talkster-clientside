@@ -1,7 +1,6 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,12 +9,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.client.talkster.HomeActivity;
-import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.LocationAdapter;
 import com.client.talkster.api.APIEndpoints;
@@ -31,7 +30,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,10 +45,11 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     private UserJWT userJWT;
     private MapView mapView;
     private final float ZOOM_LEVEL = 15.0f;
+    private boolean setLocation = false;
     private Bundle mapViewBundle = null;
     private LocationAdapter userLastLocation;
     private Marker userMarker;
-
+    private ImageButton plusButton, minusButton;
     private View rightPager, leftPager;
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
@@ -87,7 +86,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         if(locationAdapter == null || map == null)
             return;
 
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), ZOOM_LEVEL));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), ZOOM_LEVEL));
     }
 
     @Override
@@ -98,7 +97,26 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         rightPager = view.findViewById(R.id.rightPager);
         leftPager = view.findViewById(R.id.leftPager);
 
+        plusButton = view.findViewById(R.id.plusButton);
+        minusButton = view.findViewById(R.id.minusButton);
+
         initPager();
+
+        plusButton.setOnClickListener(view1 -> {
+            float zoom = map.getCameraPosition().zoom;
+            zoom += 1.5f;
+            if (zoom > map.getMaxZoomLevel())
+                zoom = map.getMaxZoomLevel();
+            map.animateCamera( CameraUpdateFactory.zoomTo(zoom) );
+        });
+
+        minusButton.setOnClickListener(view1 -> {
+            float zoom = map.getCameraPosition().zoom;
+            zoom -= 1.5f;
+            if (zoom < map.getMinZoomLevel())
+                zoom = map.getMinZoomLevel();
+            map.animateCamera( CameraUpdateFactory.zoomTo(zoom) );
+        });
     }
 
     @Override
@@ -107,6 +125,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         super.onResume();
         mapView.onResume();
         updateMarkerIcons();
+
     }
 
     @Override
@@ -156,7 +175,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, userJWT.getAccessToken());
         });
 
-        moveCameraToUserLocation(userLastLocation);
+        setLocation = true;
     }
 
     @Override
@@ -187,6 +206,11 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         if(map == null)
             return;
+
+        if (setLocation) {
+            moveCameraToUserLocation(userLastLocation);
+            setLocation = false;
+        }
 
         if(userMarker != null) {
             userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));

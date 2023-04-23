@@ -68,5 +68,6 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:2.3.0'
     implementation 'com.github.dhaval2404:imagepicker:2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
+    implementation 'io.github.muddz:styleabletoast:2.4.0'
 }
 

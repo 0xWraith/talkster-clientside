@@ -17,11 +17,13 @@ import com.client.talkster.utils.FileUtils;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>
 {
     public List<Chat> chatList;
+    public HashMap<Long, ChatViewHolder> viewHashMap = new HashMap<>();
     private final Context context;
     private final IChatClickListener IChatClickListener;
     private final FileUtils fileUtils;
@@ -47,6 +49,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     {
 
         Chat chat = chatList.get(position);
+        viewHashMap.put(chat.getId(), holder);
 
         if(chat.getReceiverID() == chat.getOwnerID())
         {
@@ -95,11 +98,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     @Override
     public int getItemCount() { return chatList.size(); }
 
-    class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
+    public class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
         private final TextView userNameText;
         private final TextView chatPreviewText;
-        private final ShapeableImageView userAvatarImage;
+        public final ShapeableImageView userAvatarImage;
 
         public ChatViewHolder(@NonNull View itemView)
         {
@@ -107,7 +110,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
 
             userNameText = itemView.findViewById(R.id.userNameText);
             chatPreviewText = itemView.findViewById(R.id.chatPreviewText);
-            userAvatarImage = itemView.findViewById(R.id.userAvatarImage);
+            userAvatarImage = itemView.findViewById(R.id.circularBackground);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
