@@ -13,22 +13,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.client.talkster.R;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
+import com.client.talkster.utils.FileUtils;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>
 {
     public List<Chat> chatList;
+    public HashMap<Long, ChatViewHolder> viewHashMap = new HashMap<>();
     private final Context context;
     private final IChatClickListener IChatClickListener;
+    private final FileUtils fileUtils;
 
-    public ChatListAdapter(Context context, IChatClickListener IChatClickListener)
+    public ChatListAdapter(Context context, IChatClickListener IChatClickListener, FileUtils fileUtils)
     {
         this.context = context;
         this.chatList = new ArrayList<>();
         this.IChatClickListener = IChatClickListener;
+        this.fileUtils = fileUtils;
     }
 
     @NonNull
@@ -44,15 +49,17 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     {
 
         Chat chat = chatList.get(position);
+        viewHashMap.put(chat.getId(), holder);
 
         if(chat.getReceiverID() == chat.getOwnerID())
         {
             holder.userNameText.setText(R.string.saved_messages);
+            //holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
             holder.userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
         }
         else
         {
-            holder.userAvatarImage.setImageResource(R.drawable.account_circle_64);
+            holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
             holder.userNameText.setText(chat.getReceiverName());
         }
 
@@ -84,18 +91,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             }
             return;
         }
-        holder.chatPreviewText.setText(R.string.cleared_history);
-        holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aurora_1));
+        holder.chatPreviewText.setText(context.getString(R.string.empty_chat, chat.getReceiverFirstname()));
+        holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aquamarine_dark));
     }
 
     @Override
     public int getItemCount() { return chatList.size(); }
 
-    class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
+    public class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
         private final TextView userNameText;
         private final TextView chatPreviewText;
-        private final ShapeableImageView userAvatarImage;
+        public final ShapeableImageView userAvatarImage;
 
         public ChatViewHolder(@NonNull View itemView)
         {
@@ -103,7 +110,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
 
             userNameText = itemView.findViewById(R.id.userNameText);
             chatPreviewText = itemView.findViewById(R.id.chatPreviewText);
-            userAvatarImage = itemView.findViewById(R.id.userAvatarImage);
+            userAvatarImage = itemView.findViewById(R.id.circularBackground);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

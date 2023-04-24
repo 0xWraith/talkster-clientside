@@ -23,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     sourceSets {
         main {
@@ -67,5 +67,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:23.0.3'
     implementation 'com.google.maps.android:android-maps-utils:2.3.0'
     implementation 'com.github.dhaval2404:imagepicker:2.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
+    implementation 'io.github.muddz:styleabletoast:2.4.0'
 }
 

@@ -62,6 +62,38 @@ public class APIHandler<T, V>
         });
     }
 
+    public void apiDELETE(String apiUrl, String jwtToken)
+    {
+        Request request = new Request
+                .Builder()
+                .url(TALKSTER_SERVER_URL + apiUrl)
+                .addHeader("Authorization", jwtToken)
+                .delete()
+                .build();
+
+        okHttpClient.newCall(request).enqueue(new Callback()
+        {
+            IAPIResponseHandler responseHandler;
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+                if(activity instanceof IAPIResponseHandler)
+                    responseHandler = (IAPIResponseHandler) activity;
+
+                responseHandler.onFailure(call, e, apiUrl);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if(activity instanceof IAPIResponseHandler)
+                    responseHandler = (IAPIResponseHandler) activity;
+
+                responseHandler.onResponse(call, response, apiUrl);
+            }
+        });
+    }
+
     public void apiPOST(String apiUrl, T object, String jwtToken)
     {
         RequestBody body = RequestBody.create(APIConfig.JSON, new Gson().toJson(object));

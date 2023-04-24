@@ -20,8 +20,8 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.508"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
-        app:layout_constraintTop_toTopOf="@+id/userAvatarImage" />
+        app:layout_constraintStart_toEndOf="@+id/circularBackground"
+        app:layout_constraintTop_toTopOf="@+id/circularBackground" />
 
     <TextView
         android:id="@+id/chatPreviewText"
@@ -32,14 +32,17 @@
         android:singleLine="true"
         android:textColor="@color/previewSecondaryText"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/userAvatarImage"
+        app:layout_constraintBottom_toBottomOf="@+id/circularBackground"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage" />
+        app:layout_constraintStart_toEndOf="@+id/circularBackground" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/userAvatarImage"
+        android:id="@+id/circularBackground"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:src="@drawable/account_circle_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
