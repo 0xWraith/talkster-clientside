@@ -4,9 +4,9 @@
         <shape android:shape="rectangle">
             <corners android:radius="50dp"/>
             <gradient
-                android:startColor = "#FF07ED99"
-                android:centerColor = "#FF04DCAA"
-                android:endColor = "#FF0AEBCD"
+                android:startColor="?attr/button_BackgroundGradient1"
+                android:centerColor="?attr/button_BackgroundGradient2"
+                android:endColor="?attr/button_BackgroundGradient3"
                 android:angle = "-45"
                 android:type = "linear" />
             </shape>

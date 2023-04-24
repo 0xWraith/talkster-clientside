@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".controllers.talkster.MapFragment" >
 
     <View
         android:id="@+id/view2"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -37,6 +37,7 @@
     <color name="gunmetal2">#FF343F46</color>
     <color name="aquamarine">#FF05F0B9</color>
     <color name="aquamarine_dark">#FF04C89A</color>
+    <color name="aquamarine_dark_2">#7905F0B9</color>
 
     <color name="ucrop_color_toolbar">@color/gunmetal</color>
     <color name="ucrop_color_statusbar">@color/gunmetal</color>

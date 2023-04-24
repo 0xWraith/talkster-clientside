@@ -3,9 +3,12 @@ package com.client.talkster.api;
 public class APIEndpoints
 {
     //-----------------------------------[Chats]
+    
+    public final static String TALKSTER_API_CHAT_ACTION = "/api/v1/chat/action";
     public final static String TALKSTER_API_CHAT_GET_CHATS = "/api/v1/chat/user-chats-messages";
     public final  static String TALKSTER_API_CHAT_GET_CHAT = "/api/v1/chat/user-chat";
     public final static String TALKSTER_API_CHAT_CREATE = "/api/v1/chat/create-chat";
+
     public final static String TALKSTER_API_CHAT_GET_NEW_CHAT = "/api/v1/chat/find-chat";
     public final static String TALKSTER_API_CHAT_GET_CHATS_INFO = "/api/v1/chat/user-chats";
     //-----------------------------------[Files]

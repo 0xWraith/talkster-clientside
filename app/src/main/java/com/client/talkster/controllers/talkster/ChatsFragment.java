@@ -3,6 +3,7 @@ package com.client.talkster.controllers.talkster;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.utils.BundleExtraNames;
+import com.client.talkster.utils.enums.MessageType;
 import com.client.talkster.utils.FileUtils;
 import com.google.gson.Gson;
 
@@ -50,6 +52,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
     private boolean doReload = false;
+
 
     public ChatsFragment(UserJWT userJWT)
     {
@@ -156,14 +159,38 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             Chat chat = chatHashMap.get(chatID);
             int chatIndex = chatListAdapter.chatList.indexOf(chat);
 
-            chat.getMessages().add(message);
-            Collections.swap(chatListAdapter.chatList, chatIndex, 0);
+            switch (message.getMessageType())
+            {
+                case MEDIA_MESSAGE:
+                case AUDIO_MESSAGE:
+                case TEXT_MESSAGE:
+                {
 
-            chatListAdapter.notifyItemChanged(chatIndex);
-            chatListAdapter.notifyItemMoved(chatIndex, 0);
+                    chat.getMessages().add(message);
+                    Collections.swap(chatListAdapter.chatList, chatIndex, 0);
 
-            Intent intent = new Intent(BundleExtraNames.CHAT_RECEIVE_BROADCAST + chatID);
-            intent.putExtra(BundleExtraNames.CHAT_NEW_MESSAGE, message);
+                    chatListAdapter.notifyItemChanged(chatIndex);
+                    chatListAdapter.notifyItemMoved(chatIndex, 0);
+                    break;
+                }
+                case CLEAR_CHAT_HISTORY:
+                {
+                    chat.clearMessages();
+                    chatListAdapter.notifyItemChanged(chatIndex);
+                    break;
+                }
+                case DELETE_CHAT:
+                {
+                    chatListAdapter.chatList.remove(chatIndex);
+                    chatListAdapter.notifyItemRemoved(chatIndex);
+                    break;
+                }
+            }
+
+            Intent intent = new Intent(BundleExtraNames.CHAT_PRIVATE_MESSAGE_RECEIVED);
+
+            intent.putExtra(BundleExtraNames.CHAT_ID, chatID);
+            intent.putExtra(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE, message);
 
             if(getActivity() != null)
                 getActivity().sendBroadcast(intent);
@@ -246,6 +273,48 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
     public void updateChatListInfo(List<Chat> chatList){
         chatList.forEach(this::updateChat);
+    }
+
+    @Override
+    public void onChatHistoryCleared(long chatID)
+    {
+        if(!chatHashMap.containsKey(chatID))
+            return;
+
+        Chat chat = chatHashMap.get(chatID);
+        int chatIndex = chatListAdapter.chatList.indexOf(chat);
+
+        chat.clearMessages();
+        chatListAdapter.notifyItemChanged(chatIndex);
+    }
+
+    @Override
+    public void onChatDeleted(long chatID)
+    {
+        if(!chatHashMap.containsKey(chatID))
+            return;
+
+        Chat chat = chatHashMap.get(chatID);
+        int chatIndex = chatListAdapter.chatList.indexOf(chat);
+
+        chatListAdapter.notifyItemRemoved(chatIndex);
+
+        chatListAdapter.chatList.remove(chatIndex);
+        chatHashMap.remove(chatID);
+
+    }
+
+    @Override
+    public void onChatMuted(long chatID, long muteTime)
+    {
+        if(!chatHashMap.containsKey(chatID))
+            return;
+
+        Chat chat = chatHashMap.get(chatID);
+        int chatIndex = chatListAdapter.chatList.indexOf(chat);
+
+        chat.setMuteTime(muteTime);
+        chatListAdapter.notifyItemChanged(chatIndex);
     }
 
     @Override

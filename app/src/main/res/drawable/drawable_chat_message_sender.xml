@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/aquamarine_dark"/>
+<!--    <solid android:color="@color/aquamarine_dark"/>-->
     <corners android:topLeftRadius="15dp"
              android:bottomLeftRadius="15dp"
              android:topRightRadius="15dp"/>
+
+    <gradient
+        android:startColor="?attr/chat_outBubbleGradient1"
+        android:centerColor="?attr/chat_outBubbleGradient2"
+        android:endColor="?attr/chat_outBubbleGradient3"
+        android:angle="-45"
+        android:type="linear"/>
+
 </shape>

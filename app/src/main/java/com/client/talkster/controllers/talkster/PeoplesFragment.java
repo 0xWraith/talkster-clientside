@@ -1,6 +1,13 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
+import android.util.TypedValue;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,6 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -21,19 +32,22 @@ import androidx.fragment.app.FragmentActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
-import com.client.talkster.api.APIEndpoints;
-import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.ChatCreateDTO;
 import com.client.talkster.dto.NameDTO;
+
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
-public class PeoplesFragment extends Fragment implements IFragmentActivity
+public class PeoplesFragment extends Fragment implements IFragmentActivity, IThemeManagerFragmentListener
 {
+    private boolean test = false;
     private UserJWT userJWT;
     private User user;
     private Button galleryButton, cameraButton, addFriendButton, deleteButton;
@@ -78,7 +92,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         closeMediaButton = view.findViewById(R.id.closeMediaButton);
         mediaChooserLayout = view.findViewById(R.id.mediaChooserLayout);
         profileView = view.findViewById(R.id.profileView);
-
+        
         firstNameLayout = view.findViewById(R.id.firstNameLayout);
         firstNameEditLayout = view.findViewById(R.id.firstNameEditLayout);
         firstNameEditButton = view.findViewById(R.id.firstNameEditButton);
@@ -217,6 +231,35 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         updateProfilePicture();
     }
 
+    @Override
+    public void onThemeChanged()
+    {
+        getActivity().setTheme(ThemeManager.getCurrentTheme());
+        ThemeManager.reloadThemeColors(getContext());
+
+        Context context = getContext();
+//        Drawable buttonGradient = AppCompatResources.getDrawable(context, R.drawable.drawable_button_gradient);
+
+        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
+                ThemeManager.getColor("button_BackgroundGradient1"),
+                ThemeManager.getColor("button_BackgroundGradient2"),
+                ThemeManager.getColor("button_BackgroundGradient3")
+        });
+
+        float dip = 5f;
+        Resources r = getResources();
+        float px = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip,
+                r.getDisplayMetrics()
+        );
+
+        gradientDrawable.setCornerRadius(px);
+
+        sendMessageButton.setBackground(gradientDrawable);
+
+    }
+    
     public void updateProfilePicture(){
         profileImageView.setImageBitmap(fileUtils.getProfilePicture(user.getId()));
     }
@@ -247,5 +290,4 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
         nameDTO.setLastName(last);
         apiHandler.apiPUT(APIEndpoints.TALKSTER_API_USER_UPDATE_NAME, nameDTO, userJWT.getAccessToken());
     }
-
 }

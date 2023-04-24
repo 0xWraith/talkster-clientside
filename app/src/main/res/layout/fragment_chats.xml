@@ -5,25 +5,25 @@
     android:id="@+id/relativeLayout7"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
-    tools:context=".controllers.talkster.ChatsFragment">
+    tools:context=".controllers.talkster.ChatsFragment"
+    android:background="?attr/windowBackgroundWhite">
 
     <LinearLayout
         android:id="@+id/toolbarKinda"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="391dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="20dp"
             android:text="@string/appname"
-            android:textColor="@color/previewMainText"
+            android:textColor="?attr/actionBarDefaultTitle"
             android:textSize="26sp"
             android:textStyle="bold" />
 
