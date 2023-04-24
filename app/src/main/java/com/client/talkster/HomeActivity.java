@@ -1,12 +1,12 @@
 package com.client.talkster;
 
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -31,6 +31,7 @@ import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
@@ -39,22 +40,21 @@ import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.dto.TokenDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
+import com.client.talkster.interfaces.IBroadcastRegister;
 import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IChatWebSocketHandler;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
 import com.client.talkster.interfaces.IMapWebSocketHandler;
-import com.client.talkster.services.LocationService;
+import com.client.talkster.interfaces.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
-import com.client.talkster.utils.PermissionChecker;
+import com.client.talkster.utils.enums.EPrivateChatAction;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +63,7 @@ import java.util.Objects;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler, IMapWebSocketHandler
+public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler, IMapWebSocketHandler, IBroadcastRegister, IThemeManagerActivityListener
 {
     private User user;
     private UserJWT userJWT;
@@ -76,7 +76,10 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private IMapGPSPositionUpdate iMapGPSPositionUpdate;
     private ArrayList<Fragment> fragments;
     private APIStompWebSocket apiStompWebSocket;
-    private BroadcastReceiver sendMessageReceiver;
+
+    private BroadcastReceiver chatBroadCastReceiver;
+    private BroadcastReceiver locationBroadCastReceiver;
+
     private BottomNavigationView bottomNavigation;
     private View rightPager;
     private View leftPager;
@@ -89,6 +92,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        ThemeManager.addListener(this);
 
         getBundleElements();
         getUIElements();
@@ -113,13 +118,14 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         fragments = new ArrayList<>(Arrays.asList(chatsFragment, mapFragment, peoplesFragment));
 
+        registerBroadCasts();
         initializeBottomNavigation();
         initPager();
         initializeSocketConnection();
 
-        Intent intent = new Intent(this, LocationService.class);
-        intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
-        startService(intent);
+//        Intent intent = new Intent(this, LocationService.class);
+//        intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
+//        startService(intent);
 
     }
 
@@ -145,30 +151,94 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         user = bundle.getParcelable(BundleExtraNames.USER);
         userJWT = bundle.getParcelable(BundleExtraNames.USER_JWT);
+    }
+    @Override
+    public void registerBroadCasts()
+    {
+        chatBroadCastReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String action = intent.getAction();
+                Bundle bundle = intent.getExtras();
 
-        sendMessageReceiver = new BroadcastReceiver()
+                Log.d("BROADCAST", "onReceive: " + action);
+
+                if(action.equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
+                {
+                    MessageDTO messageDTO = (MessageDTO) bundle.get(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE);
+                    apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+                }
+                else if(action.equals(BundleExtraNames.CHAT_ACTION_BROADCAST))
+                {
+                    long chatID;
+                    MessageDTO messageDTO;
+                    EPrivateChatAction actionType;
+
+                    chatID = (long)bundle.get(BundleExtraNames.CHAT_ACTION_CHAT_ID);
+                    messageDTO = bundle.getParcelable(BundleExtraNames.CHAT_ACTION_MESSAGE_DATA);
+                    actionType = (EPrivateChatAction) bundle.get(BundleExtraNames.CHAT_ACTION_TYPE);
+
+                    switch(actionType)
+                    {
+                        case CLEAR_CHAT_HISTORY:
+                        {
+                            iChatListener.onChatHistoryCleared(chatID);
+                            break;
+                        }
+
+                        case DELETE_CHAT:
+                        {
+                            iChatListener.onChatDeleted(chatID);
+                            break;
+                        }
+                        case MUTE_CHAT:
+                        {
+                            iChatListener.onChatMuted(chatID, messageDTO.getreceiverid());
+                            return;
+                        }
+                    }
+
+                    if(messageDTO == null)
+                        return;
+
+                    apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+                }
+            }
+        };
+
+        locationBroadCastReceiver = new BroadcastReceiver()
         {
             @Override
             public void onReceive(Context context, Intent intent)
             {
                 String action = intent.getAction();
 
-                if(action.equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
-                {
-                    MessageDTO messageDTO = (MessageDTO) intent.getExtras().get(BundleExtraNames.CHAT_NEW_MESSAGE);
-                    apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
-                }
-                else if(action.equals(BundleExtraNames.LOCATION_SERVICE_BROADCAST))
-                {
-                    Location location = (Location) intent.getExtras().get(BundleExtraNames.LOCATION_SERVICE_POSITION);
+                if(!action.equals(BundleExtraNames.LOCATION_SERVICE_BROADCAST))
+                    return;
 
-                    iMapGPSPositionUpdate.onMapGPSPositionUserUpdate(location);
+                Location location = (Location) intent.getExtras().get(BundleExtraNames.LOCATION_SERVICE_POSITION);
 
-                    LocationDTO locationDTO = new LocationDTO(userJWT.getID(), user.getFullName(), userJWT.getAccessToken(), location);
-                    apiStompWebSocket.getWebSocketClient().send("/app/map", new Gson().toJson(locationDTO)).subscribe();
-                }
+                iMapGPSPositionUpdate.onMapGPSPositionUserUpdate(location);
+
+                LocationDTO locationDTO = new LocationDTO(userJWT.getID(), user.getFullName(), userJWT.getAccessToken(), location);
+                apiStompWebSocket.getWebSocketClient().send("/app/map", new Gson().toJson(locationDTO)).subscribe();
             }
         };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
+        intentFilter.addAction(BundleExtraNames.CHAT_ACTION_BROADCAST);
+
+        registerReceiver(chatBroadCastReceiver, intentFilter);
+        registerReceiver(locationBroadCastReceiver, new IntentFilter(BundleExtraNames.LOCATION_SERVICE_BROADCAST));
+    }
+
+    @Override
+    public void unregisterBroadCasts()
+    {
+
     }
 
     @Override
@@ -207,8 +277,13 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     protected void onResume()
     {
         super.onResume();
-        registerReceiver(sendMessageReceiver, new IntentFilter(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST));
-        registerReceiver(sendMessageReceiver, new IntentFilter(BundleExtraNames.LOCATION_SERVICE_BROADCAST));
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        unregisterReceiver(chatBroadCastReceiver);
     }
 
     @Override
@@ -356,4 +431,27 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
     @Override
     public void onMapMessageReceived(String locationRAW) { iMapGPSPositionUpdate.onMapGPSPositionUpdate(locationRAW); }
+
+    @Override
+    public void onThemeChanged()
+    {
+        setTheme(ThemeManager.getCurrentTheme());
+
+        ThemeManager.reloadThemeColors(this);
+        ColorStateList colorStateList = getColorStateList(R.color.menu_item_state);
+
+        int[] colors = new int[]{
+                colorStateList.getColorForState(new int[] { -android.R.attr.state_checked }, 0),
+                colorStateList.getColorForState(new int[] { android.R.attr.state_checked }, 0)
+        };
+
+        colors[0] = ThemeManager.getColor("navBarTabUnactiveIcon");
+        colors[1] = ThemeManager.getColor("navBarTabActiveIcon");
+
+        ColorStateList newColorStateList = new ColorStateList(new int[][] { new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}}, colors);
+        bottomNavigation.setItemIconTintList(newColorStateList);
+
+        peoplesFragment.onThemeChanged();
+        Log.d("Talkster", "Theme changed" + ThemeManager.getCurrentTheme());
+    }
 }

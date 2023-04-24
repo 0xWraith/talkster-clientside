@@ -1,18 +1,13 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Build;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,36 +17,24 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.client.talkster.PrivateChatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+
 import com.client.talkster.R;
-import com.client.talkster.api.APIEndpoints;
-import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
-import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
-import com.client.talkster.dto.MessageDTO;
-import com.client.talkster.interfaces.IAPIResponseHandler;
+import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IFragmentActivity;
+import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
-import com.client.talkster.utils.enums.MessageType;
-import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Response;
-
-public class PeoplesFragment extends Fragment implements IFragmentActivity
+public class PeoplesFragment extends Fragment implements IFragmentActivity, IThemeManagerFragmentListener
 {
+    private boolean test = false;
     private UserJWT userJWT;
     private User user;
     private EditText receiverInput;
@@ -97,7 +80,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
         sendMessageButton.setOnClickListener(view1 -> {
 
-            MessageDTO messageDTO = new MessageDTO();
+            /*MessageDTO messageDTO = new MessageDTO();
 
             messageDTO.setsenderid(userJWT.getID());
             messageDTO.setjwttoken(userJWT.getAccessToken());
@@ -113,8 +96,22 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
             if(receiverInput.getText().toString().length() == 0)
                 apiStompWebSocket.getWebSocketClient().send("/app/message", new Gson().toJson(messageDTO)).subscribe();
             else
-                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+                apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();*/
 
+//            getActivity().setTheme(R.style.Theme_Talkster_First);
+//            getActivity().recreate();
+//            getActivity().setContentView(R.layout.fragment_peoples);
+
+            if(!test)
+            {
+                ThemeManager.applyTheme(R.style.Theme_Talkster_Second);
+                test = true;
+            }
+            else
+            {
+                ThemeManager.applyTheme(R.style.Theme_Talkster_First);
+                test = false;
+            }
         });
 
         imageEditButton.setOnClickListener(view1 -> {
@@ -156,5 +153,34 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity
 
     public void setProfilePicture(Bitmap bitmap){
         profileImageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void onThemeChanged()
+    {
+        getActivity().setTheme(ThemeManager.getCurrentTheme());
+        ThemeManager.reloadThemeColors(getContext());
+
+        Context context = getContext();
+//        Drawable buttonGradient = AppCompatResources.getDrawable(context, R.drawable.drawable_button_gradient);
+
+        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
+                ThemeManager.getColor("button_BackgroundGradient1"),
+                ThemeManager.getColor("button_BackgroundGradient2"),
+                ThemeManager.getColor("button_BackgroundGradient3")
+        });
+
+        float dip = 5f;
+        Resources r = getResources();
+        float px = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip,
+                r.getDisplayMetrics()
+        );
+
+        gradientDrawable.setCornerRadius(px);
+
+        sendMessageButton.setBackground(gradientDrawable);
+
     }
 }

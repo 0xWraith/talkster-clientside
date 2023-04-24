@@ -66,12 +66,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         String channelId = "fcm_default_channel";
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.talkster_logo)
                         .setContentTitle(notificationTitle)
                         .setContentText(notificationBody)
                         .setAutoCancel(true)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
 

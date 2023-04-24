@@ -43,6 +43,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     private Marker userMarker;
     private HashMap<Long, Marker> userMarkers = new HashMap<>();
 
+    public MapFragment() { }
+
     public MapFragment(UserJWT userJWT) { this.userJWT = userJWT; }
 
     @Override

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/drawable_custom_dialog_background"
+        android:layout_height="wrap_content"
+        android:paddingStart="25dp"
+        android:paddingEnd="25dp"
+        android:paddingTop="25dp">
+
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/clear_history"
+            android:textColor="@color/previewMainText"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/confirmationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView7"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:text="@string/clear_history_confirm"
+            android:textColor="@color/previewMainText" />
+
+        <CheckBox
+            android:id="@+id/confirmCheckBox"
+            style="@style/dialogCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/confirmationTextView"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/clear_history_both" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/confirmCheckBox"
+            android:layout_alignParentEnd="true">
+
+            <Button
+                android:id="@+id/cancelButton"
+                style="@style/dialogCancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/confirmButton"
+                style="@style/dialogAcceptButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

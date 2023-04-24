@@ -11,7 +11,7 @@
         android:id="@+id/view"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,6 +45,7 @@
     <Button
         android:id="@+id/sendMessageButton"
         style="@style/wfButton"
+        android:background="@drawable/drawable_button_gradient"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="256dp"
@@ -83,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="Talkster"
-        android:textColor="@color/previewMainText"
+        android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/view"

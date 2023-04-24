@@ -141,7 +141,8 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
             // profilePicture response
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
             {
-                if (responseCode != 200){
+                if (responseCode != 200)
+                {
                     image = null;
                     imageReceived = true;
                     throw new UserUnauthorizedException("Unexpected response " + response);

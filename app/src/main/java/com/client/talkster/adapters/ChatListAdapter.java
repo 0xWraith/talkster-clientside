@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -56,6 +57,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             holder.userNameText.setText(chat.getReceiverName());
         }
 
+        holder.chatMuteIcon.setVisibility(chat.isMuted() ? View.VISIBLE : View.GONE);
 
         if(chat.getMessages().size() > 0)
         {
@@ -94,6 +96,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
         private final TextView userNameText;
+        private final ImageView chatMuteIcon;
         private final TextView chatPreviewText;
         private final ShapeableImageView userAvatarImage;
 
@@ -101,6 +104,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         {
             super(itemView);
 
+            chatMuteIcon = itemView.findViewById(R.id.muteIcon);
             userNameText = itemView.findViewById(R.id.userNameText);
             chatPreviewText = itemView.findViewById(R.id.chatPreviewText);
             userAvatarImage = itemView.findViewById(R.id.userAvatarImage);

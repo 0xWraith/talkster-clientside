@@ -5,14 +5,14 @@
     android:id="@+id/relativeLayout5"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".HomeActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:itemIconTint="@color/menu_item_state"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"

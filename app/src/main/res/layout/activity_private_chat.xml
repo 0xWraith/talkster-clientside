@@ -5,7 +5,7 @@
     android:id="@+id/relativeLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".PrivateChatActivity">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -90,7 +90,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="-8dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -122,7 +122,7 @@
         android:id="@+id/view3"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -142,16 +142,27 @@
 
     <TextView
         android:id="@+id/userNameText"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:textColor="@color/previewMainText"
+        android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/menuButton"
         app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
         app:layout_constraintTop_toTopOf="@+id/userAvatarImage" />
+
+    <ImageView
+        android:id="@+id/muteIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        android:foregroundGravity="center"
+        android:src="@drawable/mute"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/userNameText"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/userStatusText"
@@ -159,7 +170,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:textColor="@color/previewSecondaryText"
+        android:textColor="?attr/actionBarDefaultSubtitle"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/userAvatarImage"
         app:layout_constraintEnd_toStartOf="@+id/menuButton"
@@ -172,7 +183,7 @@
         android:layout_height="40dp"
         android:layout_gravity="center"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/drawable_button_gradient_round"
+        android:background="@color/transparent"
         app:srcCompat="@drawable/send_24"
         app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/chatInputText"
@@ -195,7 +206,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/drawable_button_gradient_round"
+        android:background="@color/transparent"
         app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/view"
         app:layout_constraintStart_toStartOf="@+id/view"

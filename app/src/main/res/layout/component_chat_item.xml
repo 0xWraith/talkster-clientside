@@ -8,34 +8,6 @@
     android:background="@drawable/drawable_chat_border"
     android:minHeight="66dp">
 
-
-    <TextView
-        android:id="@+id/userNameText"
-        android:layout_width="0dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/previewMainText"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
-        app:layout_constraintTop_toTopOf="@+id/userAvatarImage" />
-
-    <TextView
-        android:id="@+id/chatPreviewText"
-        android:layout_width="0dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:singleLine="true"
-        android:textColor="@color/previewSecondaryText"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/userAvatarImage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage" />
-
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/userAvatarImage"
         android:layout_width="64dp"
@@ -46,6 +18,52 @@
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/circleImage"
         app:strokeColor="@null" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:gravity="start"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/userNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:text="Dmytro Dzhuha"
+            android:textColor="?attr/chat_name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.508"/>
+
+        <ImageView
+            android:id="@+id/muteIcon"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/userNameText"
+            android:foregroundGravity="center"
+            android:src="@drawable/mute"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/chatPreviewText"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:singleLine="true"
+        android:textColor="?attr/chat_message"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/userAvatarImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/userAvatarImage" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

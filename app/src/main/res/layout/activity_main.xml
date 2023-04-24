@@ -5,7 +5,7 @@
     android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".MainActivity">
 
     <TextView
@@ -15,7 +15,7 @@
         android:layout_marginBottom="72dp"
         android:gravity="center"
         android:text="Wraith &amp; Kleeat"
-        android:textColor="@color/previewSecondaryText"
+        android:textColor="?attr/actionBarDefaultSubtitle"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/splashScreenUnderLogo"
-        android:textColor="@color/previewSecondaryText"
+        android:textColor="?attr/actionBarDefaultSubtitle"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/imageView4"
         app:layout_constraintStart_toStartOf="@+id/imageView4"
