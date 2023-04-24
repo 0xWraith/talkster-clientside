@@ -32,6 +32,8 @@ import androidx.fragment.app.FragmentActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
+import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
@@ -256,7 +258,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
         gradientDrawable.setCornerRadius(px);
 
-        sendMessageButton.setBackground(gradientDrawable);
+//        sendMessageButton.setBackground(gradientDrawable);
 
     }
     
