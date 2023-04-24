@@ -1,19 +1,21 @@
 package com.client.talkster.controllers.talkster;
 
-import static androidx.core.content.ContextCompat.registerReceiver;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
 import com.client.talkster.adapters.ChatListAdapter;
@@ -27,6 +29,7 @@ import com.client.talkster.interfaces.IChatListener;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.enums.MessageType;
+import com.client.talkster.utils.FileUtils;
 import com.google.gson.Gson;
 
 import org.modelmapper.ModelMapper;
@@ -40,9 +43,15 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 {
     private final UserJWT userJWT;
     private RecyclerView userChatList;
-    private LinearLayout welcomeBlock;
+    private ConstraintLayout welcomeBlock;
     private HashMap<Long, Chat> chatHashMap;
     private ChatListAdapter chatListAdapter;
+    private View rightPager;
+    private SwipeRefreshLayout chatRefreshLayout;
+
+    private final int MIN_DISTANCE = 300;
+    private float x1,x2;
+    private boolean doReload = false;
 
 
     public ChatsFragment(UserJWT userJWT)
@@ -65,17 +74,36 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(doReload){
+            updateUserChats();
+            System.out.println("On Resume Run");
+        }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        doReload = true;
+    }
+
+    @Override
     public void getUIElements(View view)
     {
         chatHashMap = new HashMap<>();
         welcomeBlock = view.findViewById(R.id.welcomeBlock);
         userChatList = view.findViewById(R.id.userChatList);
 
+        rightPager = view.findViewById(R.id.rightPager);
+        chatRefreshLayout = view.findViewById(R.id.chatRefreshLayout);
+
+        initPager();
+
         chatListAdapter = new ChatListAdapter(getContext(), new ChatListAdapter.IChatClickListener() {
             @Override
             public void onItemClick(int position, View v)
             {
-
                 Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
 
                 privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
@@ -87,14 +115,26 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             @Override
             public void onItemLongClick(int position, View v) {
             }
-        });
+        }, new FileUtils(userJWT));
         userChatList.setAdapter(chatListAdapter);
+
+        chatRefreshLayout.setOnRefreshListener(
+                () -> {
+                    reloadUserChats();
+                    chatRefreshLayout.setRefreshing(false);
+                }
+        );
     }
 
     private void reloadUserChats()
     {
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getAccessToken());
+    }
+
+    private void updateUserChats(){
+        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO, userJWT.getAccessToken());
     }
 
     private void updateChatListVisibility()
@@ -112,6 +152,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private void onUserReceivedMessage(Message message)
     {
         long chatID = message.getChatID();
+        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
 
         if(chatHashMap.containsKey(chatID))
         {
@@ -157,8 +198,29 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             return;
         }
 
-        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getAccessToken());
+    }
+
+    private void initPager(){
+        rightPager.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                switch(event.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = event.getX();
+                        float deltaX = x1 - x2;
+                        if (deltaX > MIN_DISTANCE) {
+                            ((HomeActivity)getActivity()).selectNavigationButton(1);}
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -173,6 +235,30 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         chatListAdapter.notifyItemChanged(0);
     }
 
+    public void updateChat(Chat chat){
+        long chatID = chat.getId();
+
+        if (chatHashMap.containsKey(chatID)) {
+            Chat oldChat = chatHashMap.get(chatID);
+            int chatIndex = chatListAdapter.chatList.indexOf(oldChat);
+
+            oldChat.setReceiverFirstname(chat.getReceiverFirstname());
+            oldChat.setReceiverLastname(chat.getReceiverLastname());
+
+            if (chat.getOwnerID() != userJWT.getID()){
+                ChatListAdapter.ChatViewHolder holder = chatListAdapter.viewHashMap.get(chatID);
+                FileUtils fileUtils = new FileUtils(userJWT);
+                holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
+            }
+
+            chatListAdapter.notifyItemChanged(chatIndex);
+        }
+        else {
+            APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT+"/"+chatID+"/"+userJWT.getID(), userJWT.getAccessToken());
+        }
+    }
+
     @Override
     public void updateChatList(List<Chat> chatList)
     {
@@ -182,8 +268,11 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         chatList.forEach(chat -> chatHashMap.put(chat.getId(), chat));
         updateChatListVisibility();
 
-        if(chatList.size() > 0)
-            chatListAdapter.notifyItemChanged(0);
+        chatListAdapter.notifyDataSetChanged();
+    }
+
+    public void updateChatListInfo(List<Chat> chatList){
+        chatList.forEach(this::updateChat);
     }
 
     @Override

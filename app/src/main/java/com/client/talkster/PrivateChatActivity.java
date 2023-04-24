@@ -47,6 +47,7 @@ import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.PrivateChatActionDTO;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
@@ -114,7 +115,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         userStatusText = findViewById(R.id.userStatusText);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         chatView = findViewById(R.id.chatView);
-        userAvatarImage = findViewById(R.id.userAvatarImage);
+        userAvatarImage = findViewById(R.id.circularBackground);
         recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
 
@@ -124,8 +125,10 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
 
         }
-        else
+        else {
             userNameText.setText(chat.getReceiverName());
+            userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
+        }
 
         userStatusText.setText("last seen at 12:35");
 
@@ -200,8 +203,6 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             mediaChooserLayout.animate().translationY(0).setDuration(250);
             ImagePicker.Companion.with(PrivateChatActivity.this)
                     .cameraOnly()
-                    .cropSquare()
-                    .maxResultSize(256,256)
                     .start(101);
         });
 
@@ -209,8 +210,6 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             mediaChooserLayout.animate().translationY(0).setDuration(250);
             ImagePicker.Companion.with(PrivateChatActivity.this)
                     .galleryOnly()
-                    .cropSquare()
-                    .maxResultSize(1024,1024)
                     .start(101);
         });
 
@@ -372,7 +371,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == 101) {
             Uri uri = data.getData();
-            sendImage(uri);
+            sendProfileImage(uri);
 
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
@@ -381,7 +380,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         }
     }
 
-    private void sendImage(Uri uri){
+    private void sendProfileImage(Uri uri){
         FileContent fileContent = new FileContent();
         APIHandler<FileContent, PrivateChatActivity> apiHandler = new APIHandler<>(this);
         try {
@@ -389,7 +388,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             fileContent.setContent(FileUtils.getBytes(uri, cr));
             fileContent.setType(FileUtils.getType(uri, cr));
             fileContent.setFilename(FileUtils.getFilename(uri, cr));
-            apiHandler.apiMultipartPUT(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE,fileContent, userJWT.getAccessToken());
+            apiHandler.apiMultipartPOST(APIEndpoints.TALKSTER_API_FILE_UPLOAD,fileContent, userJWT.getAccessToken());
         } catch (IOException e){
             System.out.println("This Exception was thrown inside the sendImage method");
             e.printStackTrace();
@@ -399,7 +398,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
     {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        startActivity(intent);
+        finish();
     }
 
     @Override

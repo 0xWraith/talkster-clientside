@@ -67,6 +67,16 @@
         <item name="android:layout_marginStart">10dp</item>
     </style>
 
+    <style name="EditText">
+        <item name="android:background">@drawable/drawable_input</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorHint">@color/previewSecondaryText</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">#FFFFFF</item>
+    </style>
+
     <style name="aspectImage">
         <item name="android:layout_centerInParent">true</item>
         <item name="android:adjustViewBounds">true</item>
@@ -74,10 +84,10 @@
     </style>
 
     <style name="LoginMailEditText">
-        <item name="android:background">@drawable/drawable_input_mail</item>
+        <item name="android:background">@drawable/drawable_input</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">@color/previewSecondaryText</item>
-        <item name="android:padding">13dp</item>
+        <item name="android:padding">12dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:drawableTint">#FFFFFF</item>
@@ -205,6 +215,30 @@
 
         <item name="android:statusBarColor">?attr/actionBarDefault</item>
         <item name="android:navigationBarColor">?attr/actionBarDefault</item>
+    </style>
+    
+    <style name="customToast">
+        <item name="stColorBackground">@color/aquamarine</item>
+        <item name="stTextColor">@android:color/white</item>
+        <item name="stTextBold">true</item>
+        <item name="stRadius">10dp</item>
+        <item name="stLength">LONG</item>
+    </style>
+
+    <style name="pictureRemoved" parent="customToast">
+        <item name="stIconStart">@drawable/delete_24</item>
+    </style>
+
+    <style name="friendAdded" parent="customToast">
+        <item name="stIconStart">@drawable/person_add_24</item>
+    </style>
+
+    <style name="friendAlreadyAdded" parent="customToast">
+        <item name="stIconStart">@drawable/check_24</item>
+    </style>
+
+    <style name="friendNotFound" parent="customToast">
+        <item name="stIconStart">@drawable/close_24</item>
     </style>
 
 </resources>

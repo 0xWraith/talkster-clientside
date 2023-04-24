@@ -1,9 +1,6 @@
 package com.client.talkster.utils;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,19 +11,15 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
-import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
@@ -51,9 +44,9 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
 
     public FileUtils(UserJWT userJWT) {this.userJWT = userJWT;}
 
-    public Bitmap getProfilePicture(){
+    public Bitmap getProfilePicture(long userID){
         APIHandler<Object, FileUtils> apiHandler = new APIHandler<>(this);
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE, userJWT.getAccessToken());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE+"/"+userID, userJWT.getAccessToken());
         imageReceived = false;
         while(!imageReceived) {
             try {
@@ -95,8 +88,8 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
         bfo.inScaled = false;
         Bitmap marker = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
                 R.drawable.marker, bfo);
-        bitmap = circleCrop(bitmap);
         bitmap = Bitmap.createScaledBitmap(bitmap, 128, 128, true);
+        bitmap = circleCrop(bitmap);
         Bitmap bmOverlay = Bitmap.createBitmap(marker.getWidth(), marker.getHeight(), marker.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
         canvas.drawBitmap(bitmap, new Matrix(), null);
@@ -141,14 +134,21 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
             // profilePicture response
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
             {
-                if (responseCode != 200)
-                {
-                    image = null;
+                if (responseCode != 200){
+                    if (responseCode == 404 || responseCode == 500){
+                        BitmapFactory.Options bfo = new BitmapFactory.Options();
+                        bfo.inScaled = false;
+                        image = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
+                                R.drawable.blank_profile, bfo);
+                        imageReceived = true;
+                    }
+                    else {
+                        throw new UserUnauthorizedException("Unexpected response " + response);
+                    }
+                } else {
+                    image = BitmapFactory.decodeStream(response.body().byteStream());
                     imageReceived = true;
-                    throw new UserUnauthorizedException("Unexpected response " + response);
                 }
-                image = BitmapFactory.decodeStream(response.body().byteStream());
-                imageReceived = true;
             }
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }

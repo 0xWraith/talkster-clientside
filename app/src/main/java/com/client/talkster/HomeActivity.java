@@ -2,20 +2,25 @@ package com.client.talkster;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
@@ -28,10 +33,12 @@ import com.client.talkster.api.WebSocketPrivateChatSubscriber;
 import com.client.talkster.api.WebSocketPublicChatSubscriber;
 import com.client.talkster.api.WebSocketPublicMapSubscriber;
 import com.client.talkster.classes.Chat;
+import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.ThemeManager;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
@@ -48,7 +55,9 @@ import com.client.talkster.interfaces.IMapWebSocketHandler;
 import com.client.talkster.interfaces.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.enums.EPrivateChatAction;
+import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -60,6 +69,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import io.github.muddz.styleabletoast.StyleableToast;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -81,11 +91,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     private BroadcastReceiver locationBroadCastReceiver;
 
     private BottomNavigationView bottomNavigation;
-    private View rightPager;
-    private View leftPager;
-    private int currentPosition = 0;
-    private final int MIN_DISTANCE = 300;
-    private float x1, x2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -97,6 +102,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         getBundleElements();
         getUIElements();
+        bottomNavigation.setSelectedItemId(R.id.mapMenuID);
     }
 
     @Override
@@ -113,14 +119,10 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         homeViewPager.setUserInputEnabled(false);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        leftPager = findViewById(R.id.leftPager);
-        rightPager = findViewById(R.id.rightPager);
-
         fragments = new ArrayList<>(Arrays.asList(chatsFragment, mapFragment, peoplesFragment));
 
         registerBroadCasts();
         initializeBottomNavigation();
-        initPager();
         initializeSocketConnection();
 
 //        Intent intent = new Intent(this, LocationService.class);
@@ -289,7 +291,11 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
     {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -310,6 +316,34 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 Chat chat = new Gson().fromJson(responseBody, Chat.class);
                 runOnUiThread (() -> iChatListener.addChat(chat));
             }
+            if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO))
+            {
+                if(responseCode != 200)
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                String responseBody = response.body().string();
+                Chat[] chats = new Gson().fromJson(responseBody, Chat[].class);
+                List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
+
+                runOnUiThread (() -> chatsFragment.updateChatListInfo(chatList));
+            }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_CREATE))
+            {
+                if(responseCode != 200){
+                    if(responseCode == 409){
+                        runOnUiThread(() -> StyleableToast.makeText(this, "Friend already added!", R.style.friendAlreadyAdded).show());
+                    }
+                    if(responseCode == 404){
+                        runOnUiThread(() -> StyleableToast.makeText(this, "Friend not found!", R.style.friendNotFound).show());
+                    }
+                    else{throw new UserUnauthorizedException("Unexpected response " + response);}
+                }
+                else{
+                    String responseBody = response.body().string();
+                    Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                    runOnUiThread(() -> StyleableToast.makeText(this, "Friend added!", R.style.friendAdded).show());
+                    runOnUiThread (() -> iChatListener.addChat(chat));
+                }
+            }
             else if(apiUrl.equals(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS))
             {
                 if(responseCode != 200)
@@ -320,13 +354,32 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
                 runOnUiThread (() -> iChatListener.updateChatList(chatList));
             }
-            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE))
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT))
             {
                 if (responseCode != 200){
                     throw new UserUnauthorizedException("Unexpected response " + response);
                 }
-                Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                runOnUiThread (() -> peoplesFragment.setProfilePicture(bitmap));
+                String responseBody = response.body().string();
+                Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                Intent privateChatIntent = new Intent(getApplicationContext(), PrivateChatActivity.class);
+
+                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
+                privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chat);
+
+                startActivity(privateChatIntent);
+            }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE)) {
+                if (responseCode != 200){
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                }
+                runOnUiThread (() -> peoplesFragment.updateProfilePicture());
+            }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_DELETE_PROFILE)) {
+                if (responseCode != 200){
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                }
+                runOnUiThread(() -> StyleableToast.makeText(this, "Profile picture deleted!", R.style.pictureRemoved).show());
+                runOnUiThread (() -> peoplesFragment.updateProfilePicture());
             }
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
@@ -342,22 +395,19 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             int ID = item.getItemId();
 
             if (ID == R.id.chatMenuID) {
-                currentPosition = 0;
                 homeViewPager.setCurrentItem(0);
             }
             else if (ID == R.id.mapMenuID){
-                currentPosition = 1;
                 homeViewPager.setCurrentItem(1);
             }
             else if(ID == R.id.peoplesMenuID) {
-                currentPosition = 2;
                 homeViewPager.setCurrentItem(2);
             }
             return true;
         });
     }
 
-    private void selectNavigationButton(){
+    public void selectNavigationButton(int currentPosition){
         switch (currentPosition){
             case 0:
                 bottomNavigation.setSelectedItemId(R.id.chatMenuID);
@@ -372,54 +422,33 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         }
     }
 
-    private void initPager(){
-        leftPager.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
-            public boolean onTouch(View v, MotionEvent event) {
-                // ... Respond to touch events
-                switch(event.getAction())
-                {
-                    case MotionEvent.ACTION_DOWN:
-                        x1 = event.getX();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        x2 = event.getX();
-                        float deltaX = x2 - x1;
-                        if (deltaX > MIN_DISTANCE) {
-                            currentPosition--;
-                            if(currentPosition <= 0){
-                                currentPosition = 0;
-                            }
-                            selectNavigationButton();}
-                        break;
-                }
-                return true;
-            }
-        });
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == 101) {
+            Uri uri = data.getData();
+            sendProfileImage(uri);
 
-        rightPager.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
-            public boolean onTouch(View v, MotionEvent event) {
-                // ... Respond to touch events
-                switch(event.getAction())
-                {
-                    case MotionEvent.ACTION_DOWN:
-                        x1 = event.getX();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        x2 = event.getX();
-                        float deltaX = x1 - x2;
-                        if (deltaX > MIN_DISTANCE) {
-                            currentPosition++;
-                            if(currentPosition >= 2){
-                                currentPosition = 2;
-                            }
-                            selectNavigationButton();}
-                        break;
-                }
-                return true;
-            }
-        });
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+        } else {
+            //Toast.makeText(this, "Request code:"+requestCode+" result code:"+resultCode, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendProfileImage(Uri uri){
+        FileContent fileContent = new FileContent();
+        APIHandler<FileContent, HomeActivity> apiHandler = new APIHandler<>(this);
+        try {
+            ContentResolver cr = getContentResolver();
+            fileContent.setContent(FileUtils.getBytes(uri, cr));
+            fileContent.setType(FileUtils.getType(uri, cr));
+            fileContent.setFilename(FileUtils.getFilename(uri, cr));
+            apiHandler.apiMultipartPUT(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE,fileContent, userJWT.getAccessToken());
+        } catch (IOException e){
+            System.out.println("This Exception was thrown inside the sendImage method");
+            e.printStackTrace();
+        }
     }
 
     @Override

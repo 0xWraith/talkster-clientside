@@ -129,7 +129,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/userAvatarImage"
+        android:id="@+id/circularBackground"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="8dp"
@@ -150,8 +150,8 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/menuButton"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
-        app:layout_constraintTop_toTopOf="@+id/userAvatarImage" />
+        app:layout_constraintStart_toEndOf="@+id/circularBackground"
+        app:layout_constraintTop_toTopOf="@+id/circularBackground" />
 
     <ImageView
         android:id="@+id/muteIcon"
@@ -172,9 +172,9 @@
         android:layout_marginEnd="8dp"
         android:textColor="?attr/actionBarDefaultSubtitle"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/userAvatarImage"
+        app:layout_constraintBottom_toBottomOf="@+id/circularBackground"
         app:layout_constraintEnd_toStartOf="@+id/menuButton"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage" />
+        app:layout_constraintStart_toEndOf="@+id/circularBackground" />
 
     <ImageButton
         android:id="@+id/chatSendButton"

@@ -11,12 +11,11 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="72dp"
         android:gravity="center"
         android:text="@string/enter_code"
         android:textColor="@color/previewMainText"
         android:textSize="38sp"
-        app:layout_constraintBottom_toTopOf="@+id/codeInputThird"
+        app:layout_constraintBottom_toTopOf="@+id/mailInfoText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,13 +25,15 @@
         android:id="@+id/mailInfoText"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
         android:gravity="center"
         android:textColor="@color/previewSecondaryText"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/textView5"
         app:layout_constraintHorizontal_bias="0.48"
         app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -49,73 +50,95 @@
     <EditText
         android:id="@+id/codeInputFirst"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/codeInputSecond"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@+id/mailInfoText" />
 
     <EditText
         android:id="@+id/codeInputSecond"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/codeInputThird"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/codeInputFirst"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@+id/mailInfoText" />
 
     <EditText
         android:id="@+id/codeInputThird"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/codeInputFourth"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/codeInputSecond"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@+id/mailInfoText" />
 
     <EditText
         android:id="@+id/codeInputFourth"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/codeInputFifth"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/codeInputThird"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@+id/mailInfoText" />
 
     <EditText
         android:id="@+id/codeInputFifth"
         style="@style/LoginEditText"
-        android:background="@drawable/drawable_input_mail"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/drawable_input"
         android:gravity="center"
         android:importantForAutofill="no"
         android:maxLength="1"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/codeInputFourth"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@+id/mailInfoText" />
+
+    <Button
+        android:id="@+id/resendButton"
+        style="@style/wfButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Resend"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/codeInputFifth"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/codeInputFirst"
+        app:layout_constraintTop_toBottomOf="@+id/codeInputThird" />
+
+    <Button
+        android:id="@+id/clearButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:text=" Clear input"
+        android:textColor="@color/previewSecondaryText"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/codeInputFifth"
+        app:layout_constraintHorizontal_bias="0.463"
+        app:layout_constraintStart_toStartOf="@+id/codeInputFirst"
+        app:layout_constraintTop_toBottomOf="@+id/resendButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,12 +1,7 @@
 package com.client.talkster;
 
-import static com.client.talkster.api.APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN;
-import static com.google.firebase.messaging.Constants.TAG;
-
-import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,22 +10,16 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.IntroductionScreenActivity;
-import com.client.talkster.dto.TokenDTO;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IMainActivityScreen;
 import com.client.talkster.utils.BundleExtraNames;
-import com.client.talkster.utils.PermissionChecker;
 import com.client.talkster.utils.UserAccountManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -76,6 +65,15 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         }, SPLASH_DISPLAY_LENGTH);
     }
 
+    public void showOfflineScreen()
+    {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public void showIntroductionScreen()
     {
@@ -93,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
     {
-
+        showOfflineScreen();
     }
 
     @Override
