@@ -10,7 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -21,9 +23,13 @@ import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.TalksterMapIcon;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.theme.ToolbarElements;
+import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
+import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,8 +45,14 @@ import com.google.gson.Gson;
 
 import java.util.HashMap;
 
-public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate
+public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate, IThemeManagerFragmentListener
 {
+
+    private ToolbarElements toolbarElements;
+
+    private ImageView toolbarLogoIcon;
+
+    private ConstraintLayout mapLayout;
     private GoogleMap map;
     private UserJWT userJWT;
     private MapView mapView;
@@ -94,6 +106,14 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     @Override
     public void getUIElements(View view)
     {
+        ImageButton toolbarMenuIcon;
+
+        toolbarElements = new ToolbarElements();
+
+        toolbarMenuIcon = view.findViewById(R.id.toolbarMenuIcon);
+        toolbarLogoIcon = view.findViewById(R.id.toolbarLogoIcon);
+
+        mapLayout = view.findViewById(R.id.mapLayout);
         mapView = view.findViewById(R.id.mapView);
 
         rightPager = view.findViewById(R.id.rightPager);
@@ -101,6 +121,9 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         plusButton = view.findViewById(R.id.plusButton);
         minusButton = view.findViewById(R.id.minusButton);
+
+        toolbarElements.setToolbar(view.findViewById(R.id.toolbar));
+        toolbarElements.addToolbarIcon(toolbarMenuIcon);
 
         initPager();
 
@@ -302,4 +325,12 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         });
     }
 
+    @Override
+    public void onThemeChanged()
+    {
+        ThemeManager.changeToolbarColor(toolbarElements);
+
+        toolbarLogoIcon.setColorFilter(ThemeManager.getColor("actionBarDefaultIcon"));
+        mapLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
+    }
 }

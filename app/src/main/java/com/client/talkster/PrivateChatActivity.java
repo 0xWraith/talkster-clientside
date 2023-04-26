@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
@@ -88,10 +87,10 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        loadApplicationTheme();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_chat);
-
-        ThemeManager.addListener(this);
 
         getBundleElements();
         getUIElements();
@@ -351,6 +350,8 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     protected void onDestroy()
     {
         super.onDestroy();
+
+        removeListener();
         unregisterBroadCasts();
     }
 
@@ -534,8 +535,20 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     }
 
     @Override
-    public void onThemeChanged()
+    public void removeListener()
     {
-        Log.d("Theme", "onThemeChanged: " + ThemeManager.getCurrentTheme());
+        ThemeManager.removeListener(this);
+    }
+
+    @Override
+    public void onThemeChanged() {
+
+    }
+
+    @Override
+    public void loadApplicationTheme()
+    {
+        ThemeManager.addListener(this);
+        setTheme(ThemeManager.getCurrentThemeStyle());
     }
 }

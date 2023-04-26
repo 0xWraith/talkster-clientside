@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/navHeader"
+    android:layout_width="match_parent"
+    android:layout_height="185dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="top"
+    android:background="?attr/chat_backgroundImage"
+    android:orientation="vertical">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/userNavbarAvatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/account_circle_64"
+        app:shapeAppearanceOverlay="@style/circleImage"
+        app:strokeColor="@null" />
+
+    <TextView
+        android:id="@+id/userNavbarName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userNavbarAvatar"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="20dp"
+        android:text="wraith"
+        android:textColor="?attr/navBarText"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/userNavbarEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userNavbarName"
+        android:fontFamily="sans-serif-thin"
+        android:text="d.dzhuhaaa@gmail.com"
+        android:textColor="?attr/navBarSubText"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

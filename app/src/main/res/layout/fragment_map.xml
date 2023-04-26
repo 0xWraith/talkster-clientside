@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,53 +8,62 @@
     android:background="?attr/windowBackgroundWhite"
     tools:context=".controllers.talkster.MapFragment" >
 
-    <View
-        android:id="@+id/view2"
+    <RelativeLayout
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="60dp"
+        android:layout_height="88dp"
         android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/searchInput"
-        style="@style/LoginMailEditText"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:drawableRight="@drawable/search_24"
-        android:drawableTint="@color/previewSecondaryText"
-        android:ems="10"
-        android:hint="@string/search"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="@+id/view2"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
-        app:layout_constraintStart_toEndOf="@+id/imageView7"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/toolbarLogoIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="31dp"
+            android:layout_marginBottom="9dp"
+            android:src="@drawable/talkster_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/actionBarDefaultIcon" />
 
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="8dp"
-        android:background="@color/transparent"
-        android:src="@drawable/menu_32"
-        app:layout_constraintBottom_toBottomOf="@+id/view2"
-        app:layout_constraintEnd_toEndOf="@+id/view2"
-        app:layout_constraintTop_toTopOf="@+id/view2"
-        app:tint="@android:color/white" />
+        <EditText
+            android:id="@+id/toolbarInput"
+            style="@style/LoginMailEditText"
+            android:layout_width="40dp"
+            android:layout_height="48dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="39dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toStartOf="@+id/toolbarMenuIcon"
+            android:layout_toEndOf="@+id/toolbarLogoIcon"
+            android:drawableEnd="@drawable/search_24"
+            android:drawableTint="?attr/actionBarDefaultIcon"
+            android:ems="10"
+            android:hint="@string/search"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toStartOf="@+id/toolbarMenuIcon"
+            app:layout_constraintStart_toEndOf="@+id/toolbarLogoIcon" />
 
-    <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/talkster_logo"
-        app:layout_constraintBottom_toBottomOf="@+id/view2"
-        app:layout_constraintStart_toStartOf="@+id/view2"
-        app:layout_constraintTop_toTopOf="@+id/view2" />
+        <ImageButton
+            android:id="@+id/toolbarMenuIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="31dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/transparent"
+            android:src="@drawable/menu_32"
+            app:tint="?attr/actionBarDefaultIcon" />
+
+    </RelativeLayout>
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
@@ -62,7 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <View
         android:id="@+id/leftPager"
@@ -91,7 +101,7 @@
         android:background="@drawable/drawable_map_button"
         android:src="@drawable/add_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <ImageButton
         android:id="@+id/minusButton"

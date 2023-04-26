@@ -1,13 +1,6 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Bundle;
-import android.util.TypedValue;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -20,10 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -32,22 +21,29 @@ import androidx.fragment.app.FragmentActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
+import com.client.talkster.api.APIEndpoints;
+import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.theme.ButtonElements;
+import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.ChatCreateDTO;
 import com.client.talkster.dto.NameDTO;
-
 import com.client.talkster.interfaces.IFragmentActivity;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
 import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
 public class PeoplesFragment extends Fragment implements IFragmentActivity, IThemeManagerFragmentListener
 {
-    private boolean test = false;
+    private boolean FRAGMENT_CREATED = false;
+
+    private ButtonElements buttonElements;
+    private ToolbarElements toolbarElements;
+    private ConstraintLayout peoplesLayout;
+
     private UserJWT userJWT;
     private User user;
     private Button galleryButton, cameraButton, addFriendButton, deleteButton;
@@ -67,8 +63,11 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     public PeoplesFragment(UserJWT userJWT, User user) { this.userJWT = userJWT; this.user = user;}
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+
+        FRAGMENT_CREATED = true;
         fileUtils = new FileUtils(userJWT);
     }
 
@@ -84,6 +83,14 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     @Override
     public void getUIElements(View view)
     {
+        buttonElements = new ButtonElements();
+        toolbarElements = new ToolbarElements();
+
+        toolbarElements.setToolbar(view.findViewById(R.id.toolbar));
+        toolbarElements.setToolbarTitle(view.findViewById(R.id.toolbarTitle));
+
+        addFriendButton = view.findViewById(R.id.addFriendButton);
+        peoplesLayout = view.findViewById(R.id.peoplesLayout);
         profileImageView = view.findViewById(R.id.profileImageView);
         imageEditButton = view.findViewById(R.id.imageEditButton);
         galleryButton = view.findViewById(R.id.galleryButton);
@@ -108,6 +115,14 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         firstNameEditText = view.findViewById(R.id.firstNameEditText);
         lastNameEditText = view.findViewById(R.id.lastNameEditText);
 
+        buttonElements.addButton(addFriendButton, false);
+        buttonElements.addImageButton(imageEditButton, true);
+        buttonElements.addImageButton(firstNameEditButton, true);
+        buttonElements.addImageButton(firstNameSaveButton, true);
+        buttonElements.addImageButton(lastNameEditButton, true);
+        buttonElements.addImageButton(lastNameSaveButton, true);
+
+
         firstNameView.setText(user.getFirstname());
         firstNameEditText.setText(user.getFirstname());
         String lastname = user.getLastname();
@@ -121,7 +136,6 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
             lastNameEditText.setText(lastname);
         }
 
-        addFriendButton = view.findViewById(R.id.addFriendButton);
         mailEditText = view.findViewById(R.id.mailEditText);
 
         leftPager = view.findViewById(R.id.leftPager);
@@ -234,30 +248,13 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     @Override
     public void onThemeChanged()
     {
-        getActivity().setTheme(ThemeManager.getCurrentTheme());
-        ThemeManager.reloadThemeColors(getContext());
+        if(!FRAGMENT_CREATED)
+            return;
 
-        Context context = getContext();
-//        Drawable buttonGradient = AppCompatResources.getDrawable(context, R.drawable.drawable_button_gradient);
+        ThemeManager.changeButtonsColor(buttonElements);
+        ThemeManager.changeToolbarColor(toolbarElements);
 
-        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
-                ThemeManager.getColor("button_BackgroundGradient1"),
-                ThemeManager.getColor("button_BackgroundGradient2"),
-                ThemeManager.getColor("button_BackgroundGradient3")
-        });
-
-        float dip = 5f;
-        Resources r = getResources();
-        float px = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dip,
-                r.getDisplayMetrics()
-        );
-
-        gradientDrawable.setCornerRadius(px);
-
-        sendMessageButton.setBackground(gradientDrawable);
-
+        peoplesLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
     
     public void updateProfilePicture(){

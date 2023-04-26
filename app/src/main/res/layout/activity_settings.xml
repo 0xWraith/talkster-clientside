@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/windowBackgroundGray"
+    tools:context=".SettingsActivity">
+
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="88dp"
+        android:background="?attr/actionBarDefault"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/toolbarBackIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="31dp"
+            android:background="@color/transparent"
+            app:srcCompat="@drawable/arrow_back_24"
+            app:tint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/toolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/toolbarBackIcon"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="31dp"
+            android:gravity="center"
+            android:text="@string/settings"
+            android:textColor="?attr/actionBarDefaultTitle"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/subToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:layout_gravity="top"
+                android:background="?attr/actionBarDefault"
+                android:paddingStart="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/userAvatarImage"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:src="@drawable/account_circle_64"
+                    app:shapeAppearanceOverlay="@style/circleImage"
+                    app:strokeColor="@null" />
+
+                <TextView
+                    android:id="@+id/userNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_toEndOf="@+id/userAvatarImage"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="wraith"
+                    android:textColor="?attr/actionBarDefaultTitle"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/userStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/userAvatarImage"
+                    android:layout_below="@id/userNameText"
+                    android:text="online"
+                    android:textColor="?attr/actionBarDefaultSubtitle"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/settingsBlock1"
+                style="@style/SettingsBlock"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/subToolbar">
+
+                <TextView
+                    android:id="@+id/headerText1"
+                    style="@style/SettingsHeaderTextView"
+                    android:text="@string/account" />
+
+                <LinearLayout
+                    android:id="@+id/settingsMailBlock"
+                    style="@style/SettingsBlockItem"
+                    android:orientation="vertical"
+                    android:layout_below="@+id/headerText1">
+
+                    <TextView
+                        android:id="@+id/userMailText"
+                        style="@style/SettingsBlockText"/>
+
+                    <TextView
+                        android:id="@+id/settingsSubText1"
+                        style="@style/SettingsBlockSubtext"
+                        android:text="@string/tap_to_change_email_address" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsUsernameBlock"
+                    style="@style/SettingsBlockItem"
+                    android:orientation="vertical"
+                    android:layout_below="@+id/settingsMailBlock">
+
+                    <TextView
+                        android:id="@+id/loginText"
+                        style="@style/SettingsBlockText"/>
+
+                    <TextView
+                        android:id="@+id/settingsSubText2"
+                        style="@style/SettingsBlockSubtext"
+                        android:text="@string/username" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsBiographyBlock"
+                    style="@style/SettingsBlockItem"
+                    android:orientation="vertical"
+                    android:layout_below="@+id/settingsUsernameBlock">
+
+                    <TextView
+                        android:id="@+id/biographyText"
+                        style="@style/SettingsBlockText"/>
+
+                    <TextView
+                        android:id="@+id/settingsSubText3"
+                        style="@style/SettingsBlockSubtext"
+                        android:text="@string/add_few_words_about_your_self" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+
+                android:id="@+id/settingsBlock2"
+                style="@style/SettingsBlock"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock1">
+
+                <TextView
+                    android:id="@+id/headerText2"
+                    style="@style/SettingsHeaderTextView"
+                    android:text="@string/settings" />
+
+                <LinearLayout
+                    android:id="@+id/settingsChatBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/headerText2">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon1"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_chat" />
+
+                    <TextView
+                        android:id="@+id/settingsText1"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/chat_settings" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsSecurityBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/settingsChatBlock">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon2"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_security" />
+
+                    <TextView
+                        android:id="@+id/settingsText2"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/privacy_and_security" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsNotificationBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/settingsSecurityBlock">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon3"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_notification" />
+
+                    <TextView
+                        android:id="@+id/settingsText3"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/notifications_and_sounds" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsDevicesBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/settingsNotificationBlock">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon4"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_device" />
+
+                    <TextView
+                        android:id="@+id/settingsText4"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/devices" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsLanguageBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/settingsDevicesBlock">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon5"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_language" />
+
+                    <TextView
+                        android:id="@+id/settingsText5"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/language" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+
+                android:id="@+id/settingsBlock3"
+                style="@style/SettingsBlock"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock2">
+
+                <TextView
+                    android:id="@+id/headerText3"
+                    style="@style/SettingsHeaderTextView"
+                    android:text="@string/help" />
+
+                <LinearLayout
+                    android:id="@+id/settingsFAQBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/headerText3">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon6"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_faq" />
+
+                    <TextView
+                        android:id="@+id/settingsText6"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/talkster_faq" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsPolicyBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/settingsFAQBlock">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon7"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_policy" />
+
+                    <TextView
+                        android:id="@+id/settingsText7"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/privacy_policy" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/settingsBlock4"
+                style="@style/SettingsBlock"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock3">
+
+                <TextView
+                    android:id="@+id/headerText4"
+                    style="@style/SettingsHeaderTextView"
+                    android:text="@string/other" />
+
+                <LinearLayout
+                    android:id="@+id/settingsBugBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/headerText4">
+
+                    <ImageView
+                        android:id="@+id/settingsIcon8"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/ic_bug" />
+
+                    <TextView
+                        android:id="@+id/settingsText8"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/bug_report" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,15 +11,11 @@ import com.client.talkster.interfaces.IMainActivityScreen;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import okhttp3.internal.Util;
+
 public class UserAccountManager
 {
-    public static void saveAccount(Context context, UserJWT userJWT)
-    {
-        SharedPreferences.Editor editor = context.getSharedPreferences("TalksterUser", 0).edit();
-
-        editor.putString("account_data", new Gson().toJson(userJWT));
-        editor.apply();
-    }
+    public static void saveAccount(Context context, UserJWT userJWT) { Utils.saveToSharedPreferences(context, "account_data", new Gson().toJson(userJWT)); }
     public static void getAccount(MainActivity mainActivity)
     {
         UserJWT userJWT;

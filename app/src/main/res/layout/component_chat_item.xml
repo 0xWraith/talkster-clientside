@@ -48,7 +48,8 @@
             android:layout_toEndOf="@+id/userNameText"
             android:foregroundGravity="center"
             android:src="@drawable/mute"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:tint="?attr/chat_muteIcon" />
 
     </RelativeLayout>
 

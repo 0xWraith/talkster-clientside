@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/mainGroup1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/newGroupItem"
+            android:icon="@drawable/ic_group"
+            android:title="@string/new_group"/>
+
+        <item
+            android:id="@+id/contactsItem"
+            android:icon="@drawable/ic_contact"
+            android:title="@string/contacts"/>
+
+        <item
+            android:id="@+id/callsItem"
+            android:icon="@drawable/ic_call"
+            android:title="@string/calls"/>
+
+        <item
+            android:id="@+id/savedMessagesItem"
+            android:icon="@drawable/ic_save"
+            android:title="@string/saved_messages"/>
+
+        <item
+            android:id="@+id/settingsItem"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/settings"/>
+
+    </group>
+
+    <item
+        android:id="@+id/inviteFriendsItem"
+        android:icon="@drawable/ic_add_friend"
+        android:title="@string/invite_friends"/>
+</menu>

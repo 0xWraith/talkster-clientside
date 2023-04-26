@@ -7,7 +7,6 @@
 
     <gradient
         android:startColor="?attr/chat_outBubbleGradient1"
-        android:centerColor="?attr/chat_outBubbleGradient2"
         android:endColor="?attr/chat_outBubbleGradient3"
         android:angle="-45"
         android:type="linear"/>
