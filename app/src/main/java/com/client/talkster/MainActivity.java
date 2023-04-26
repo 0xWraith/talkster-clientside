@@ -1,7 +1,6 @@
 package com.client.talkster;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,9 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
-import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.controllers.IntroductionScreenActivity;
 import com.client.talkster.controllers.OfflineActivity;
@@ -24,7 +21,6 @@ import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IMainActivityScreen;
-import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.UserAccountManager;
 import com.client.talkster.utils.Utils;
 import com.client.talkster.utils.enums.EThemeType;
@@ -40,8 +36,6 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements IMainActivityScreen, IAPIResponseHandler
 {
     private final int SPLASH_DISPLAY_LENGTH = 750;
-
-    private UserJWT userJWT;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override

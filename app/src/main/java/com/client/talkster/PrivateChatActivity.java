@@ -43,6 +43,8 @@ import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.Message;
+import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.PrivateChatActionDTO;
@@ -69,7 +71,6 @@ import okhttp3.Response;
 public class PrivateChatActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IBroadcastRegister, IThemeManagerActivityListener
 {
     private Chat chat;
-    private UserJWT userJWT;
     private ImageView chatMuteIcon;
     private Menu privateChatActionMenu;
     private TextView userNameText, userStatusText;
@@ -101,6 +102,8 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     @Override
     public void getUIElements()
     {
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
         chatMuteIcon = findViewById(R.id.muteIcon);
         menuButton = findViewById(R.id.menuButton);
         userNameText = findViewById(R.id.userNameText);
@@ -274,8 +277,10 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
     private boolean muteForTime(int seconds)
     {
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
         APIHandler<PrivateChatActionDTO, PrivateChatActivity> apiHandler = new APIHandler<>(this);
         apiHandler.apiPOST(APIEndpoints.TALKSTER_API_CHAT_ACTION, new PrivateChatActionDTO(EPrivateChatAction.MUTE_CHAT, chat.getId(), userJWT.getID(), seconds), userJWT.getAccessToken());
+
         return true;
     }
 
@@ -310,6 +315,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
         confirmButton.setOnClickListener(view ->
         {
+            UserJWT userJWT = UserAccount.getInstance().getUserJWT();
             apiHandler.apiPOST(APIEndpoints.TALKSTER_API_CHAT_ACTION, new PrivateChatActionDTO(action, chat.getId(), userJWT.getID(), chat.getReceiverID(), confirmCheckBox.isChecked()), userJWT.getAccessToken());
             dialog.dismiss();
         });
@@ -364,7 +370,6 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             return;
 
         chat = (Chat) bundle.get(BundleExtraNames.USER_CHAT);
-        userJWT = (UserJWT) bundle.get(BundleExtraNames.USER_JWT);
     }
 
     @Override
@@ -389,7 +394,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             fileContent.setContent(FileUtils.getBytes(uri, cr));
             fileContent.setType(FileUtils.getType(uri, cr));
             fileContent.setFilename(FileUtils.getFilename(uri, cr));
-            apiHandler.apiMultipartPOST(APIEndpoints.TALKSTER_API_FILE_UPLOAD,fileContent, userJWT.getAccessToken());
+            apiHandler.apiMultipartPOST(APIEndpoints.TALKSTER_API_FILE_UPLOAD,fileContent, UserAccount.getInstance().getUserJWT().getAccessToken());
         } catch (IOException e){
             System.out.println("This Exception was thrown inside the sendImage method");
             e.printStackTrace();
@@ -428,6 +433,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
                     throw new IOException("Unexpected response " + response);
 
                 MessageDTO messageDTO = null;
+                UserJWT userJWT = UserAccount.getInstance().getUserJWT();
                 EPrivateChatAction action = privateChatActionDTO.getAction();
                 Intent intent = new Intent(BundleExtraNames.CHAT_ACTION_BROADCAST);
 

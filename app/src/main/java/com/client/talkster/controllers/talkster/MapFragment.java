@@ -22,6 +22,7 @@ import com.client.talkster.adapters.LocationAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.TalksterMapIcon;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
@@ -48,28 +49,27 @@ import java.util.HashMap;
 public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate, IThemeManagerFragmentListener
 {
 
+
+    private float x1,x2;
+    private boolean setLocation = false;
+    private final int MIN_DISTANCE = 300;
+    private final float ZOOM_LEVEL = 15.0f;
+
+    private Bundle mapViewBundle = null;
     private ToolbarElements toolbarElements;
+    private LocationAdapter userLastLocation;
+    private HashMap<Long, Marker> userMarkers = new HashMap<>();
 
     private ImageView toolbarLogoIcon;
 
-    private ConstraintLayout mapLayout;
     private GoogleMap map;
-    private UserJWT userJWT;
     private MapView mapView;
-    private final float ZOOM_LEVEL = 15.0f;
-    private boolean setLocation = false;
-    private Bundle mapViewBundle = null;
-    private LocationAdapter userLastLocation;
     private Marker userMarker;
-    private ImageButton plusButton, minusButton;
+    private ConstraintLayout mapLayout;
     private View rightPager, leftPager;
-    private final int MIN_DISTANCE = 300;
-    private float x1,x2;
-    private HashMap<Long, Marker> userMarkers = new HashMap<>();
+    private ImageButton plusButton, minusButton;
 
     public MapFragment() { }
-
-    public MapFragment(UserJWT userJWT) { this.userJWT = userJWT; }
 
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
@@ -197,7 +197,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             long id = (long) marker.getTag();
             Log.d("MapFragment", "onInfoWindowClick: " + id);
             APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, userJWT.getAccessToken());
+            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, UserAccount.getInstance().getUserJWT().getAccessToken());
         });
 
         setLocation = true;
@@ -237,10 +237,13 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             setLocation = false;
         }
 
-        if(userMarker != null) {
+        if(userMarker != null)
             userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
-        }
-        else {
+
+        else
+        {
+            UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
             userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, userJWT.getID()).getMarkerOptions());
             userMarker.setTag(userJWT.getID());
         }
@@ -253,6 +256,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             return;
 
         long id = 0;
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
         LocationDTO locationDTO = new Gson().fromJson(locationRAW, LocationDTO.class);
         LocationAdapter locationAdapter = new LocationAdapter(locationDTO);
 
@@ -271,7 +275,10 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         }
     }
 
-    public void updateMarkerIcons(){
+    public void updateMarkerIcons()
+    {
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
         FileUtils fileUtils = new FileUtils(userJWT);
         Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userJWT.getID()));
         if (userMarker != null) {

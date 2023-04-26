@@ -23,8 +23,8 @@ import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ButtonElements;
 import com.client.talkster.classes.theme.ToolbarElements;
@@ -40,27 +40,25 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 {
     private boolean FRAGMENT_CREATED = false;
 
+    private FileUtils fileUtils;
     private ButtonElements buttonElements;
     private ToolbarElements toolbarElements;
     private ConstraintLayout peoplesLayout;
 
-    private UserJWT userJWT;
-    private User user;
-    private Button galleryButton, cameraButton, addFriendButton, deleteButton;
-    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
-    private ImageButton lastNameEditButton, lastNameSaveButton;
     private ImageView profileImageView;
     private View profileView, leftPager;
-    private EditText firstNameEditText, lastNameEditText, mailEditText;
     private TextView firstNameView, lastNameView;
+    private ImageButton lastNameEditButton, lastNameSaveButton;
+    private EditText firstNameEditText, lastNameEditText, mailEditText;
+    private Button galleryButton, cameraButton, addFriendButton, deleteButton;
+    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
     private ConstraintLayout mediaChooserLayout, firstNameLayout, firstNameEditLayout, lastNameLayout, lastNameEditLayout;
-    private FileUtils fileUtils;
-    public APIStompWebSocket apiStompWebSocket;
 
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
 
-    public PeoplesFragment(UserJWT userJWT, User user) { this.userJWT = userJWT; this.user = user;}
+
+    public PeoplesFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -68,7 +66,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         super.onCreate(savedInstanceState);
 
         FRAGMENT_CREATED = true;
-        fileUtils = new FileUtils(userJWT);
+        fileUtils = new FileUtils(UserAccount.getInstance().getUserJWT());
     }
 
     @Override
@@ -83,6 +81,9 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     @Override
     public void getUIElements(View view)
     {
+        User user = UserAccount.getInstance().getUser();
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
         buttonElements = new ButtonElements();
         toolbarElements = new ToolbarElements();
 
@@ -125,7 +126,9 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
         firstNameView.setText(user.getFirstname());
         firstNameEditText.setText(user.getFirstname());
+
         String lastname = user.getLastname();
+
         if (lastname.isBlank()){
             lastNameView.setText(R.string.last_name_placeholder);
             lastNameView.setTextColor(getResources().getColor(R.color.previewSecondaryText));
@@ -257,11 +260,12 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         peoplesLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
     
-    public void updateProfilePicture(){
-        profileImageView.setImageBitmap(fileUtils.getProfilePicture(user.getId()));
-    }
+    public void updateProfilePicture() { profileImageView.setImageBitmap(fileUtils.getProfilePicture(UserAccount.getInstance().getUser().getId())); }
 
-    private void updateUserName(){
+    private void updateUserName()
+    {
+        User user = UserAccount.getInstance().getUser();
+
         MyApplication.hideKeyboard((AppCompatActivity) getActivity());
         String first = firstNameEditText.getText().toString();
         String last = lastNameEditText.getText().toString();
@@ -285,6 +289,6 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         APIHandler<NameDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         nameDTO.setFirstName(first);
         nameDTO.setLastName(last);
-        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_USER_UPDATE_NAME, nameDTO, userJWT.getAccessToken());
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_USER_UPDATE_NAME, nameDTO, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
 }

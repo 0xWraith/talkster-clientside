@@ -118,9 +118,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     public void getUIElements()
     {
 
-        mapFragment = new MapFragment(UserAccount.getInstance().getUserJWT());
-        chatsFragment = new ChatsFragment(UserAccount.getInstance().getUserJWT(), UserAccount.getInstance().getUser());
-        peoplesFragment = new PeoplesFragment(UserAccount.getInstance().getUserJWT(), UserAccount.getInstance().getUser());
+        mapFragment = new MapFragment();
+        chatsFragment = new ChatsFragment();
+        peoplesFragment = new PeoplesFragment();
 
         iChatListener = chatsFragment;
         iMapGPSPositionUpdate = mapFragment;
@@ -147,7 +147,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     {
         userAccount = UserAccount.getInstance();
         apiStompWebSocket = new APIStompWebSocket();
-        peoplesFragment.apiStompWebSocket = apiStompWebSocket;
 
         apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
         apiStompWebSocket.addTopic("/user/"+ userAccount.getUser().getId() +"/private", new WebSocketPrivateChatSubscriber(this));
@@ -380,10 +379,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
                 String responseBody = response.body().string();
                 Chat chat = new Gson().fromJson(responseBody, Chat.class);
-                Intent privateChatIntent = new Intent(getApplicationContext(), PrivateChatActivity.class);
 
+                Intent privateChatIntent = new Intent(getApplicationContext(), PrivateChatActivity.class);
                 privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chat);
-                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userAccount.getUserJWT());
 
                 startActivity(privateChatIntent);
             }

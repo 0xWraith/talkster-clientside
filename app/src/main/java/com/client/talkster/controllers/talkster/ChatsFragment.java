@@ -60,36 +60,28 @@ import java.util.Locale;
 
 public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener, NavigationView.OnNavigationItemSelectedListener, IThemeManagerFragmentListener
 {
-
+    private HashMap<Long, Chat> chatHashMap;
     private ToolbarElements toolbarElements;
 
     private float x1,x2;
     private boolean doReload = false;
     private final int MIN_DISTANCE = 300;
 
-    private final User user;
-    private final UserJWT userJWT;
-    private HashMap<Long, Chat> chatHashMap;
-    private ChatListAdapter chatListAdapter;
-
     private View rightPager;
-    private RelativeLayout navBarHeader;
     private TextView userNavbarName;
     private TextView userNavbarEmail;
     private RecyclerView userChatList;
     private DrawerLayout drawerLayout;
     private ImageView userNavbarAvatar;
+    private RelativeLayout navBarHeader;
     private ConstraintLayout welcomeBlock;
     private NavigationView navigationView;
+    private ChatListAdapter chatListAdapter;
     private SwipeRefreshLayout chatRefreshLayout;
 
 
 
-    public ChatsFragment(UserJWT userJWT, User user)
-    {
-        this.user = user;
-        this.userJWT = userJWT;
-    }
+    public ChatsFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
@@ -126,9 +118,11 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         View navHeader;
         ImageButton toolbarMenuIcon;
 
-        toolbarElements = new ToolbarElements();
+        User user = UserAccount.getInstance().getUser();
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
         chatHashMap = new HashMap<>();
+        toolbarElements = new ToolbarElements();
 
         toolbarMenuIcon = view.findViewById(R.id.toolbarMenuIcon);
 
@@ -172,7 +166,6 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             {
                 Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
 
-                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
                 privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chatListAdapter.chatList.get(position));
 
                 startActivity(privateChatIntent);
@@ -195,12 +188,12 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private void reloadUserChats()
     {
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, userJWT.getAccessToken());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
 
     private void updateUserChats(){
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO, userJWT.getAccessToken());
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
 
     private void updateChatListVisibility()
@@ -218,6 +211,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private void onUserReceivedMessage(Message message)
     {
         long chatID = message.getChatID();
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
 
         if(chatHashMap.containsKey(chatID))
@@ -303,6 +297,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
     public void updateChat(Chat chat){
         long chatID = chat.getId();
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
         if (chatHashMap.containsKey(chatID)) {
             Chat oldChat = chatHashMap.get(chatID);
