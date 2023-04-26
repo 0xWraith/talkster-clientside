@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.client.talkster.R;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.Message;
+import com.client.talkster.controllers.ThemeManager;
+import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
+import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -21,20 +24,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>
+public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder> implements IThemeManagerFragmentListener
 {
     public List<Chat> chatList;
     public HashMap<Long, ChatViewHolder> viewHashMap = new HashMap<>();
     private final Context context;
-    private final IChatClickListener IChatClickListener;
+    private final IRecyclerViewItemClickListener IRecyclerViewItemClickListener;
     private final FileUtils fileUtils;
 
-    public ChatListAdapter(Context context, IChatClickListener IChatClickListener, FileUtils fileUtils)
+    public ChatListAdapter(Context context, IRecyclerViewItemClickListener IRecyclerViewItemClickListener, FileUtils fileUtils)
     {
         this.context = context;
-        this.chatList = new ArrayList<>();
-        this.IChatClickListener = IChatClickListener;
         this.fileUtils = fileUtils;
+        this.chatList = new ArrayList<>();
+        this.IRecyclerViewItemClickListener = IRecyclerViewItemClickListener;
     }
 
     @NonNull
@@ -50,7 +53,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     {
 
         Chat chat = chatList.get(position);
-        viewHashMap.put(chat.getId(), holder);
+        viewHashMap.put(chat.getReceiverID(), holder);
 
         if(chat.getReceiverID() == chat.getOwnerID())
         {
@@ -100,6 +103,17 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     @Override
     public int getItemCount() { return chatList.size(); }
 
+    @Override
+    public void onThemeChanged()
+    {
+        for(ChatViewHolder viewHolder : viewHashMap.values())
+        {
+            viewHolder.userNameText.setTextColor(ThemeManager.getColor("chat_name"));
+            viewHolder.chatMuteIcon.setColorFilter(ThemeManager.getColor("chat_muteIcon"));
+            viewHolder.chatPreviewText.setTextColor(ThemeManager.getColor("chat_message"));
+        }
+    }
+
     public class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
         private final TextView userNameText;
@@ -116,6 +130,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             chatPreviewText = itemView.findViewById(R.id.chatPreviewText);
             userAvatarImage = itemView.findViewById(R.id.circularBackground);
 
+            userNameText.setTextColor(ThemeManager.getColor("chat_name"));
+            chatMuteIcon.setColorFilter(ThemeManager.getColor("chat_muteIcon"));
+            chatPreviewText.setTextColor(ThemeManager.getColor("chat_message"));
+
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -126,7 +144,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             int position = getAdapterPosition();
 
             if (position >= 0)
-                IChatClickListener.onItemClick(position, view);
+                IRecyclerViewItemClickListener.onItemClick(position, view);
         }
 
         @Override
@@ -136,15 +154,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
 
             if (position >= 0)
             {
-                IChatClickListener.onItemLongClick(position, view);
+                IRecyclerViewItemClickListener.onItemLongClick(position, view);
                 return true;
             }
             return false;
         }
-    }
-    public interface IChatClickListener
-    {
-        void onItemClick(int position, View v);
-        void onItemLongClick(int position, View v);
     }
 }

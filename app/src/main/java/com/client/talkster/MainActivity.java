@@ -2,24 +2,33 @@ package com.client.talkster;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.controllers.IntroductionScreenActivity;
 import com.client.talkster.controllers.OfflineActivity;
+import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IMainActivityScreen;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.UserAccountManager;
+import com.client.talkster.utils.Utils;
+import com.client.talkster.utils.enums.EThemeType;
+import com.client.talkster.utils.exceptions.ThemeNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -38,9 +47,15 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        createApplicationThemes();
+        setTheme(ThemeManager.getCurrentThemeStyle());
 
+        super.onCreate(savedInstanceState);
+
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setContentView(R.layout.activity_main);
         UserAccountManager.getAccount(this);
     }
 
@@ -49,15 +64,13 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
     {
         new Handler().postDelayed(() -> {
 
-            Intent intent = new Intent(this, HomeActivity.class);
+            UserAccount userAccount = UserAccount.getInstance();
 
+            Intent intent = new Intent(this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            User user = verifiedUserDTO.getUser();
-            UserJWT userJWT = verifiedUserDTO.getUserJWT();
-
-            intent.putExtra(BundleExtraNames.USER_JWT, userJWT);
-            intent.putExtra(BundleExtraNames.USER, user);
+            userAccount.setUser(verifiedUserDTO.getUser());
+            userAccount.setUserJWT(verifiedUserDTO.getUserJWT());
 
             startActivity(intent);
             finish();
@@ -107,11 +120,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
 
             if(responseCode != 200)
             {
-                SharedPreferences.Editor editor = getSharedPreferences("TalksterUser", 0).edit();
-
-                editor.putString("account_data", "");
-                editor.apply();
-
+                Utils.saveToSharedPreferences(this, "account_data", "");
                 runOnUiThread(this::showIntroductionScreen);
                 return;
             }
@@ -122,5 +131,56 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         }
         catch (IOException e) { e.printStackTrace(); }
         catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster", "Failed to parse JWT token: " + exception.getMessage()); }
+    }
+
+    private void createApplicationThemes()
+    {
+        Theme theme;
+
+        theme = new Theme("Dark Forest",
+                EThemeType.THEME_NIGHT,
+                R.style.Theme_Talkster_First,
+                Color.parseColor("#099877"),
+                Color.parseColor("#222023"),
+                Color.parseColor("#8FA457"),
+                Color.parseColor("#4FA149"),
+                Color.parseColor("#35A07B"),
+                R.drawable.bg_chat_forest_blur);
+
+        ThemeManager.addTheme(theme);
+
+        theme = new Theme("Dark Amethyst",
+                EThemeType.THEME_NIGHT,
+                R.style.Theme_Talkster_Second,
+                Color.parseColor("#c992eb"),
+                Color.parseColor("#55405e"),
+                Color.parseColor("#55405e"),
+                Color.parseColor("#5b57a4"),
+                Color.parseColor("#ba78dd"),
+                R.drawable.bg_chat_dark_amethyst);
+
+        ThemeManager.addTheme(theme);
+
+
+        theme = new Theme("Light Amethyst",
+                EThemeType.THEME_DAY,
+                R.style.Theme_Talkster_Third,
+                Color.parseColor("#a7637b"),
+                Color.parseColor("#55405e"),
+                Color.parseColor("#55405e"),
+                Color.parseColor("#5b57a4"),
+                Color.parseColor("#ba78dd"),
+                R.drawable.bg_chat_light_amethyst);
+
+        ThemeManager.addTheme(theme);
+
+        try
+        {
+            String themeName = Utils.getFromSharedPreferences(this, "TalksterTheme");
+            theme = ThemeManager.getThemeByName(themeName);
+        }
+        catch (IllegalStateException | ThemeNotFoundException exception) { theme = ThemeManager.getThemes().get(0); }
+
+        ThemeManager.applyTheme(this, theme);
     }
 }

@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
+    android:id="@+id/peoplesLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".controllers.talkster.MapFragment">
 
     <View
@@ -18,14 +18,31 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <View
-        android:id="@+id/view"
+    <RelativeLayout
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="60dp"
+        android:layout_height="88dp"
         android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/toolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="31dp"
+            android:gravity="center"
+            android:text="@string/appname"
+            android:textColor="?attr/actionBarDefaultTitle"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profileImageView"
@@ -36,7 +53,7 @@
         android:padding="3dp"
         android:src="@drawable/blank_profile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:shapeAppearanceOverlay="@style/circleImage"
         app:strokeColor="@color/gunmetal2"
         app:strokeWidth="3dp" />
@@ -53,18 +70,6 @@
         app:srcCompat="@drawable/edit_24"
         app:tint="@android:color/white" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="Talkster"
-        android:textColor="?attr/actionBarDefaultTitle"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/view"
-        app:layout_constraintStart_toStartOf="@+id/view"
-        app:layout_constraintTop_toTopOf="@+id/view" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/firstNameLayout"
@@ -215,6 +220,7 @@
             app:layout_constraintTop_toTopOf="@+id/lastNameEditText"
             app:srcCompat="@drawable/save_24"
             app:tint="@android:color/white" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
@@ -254,7 +260,6 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:drawableRight="@drawable/person_add_24"
-        android:drawableTint="@android:color/white"
         android:drawablePadding="0dp"
         android:paddingRight="48dp"
         android:paddingLeft="48dp"
@@ -263,6 +268,7 @@
         app:layout_constraintTop_toBottomOf="@+id/mailEditText" />
 
     <View
+
         android:id="@+id/profileView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -270,7 +276,7 @@
         app:layout_constraintBottom_toTopOf="@+id/mediaChooserLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view" />
+        app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mediaChooserLayout"

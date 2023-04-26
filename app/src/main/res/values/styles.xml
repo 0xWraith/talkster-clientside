@@ -2,10 +2,12 @@
 <resources>
     <style name="wfButton" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="cornerRadius">5dp</item>
-        <item name="android:textColorHint">@color/previewMainText</item>
-        <item name="android:textColor">@color/previewMainText</item>
-        <item name="android:textColorHintInverse">@color/previewMainText</item>
-        <item name="android:textColorHighlight">@color/aquamarine</item>
+        <item name="android:background">@drawable/drawable_button_gradient</item>
+        <item name="android:textColorHint">?attr/button_textColor</item>
+        <item name="android:textColor">?attr/button_textColor</item>
+        <item name="android:textColorHintInverse">?attr/button_textColor</item>
+        <item name="android:textColorHighlight">?attr/button_textColor</item>
+        <item name="drawableTint">?attr/button_iconColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
@@ -106,22 +108,89 @@
         <item name="android:itemBackground">@color/gunmetal</item>
     </style>
 
+    <style name="SettingsBlock">
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/windowBackgroundWhite</item>
+    </style>
+
+    <style name="SettingsBlockItem">
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/drawable_chat_border</item>
+    </style>
+
+    <style name="SettingsBlockItem.Icon">
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+    </style>
+
+    <style name="SettingsBlockText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:textColor">?attr/settings_text</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="SettingsBlockSubtext">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:textColor">?attr/settings_subText</item>
+        <item name="fontFamily">sans-serif-light</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SettingsHeaderTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/settings_actionTextColor</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="SettingsBlockIcon">
+        <item name="android:layout_width">25dp</item>
+        <item name="android:layout_height">25dp</item>
+        <item name="tint">?attr/settings_iconColor</item>
+        <item name="android:layout_marginRight">20dp</item>
+    </style>
+
 <!--    <style name="PopupAnimation">-->
 <!--        <item name="android:windowExitAnimation">@anim/animation_popup_from_top_to_bottom</item>-->
 <!--        <item name="android:windowEnterAnimation">@anim/animation_popup_from_bottom_to_top</item>-->
 <!--    </style>-->
 
     <style name="Theme.Talkster.First" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="themeName">Dark Forest</item>
         <item name="windowBackgroundWhite">#191819</item>
-        <item name="windowBackgroundGray">#FFFFFF</item>
+        <item name="windowBackgroundGray">#000000</item>
         <item name="actionBarDefault">#262425</item>
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
 
+        <item name="navBarBackground">#262425</item>
+        <item name="navBarHeaderBackground">#35A07B</item>
+        <item name="navBarText">#FFFFFF</item>
+        <item name="navBarSubText">#8Af2f2f2</item>
+        <item name="navBarIcon">#8Af2f2f2</item>
         <item name="navBarTabActiveIcon">@color/aquamarine</item>
         <item name="navBarTabUnactiveIcon">#8f8e8f</item>
+        <item name="navMenuDivider">#54000000</item>
 
+        <item name="chat_backgroundImage">@drawable/bg_chat_forest_blur</item>
         <item name="chat_name">#f1f1f1</item>
         <item name="chat_message">#828282</item>
         <item name="chat_divider">#000000</item>
@@ -152,7 +221,8 @@
         <item name="checkboxBackground">#606060</item>
         <item name="checkboxBackgroundChecked">@color/aquamarine</item>
 
-        <item name="button_TextColor">#FFFFFF</item>
+        <item name="button_textColor">#FFFFFF</item>
+        <item name="button_iconColor">#FFFFFF</item>
         <item name="button_BackgroundGradient1">@color/aquamarine</item>
         <item name="button_BackgroundGradient2">@color/aquamarine</item>
         <item name="button_BackgroundGradient3">@color/aquamarine</item>
@@ -160,22 +230,38 @@
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
+        <item name="settings_actionTextColor">#099877</item>
+        <item name="settings_iconColor">#8Af2f2f2</item>
+        <item name="settings_text">#FFFFFF</item>
+        <item name="settings_subText">#8Af2f2f2</item>
+
+
         <item name="android:statusBarColor">?attr/actionBarDefault</item>
         <item name="android:navigationBarColor">?attr/actionBarDefault</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
 
     <style name="Theme.Talkster.Second" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="themeName">Dark Amethyst</item>
         <item name="windowBackgroundWhite">#191819</item>
-        <item name="windowBackgroundGray">#FFFFFF</item>
+        <item name="windowBackgroundGray">#000000</item>
         <item name="actionBarDefault">#262425</item>
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
 
+        <item name="navBarBackground">#262425</item>
+        <item name="navBarHeaderBackground">#90CC84FF</item>
+        <item name="navBarText">#FFFFFF</item>
+        <item name="navBarSubText">#8Af2f2f2</item>
+        <item name="navBarIcon">#8Af2f2f2</item>
+        <item name="navMenuDivider">#54000000</item>
+
         <item name="navBarTabActiveIcon">#cc84ff</item>
         <item name="navBarTabUnactiveIcon">#8f8e8f</item>
 
+        <item name="chat_backgroundImage">@drawable/bg_chat_dark_amethyst</item>
         <item name="chat_name">#f1f1f1</item>
         <item name="chat_message">#828282</item>
         <item name="chat_divider">#000000</item>
@@ -187,9 +273,9 @@
         <item name="chat_inBubble">#222023</item>
         <item name="chat_inBubbleSelected">#55405e</item>
         <item name="chat_outBubble">#FFFFFF</item>
-        <item name="chat_outBubbleGradient1">#5b57a4</item>
-        <item name="chat_outBubbleGradient2">#4959a1</item>
-        <item name="chat_outBubbleGradient3">#3589a0</item>
+        <item name="chat_outBubbleGradient1">#55405e</item>
+        <item name="chat_outBubbleGradient2">#5b57a4</item>
+        <item name="chat_outBubbleGradient3">#ba78dd</item>
         <item name="chat_outBubbleSelected">#FFFFFF</item>
         <item name="chat_messageTextIn">#fafafa</item>
         <item name="chat_messageTextOut">#FFFFFF</item>
@@ -205,16 +291,95 @@
         <item name="checkboxBackground">#606060</item>
         <item name="checkboxBackgroundChecked">#ba78dd</item>
 
-        <item name="button_TextColor">#FFFFFF</item>
+        <item name="button_textColor">#FFFFFF</item>
+        <item name="button_iconColor">#FFFFFF</item>
         <item name="button_BackgroundGradient1">#c992eb</item>
         <item name="button_BackgroundGradient2">#c992eb</item>
         <item name="button_BackgroundGradient3">#c992eb</item>
 
+        <item name="settings_actionTextColor">#c992eb</item>
+        <item name="settings_iconColor">#8Af2f2f2</item>
+        <item name="settings_text">#FFFFFF</item>
+        <item name="settings_subText">#8Af2f2f2</item>
+
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
-        <item name="android:statusBarColor">?attr/actionBarDefault</item>
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="android:navigationBarColor">?attr/actionBarDefault</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="Theme.Talkster.Third" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="themeName">Dark Amethyst</item>
+        <item name="windowBackgroundWhite">#FFFFFF</item>
+        <item name="windowBackgroundGray">#FFFFFF</item>
+        <item name="actionBarDefault">#a7637b</item>
+        <item name="actionBarDefaultIcon">#FFFFFF</item>
+        <item name="actionBarDefaultTitle">#FFFFFF</item>
+        <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
+
+        <item name="navBarBackground">#FFFFFF</item>
+        <item name="navBarHeaderBackground">#a7637b</item>
+        <item name="navBarText">#595959</item>
+        <item name="navBarSubText">#8A393838</item>
+        <item name="navBarIcon">#8A717070</item>
+        <item name="navMenuDivider">#54000000</item>
+
+        <item name="navBarTabActiveIcon">#a7637b</item>
+        <item name="navBarTabUnactiveIcon">#8f8e8f</item>
+
+        <item name="chat_backgroundImage">@drawable/bg_chat_light_amethyst</item>
+        <item name="chat_name">#3A3A3A</item>
+        <item name="chat_message">#232323</item>
+        <item name="chat_divider">#000000</item>
+        <item name="chat_messageAction">#a7637b</item>
+        <!--        Todo set to chat date-->
+        <item name="chat_date">#787878</item>
+        <!--        Todo -->
+        <item name="chat_muteIcon">#292929</item>
+        <item name="chat_inBubble">#222023</item>
+        <item name="chat_inBubbleSelected">#6E4352</item>
+        <item name="chat_outBubble">#FFFFFF</item>
+        <item name="chat_outBubbleGradient1">#55405e</item>
+        <item name="chat_outBubbleGradient2">#6E4352</item>
+        <item name="chat_outBubbleGradient3">#6E4352</item>
+        <item name="chat_outBubbleSelected">#FFFFFF</item>
+        <item name="chat_messageTextIn">#fafafa</item>
+        <item name="chat_messageTextOut">#FFFFFF</item>
+        <item name="chat_inTimeText">#807e81</item>
+        <item name="chat_outTimeText">#FFFFFF</item>
+        <item name="chat_TextCursor">#6E4352</item>
+        <item name="chat_TextCursorSelection">#69c18ade</item>
+
+        <item name="radioBackground">#606060</item>
+        <item name="radioBackgroundChecked">#6E4352</item>
+        <item name="switchTrack">#606060</item>
+        <item name="switchTrackChecked">#6E4352</item>
+        <item name="checkboxBackground">#606060</item>
+        <item name="checkboxBackgroundChecked">#6E4352</item>
+
+        <item name="button_textColor">#FFFFFF</item>
+        <item name="button_iconColor">#FFFFFF</item>
+        <item name="button_BackgroundGradient1">#6E4352</item>
+        <item name="button_BackgroundGradient2">#6E4352</item>
+        <item name="button_BackgroundGradient3">#6E4352</item>
+
+        <item name="settings_actionTextColor">#6E4352</item>
+        <item name="settings_iconColor">#8A393939</item>
+        <item name="settings_text">#3C3C3C</item>
+        <item name="settings_subText">#8A2B2B2B</item>
+
+        <item name="dialogBackground">#1e1e1e</item>
+        <item name="errorColor">#cc4747</item>
+
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:navigationBarColor">#00000000</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
     
     <style name="customToast">
@@ -239,6 +404,12 @@
 
     <style name="friendNotFound" parent="customToast">
         <item name="stIconStart">@drawable/close_24</item>
+    </style>
+
+    <style name="NavigationStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="listPreferredItemHeightSmall">50dp</item>
+        <item name="android:listDivider">?attr/navMenuDivider</item>
     </style>
 
 </resources>

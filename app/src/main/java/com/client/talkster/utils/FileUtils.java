@@ -41,6 +41,7 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
     private boolean imageReceived;
     private Bitmap image;
 
+    public FileUtils() {}
 
     public FileUtils(UserJWT userJWT) {this.userJWT = userJWT;}
 

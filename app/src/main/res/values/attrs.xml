@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <attr name="themeName" format="string" />
     <attr name="windowBackgroundWhite" format="color" />
     <attr name="windowBackgroundGray" format="color" />
     <attr name="actionBarDefault" format="color" />
     <attr name="actionBarDefaultIcon" format="color" />
     <attr name="actionBarDefaultTitle" format="color" />
     <attr name="actionBarDefaultSubtitle" format="color" />
+    <attr name="navBarBackground" format="color" />
+    <attr name="navBarHeaderBackground" format="color" />
+    <attr name="navBarText" format="color" />
+    <attr name="navBarSubText" format="color" />
+    <attr name="navMenuDivider" format="color" />
+    <attr name="navBarIcon" format="color" />
     <attr name="navBarTabActiveIcon" format="color" />
     <attr name="navBarTabUnactiveIcon" format="color" />
-
+    <attr name="chat_backgroundImage" format="integer" />
     <attr name="chat_name" format="color" />
     <attr name="chat_message" format="color" />
     <attr name="chat_divider" format="color" />
-<!--    Todo set color to media message, action message-->
     <attr name="chat_mediaMessage" format="color" />
     <attr name="chat_date" format="color" />
     <attr name="chat_muteIcon" format="color" />
@@ -31,7 +36,6 @@
     <attr name="chat_outTimeText" format="color" />
     <attr name="chat_TextCursor" format="color" />
     <attr name="chat_TextCursorSelection" format="color" />
-
     <attr name="radioBackground" format="color" />
     <attr name="radioBackgroundChecked" format="color" />
     <attr name="switchTrack" format="color" />
@@ -39,14 +43,16 @@
     <attr name="checkboxBackground" format="color" />
     <attr name="checkboxBackgroundChecked" format="color" />
 
-    <attr name="button_TextColor" format="color" />
+    <attr name="button_textColor" format="color" />
+    <attr name="button_iconColor" format="color" />
     <attr name="button_BackgroundGradient1" format="color" />
     <attr name="button_BackgroundGradient2" format="color" />
     <attr name="button_BackgroundGradient3" format="color" />
 
-
+    <attr name="settings_actionTextColor" format="color" />
+    <attr name="settings_iconColor" format="color" />
+    <attr name="settings_text" format="color" />
+    <attr name="settings_subText" format="color" />
     <attr name="dialogBackground" format="color" />
     <attr name="errorColor" format="color" />
-
-
 </resources>

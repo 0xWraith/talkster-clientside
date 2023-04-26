@@ -1,18 +1,12 @@
 package com.client.talkster;
 
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
-import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -36,9 +31,10 @@ import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.Message;
 import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
-import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.controllers.OfflineActivity;
+import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
@@ -54,8 +50,8 @@ import com.client.talkster.interfaces.IMapGPSPositionUpdate;
 import com.client.talkster.interfaces.IMapWebSocketHandler;
 import com.client.talkster.interfaces.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
-import com.client.talkster.utils.enums.EPrivateChatAction;
 import com.client.talkster.utils.FileUtils;
+import com.client.talkster.utils.enums.EPrivateChatAction;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -75,30 +71,33 @@ import okhttp3.Response;
 
 public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler, IMapWebSocketHandler, IBroadcastRegister, IThemeManagerActivityListener
 {
-    private User user;
-    private UserJWT userJWT;
+
     private String FCMToken;
+    private UserAccount userAccount;
+    private IChatListener iChatListener;
+    private ArrayList<Fragment> fragments;
+    private APIStompWebSocket apiStompWebSocket;
+    private BroadcastReceiver chatBroadCastReceiver;
+    private BroadcastReceiver locationBroadCastReceiver;
+    private IMapGPSPositionUpdate iMapGPSPositionUpdate;
+
     private MapFragment mapFragment;
     private ChatsFragment chatsFragment;
     private PeoplesFragment peoplesFragment;
     private ViewPager2 homeViewPager;
-    private IChatListener iChatListener;
-    private IMapGPSPositionUpdate iMapGPSPositionUpdate;
-    private ArrayList<Fragment> fragments;
-    private APIStompWebSocket apiStompWebSocket;
-
-    private BroadcastReceiver chatBroadCastReceiver;
-    private BroadcastReceiver locationBroadCastReceiver;
-
     private BottomNavigationView bottomNavigation;
+
+
+
+    private ConstraintLayout homeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        loadApplicationTheme();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        ThemeManager.addListener(this);
 
         getBundleElements();
         getUIElements();
@@ -106,19 +105,32 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     }
 
     @Override
+    public void loadApplicationTheme()
+    {
+        ThemeManager.addListener(this);
+        setTheme(ThemeManager.getCurrentThemeStyle());
+    }
+
+    @Override
+    public void removeListener() { ThemeManager.removeListener(this); }
+
+    @Override
     public void getUIElements()
     {
-        mapFragment = new MapFragment(userJWT);
-        chatsFragment = new ChatsFragment(userJWT);
-        peoplesFragment = new PeoplesFragment(userJWT, user);
+
+        mapFragment = new MapFragment(UserAccount.getInstance().getUserJWT());
+        chatsFragment = new ChatsFragment(UserAccount.getInstance().getUserJWT(), UserAccount.getInstance().getUser());
+        peoplesFragment = new PeoplesFragment(UserAccount.getInstance().getUserJWT(), UserAccount.getInstance().getUser());
 
         iChatListener = chatsFragment;
         iMapGPSPositionUpdate = mapFragment;
 
+        homeLayout = findViewById(R.id.homeLayout);
         homeViewPager = findViewById(R.id.homeViewPager);
-        homeViewPager.setUserInputEnabled(false);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
+
+        homeViewPager.setUserInputEnabled(false);
         fragments = new ArrayList<>(Arrays.asList(chatsFragment, mapFragment, peoplesFragment));
 
         registerBroadCasts();
@@ -133,11 +145,12 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
     private void initializeSocketConnection()
     {
+        userAccount = UserAccount.getInstance();
         apiStompWebSocket = new APIStompWebSocket();
         peoplesFragment.apiStompWebSocket = apiStompWebSocket;
 
         apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
-        apiStompWebSocket.addTopic("/user/"+ userJWT.getID() +"/private", new WebSocketPrivateChatSubscriber(this));
+        apiStompWebSocket.addTopic("/user/"+ userAccount.getUser().getId() +"/private", new WebSocketPrivateChatSubscriber(this));
         apiStompWebSocket.addTopic("/map/public", new WebSocketPublicMapSubscriber(this));
 
         apiStompWebSocket.connect();
@@ -148,11 +161,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     {
         Bundle bundle = getIntent().getExtras();
 
-        if(bundle.isEmpty())
+        if(bundle == null || bundle.isEmpty())
             return;
-
-        user = bundle.getParcelable(BundleExtraNames.USER);
-        userJWT = bundle.getParcelable(BundleExtraNames.USER_JWT);
+        
     }
     @Override
     public void registerBroadCasts()
@@ -220,11 +231,15 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 if(!action.equals(BundleExtraNames.LOCATION_SERVICE_BROADCAST))
                     return;
 
+                userAccount = UserAccount.getInstance();
+                User user = userAccount.getUser();
+                UserJWT userJWT = userAccount.getUserJWT();
+
                 Location location = (Location) intent.getExtras().get(BundleExtraNames.LOCATION_SERVICE_POSITION);
 
                 iMapGPSPositionUpdate.onMapGPSPositionUserUpdate(location);
 
-                LocationDTO locationDTO = new LocationDTO(userJWT.getID(), user.getFullName(), userJWT.getAccessToken(), location);
+                LocationDTO locationDTO = new LocationDTO(user.getId(), user.getFullName(), userJWT.getAccessToken(), location);
                 apiStompWebSocket.getWebSocketClient().send("/app/map", new Gson().toJson(locationDTO)).subscribe();
             }
         };
@@ -272,7 +287,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         TokenDTO tokenDTO = new TokenDTO();
         APIHandler<TokenDTO, HomeActivity> apiHandler = new APIHandler<>(this);
         tokenDTO.setToken(FCMToken);
-        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN, tokenDTO, userJWT.getAccessToken());
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_NOTIFICATION_ADD_TOKEN, tokenDTO, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
 
     @Override
@@ -285,6 +300,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     protected void onDestroy()
     {
         super.onDestroy();
+
+        removeListener();
         unregisterReceiver(chatBroadCastReceiver);
     }
 
@@ -356,15 +373,17 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             }
             else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT))
             {
-                if (responseCode != 200){
+                if (responseCode != 200)
                     throw new UserUnauthorizedException("Unexpected response " + response);
-                }
+
+                userAccount = UserAccount.getInstance();
+
                 String responseBody = response.body().string();
                 Chat chat = new Gson().fromJson(responseBody, Chat.class);
                 Intent privateChatIntent = new Intent(getApplicationContext(), PrivateChatActivity.class);
 
-                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
                 privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chat);
+                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userAccount.getUserJWT());
 
                 startActivity(privateChatIntent);
             }
@@ -407,7 +426,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         });
     }
 
-    public void selectNavigationButton(int currentPosition){
+    public void selectNavigationButton(int currentPosition)
+    {
         switch (currentPosition){
             case 0:
                 bottomNavigation.setSelectedItemId(R.id.chatMenuID);
@@ -436,16 +456,23 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         }
     }
 
-    private void sendProfileImage(Uri uri){
+    private void sendProfileImage(Uri uri)
+    {
+        userAccount = UserAccount.getInstance();
+
         FileContent fileContent = new FileContent();
         APIHandler<FileContent, HomeActivity> apiHandler = new APIHandler<>(this);
-        try {
+        try
+        {
             ContentResolver cr = getContentResolver();
             fileContent.setContent(FileUtils.getBytes(uri, cr));
             fileContent.setType(FileUtils.getType(uri, cr));
             fileContent.setFilename(FileUtils.getFilename(uri, cr));
-            apiHandler.apiMultipartPUT(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE,fileContent, userJWT.getAccessToken());
-        } catch (IOException e){
+            apiHandler.apiMultipartPUT(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE,fileContent, userAccount.getUserJWT().getAccessToken());
+
+        }
+        catch (IOException e)
+        {
             System.out.println("This Exception was thrown inside the sendImage method");
             e.printStackTrace();
         }
@@ -464,23 +491,16 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     @Override
     public void onThemeChanged()
     {
-        setTheme(ThemeManager.getCurrentTheme());
-
+        setTheme(ThemeManager.getCurrentThemeStyle());
         ThemeManager.reloadThemeColors(this);
-        ColorStateList colorStateList = getColorStateList(R.color.menu_item_state);
 
-        int[] colors = new int[]{
-                colorStateList.getColorForState(new int[] { -android.R.attr.state_checked }, 0),
-                colorStateList.getColorForState(new int[] { android.R.attr.state_checked }, 0)
-        };
+        homeLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
 
-        colors[0] = ThemeManager.getColor("navBarTabUnactiveIcon");
-        colors[1] = ThemeManager.getColor("navBarTabActiveIcon");
+        ThemeManager.changeColorState(bottomNavigation);
 
-        ColorStateList newColorStateList = new ColorStateList(new int[][] { new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}}, colors);
-        bottomNavigation.setItemIconTintList(newColorStateList);
-
+        mapFragment.onThemeChanged();
+        chatsFragment.onThemeChanged();
         peoplesFragment.onThemeChanged();
-        Log.d("Talkster", "Theme changed" + ThemeManager.getCurrentTheme());
+
     }
 }
