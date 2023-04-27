@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -45,7 +46,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     private ToolbarElements toolbarElements;
     private ConstraintLayout peoplesLayout;
 
-    private ImageView profileImageView;
+    private ShapeableImageView profileImageView;
     private View profileView, leftPager;
     private TextView firstNameView, lastNameView;
     private ImageButton lastNameEditButton, lastNameSaveButton;

@@ -125,7 +125,7 @@
         android:layout_height="88dp"
         android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -134,24 +134,21 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="31dp"
         android:src="@drawable/account_circle_64"
         app:layout_constraintBottom_toBottomOf="@+id/view3"
         app:layout_constraintStart_toEndOf="@+id/backButton"
-        app:layout_constraintTop_toTopOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
         app:shapeAppearanceOverlay="@style/circleImage"
         app:strokeColor="@null" />
 
     <TextView
         android:id="@+id/userNameText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
         android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/menuButton"
         app:layout_constraintStart_toEndOf="@+id/circularBackground"
         app:layout_constraintTop_toTopOf="@+id/circularBackground" />
 
@@ -186,21 +183,20 @@
         android:layout_gravity="center"
         android:layout_marginEnd="8dp"
         android:background="@color/transparent"
-        app:srcCompat="@drawable/send_24"
-        app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/chatInputText"
-        app:layout_constraintEnd_toEndOf="@+id/view" />
+        app:layout_constraintEnd_toEndOf="@+id/view"
+        app:srcCompat="@drawable/send_24"
+        app:tint="@android:color/white" />
 
     <ImageButton
         android:id="@+id/backButton"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="31dp"
         android:background="@color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/chatMessagesList"
         app:layout_constraintStart_toStartOf="@+id/view3"
-        app:layout_constraintTop_toTopOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
         app:srcCompat="@drawable/arrow_back_24"
         app:tint="@android:color/white" />
 
@@ -210,23 +206,29 @@
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:background="@color/transparent"
-        app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/view"
         app:layout_constraintStart_toStartOf="@+id/view"
         app:layout_constraintTop_toTopOf="@+id/view"
-        app:srcCompat="@drawable/image_24" />
+        app:srcCompat="@drawable/image_24"
+        app:tint="@android:color/white" />
 
     <ImageButton
         android:id="@+id/menuButton"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginTop="31dp"
         android:layout_marginEnd="8dp"
         android:background="@color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/chatMessagesList"
         app:layout_constraintEnd_toEndOf="@+id/view3"
-        app:layout_constraintTop_toTopOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
         app:srcCompat="@drawable/menu_32"
         app:tint="@android:color/white" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

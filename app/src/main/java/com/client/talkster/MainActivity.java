@@ -134,11 +134,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         theme = new Theme("Dark Forest",
                 EThemeType.THEME_NIGHT,
                 R.style.Theme_Talkster_First,
-                Color.parseColor("#099877"),
-                Color.parseColor("#222023"),
-                Color.parseColor("#8FA457"),
-                Color.parseColor("#4FA149"),
-                Color.parseColor("#35A07B"),
+                R.color.theme1_color,
+                R.color.theme1_in_bubble,
+                R.color.theme1_out_bubble1,
+                R.color.theme1_out_bubble2,
+                R.color.theme1_out_bubble3,
                 R.drawable.bg_chat_forest_blur);
 
         ThemeManager.addTheme(theme);
@@ -146,11 +146,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         theme = new Theme("Dark Amethyst",
                 EThemeType.THEME_NIGHT,
                 R.style.Theme_Talkster_Second,
-                Color.parseColor("#c992eb"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#5b57a4"),
-                Color.parseColor("#ba78dd"),
+                R.color.theme2_color,
+                R.color.theme2_in_bubble,
+                R.color.theme2_out_bubble1,
+                R.color.theme2_out_bubble2,
+                R.color.theme2_out_bubble3,
                 R.drawable.bg_chat_dark_amethyst);
 
         ThemeManager.addTheme(theme);
@@ -159,11 +159,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         theme = new Theme("Light Amethyst",
                 EThemeType.THEME_DAY,
                 R.style.Theme_Talkster_Third,
-                Color.parseColor("#a7637b"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#5b57a4"),
-                Color.parseColor("#ba78dd"),
+                R.color.theme3_color,
+                R.color.theme3_in_bubble,
+                R.color.theme3_out_bubble1,
+                R.color.theme3_out_bubble2,
+                R.color.theme3_out_bubble3,
                 R.drawable.bg_chat_light_amethyst);
 
         ThemeManager.addTheme(theme);

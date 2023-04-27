@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -302,7 +303,9 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_private_chat_action);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Window window = dialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         cancelButton = dialog.findViewById(R.id.cancelButton);
         confirmButton = dialog.findViewById(R.id.confirmButton);

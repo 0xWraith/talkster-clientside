@@ -54,4 +54,24 @@
 
     <color name="transparent">#00000000</color>
 
+    <!--    Theme Colors    -->
+
+    <color name="theme1_color">#099877</color>
+    <color name="theme1_in_bubble">#222023</color>
+    <color name="theme1_out_bubble1">#8FA457</color>
+    <color name="theme1_out_bubble2">#4FA149</color>
+    <color name="theme1_out_bubble3">#35A07B</color>
+
+    <color name="theme2_color">#c992eb</color>
+    <color name="theme2_in_bubble">#55405e</color>
+    <color name="theme2_out_bubble1">#55405e</color>
+    <color name="theme2_out_bubble2">#5b57a4</color>
+    <color name="theme2_out_bubble3">#ba78dd</color>
+
+    <color name="theme3_color">#a7637b</color>
+    <color name="theme3_in_bubble">#55405e</color>
+    <color name="theme3_out_bubble1">#55405e</color>
+    <color name="theme3_out_bubble2">#5b57a4</color>
+    <color name="theme3_out_bubble3">#ba78dd</color>
+
 </resources>

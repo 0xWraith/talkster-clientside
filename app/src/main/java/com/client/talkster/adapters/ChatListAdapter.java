@@ -128,7 +128,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             chatMuteIcon = itemView.findViewById(R.id.muteIcon);
             userNameText = itemView.findViewById(R.id.userNameText);
             chatPreviewText = itemView.findViewById(R.id.chatPreviewText);
-            userAvatarImage = itemView.findViewById(R.id.circularBackground);
+            userAvatarImage = itemView.findViewById(R.id.userAvatarImage);
 
             userNameText.setTextColor(ThemeManager.getColor("chat_name"));
             chatMuteIcon.setColorFilter(ThemeManager.getColor("chat_muteIcon"));

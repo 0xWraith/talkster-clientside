@@ -73,7 +73,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private RecyclerView userChatList;
     private DrawerLayout drawerLayout;
     private ImageView userNavbarAvatar;
-    private RelativeLayout navBarHeader;
+    private ConstraintLayout navBarHeader;
     private ConstraintLayout welcomeBlock;
     private NavigationView navigationView;
     private ChatListAdapter chatListAdapter;

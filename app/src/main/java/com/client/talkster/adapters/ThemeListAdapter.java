@@ -1,23 +1,28 @@
 package com.client.talkster.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
 import com.client.talkster.utils.Utils;
+
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +56,7 @@ public class ThemeListAdapter extends RecyclerView.Adapter<ThemeListAdapter.Them
         Theme theme = themeList.get(position);
 
         holder.themeNameText.setText(theme.getName());
-        holder.themeNameText.setTextColor(theme.getThemeColor());
+        holder.themeNameText.setTextColor(ContextCompat.getColor(MyApplication.getAppContext(), theme.getThemeColor()));
 
         setThemeBackground(holder.themePreview, theme);
         setThemeChatSenderPreview(holder.themeChatSenderPreview, theme);
@@ -60,34 +65,24 @@ public class ThemeListAdapter extends RecyclerView.Adapter<ThemeListAdapter.Them
 
     private void setThemeChatSenderPreview(View themeChatSenderPreview, Theme theme)
     {
-        GradientDrawable gradientDrawable = ThemeManager.getChatSenderDrawable(theme.getChatSenderColor1(), theme.getChatSenderColor2(), theme.getChatSenderColor3());
+        GradientDrawable gradientDrawable = ThemeManager.getChatSenderDrawable(ContextCompat.getColor(MyApplication.getAppContext(), theme.getChatSenderColor1()),
+                                                                               ContextCompat.getColor(MyApplication.getAppContext(), theme.getChatSenderColor2()),
+                                                                               ContextCompat.getColor(MyApplication.getAppContext(), theme.getChatSenderColor3()));
         gradientDrawable.setCornerRadius(Utils.convertDPToPx(context, 10));
         themeChatSenderPreview.setBackground(gradientDrawable);
     }
 
     private void setThemeChatReceiverPreview(View themeChatReceiverPreview, Theme theme)
     {
-        GradientDrawable gradientDrawable = ThemeManager.getChatReceiverDrawable(theme.getChatInColor());
+        GradientDrawable gradientDrawable = ThemeManager.getChatReceiverDrawable(ContextCompat.getColor(MyApplication.getAppContext(), theme.getChatInColor()));
         gradientDrawable.setCornerRadius(Utils.convertDPToPx(context, 10));
         themeChatReceiverPreview.setBackground(gradientDrawable);
     }
 
-    private void setThemeBackground(RelativeLayout themeBackground, Theme theme)
+    private void setThemeBackground(ShapeableImageView themeBackground, Theme theme)
     {
-        LayerDrawable layerDrawable;
-        GradientDrawable gradientDrawable;
-
-        layerDrawable = (LayerDrawable) AppCompatResources.getDrawable(context, R.drawable.drawable_theme_background);
-
-        if(layerDrawable == null)
-            return;
-
-        gradientDrawable = (GradientDrawable) layerDrawable.findDrawableByLayerId(R.id.themeBorder);
-
-        gradientDrawable.setStroke(Utils.convertDPToPx(context, 2), theme.getThemeColor());
-        layerDrawable.setDrawableByLayerId(R.id.themeBackground, AppCompatResources.getDrawable(context, theme.getChatBackgroundImage()));
-
-        themeBackground.setBackground(layerDrawable);
+       themeBackground.setBackgroundResource(theme.getChatBackgroundImage());
+       themeBackground.setStrokeColorResource(theme.getThemeColor());
     }
 
     @Override
@@ -96,7 +91,7 @@ public class ThemeListAdapter extends RecyclerView.Adapter<ThemeListAdapter.Them
     public class ThemeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private final TextView themeNameText;
-        private final RelativeLayout themePreview;
+        private final ShapeableImageView themePreview;
         private final View themeChatSenderPreview;
         private final View themeChatReceiverPreview;
 
