@@ -9,7 +9,7 @@
     tools:context=".controllers.talkster.MapFragment" >
 
     <View
-        android:id="@+id/view5"
+        android:id="@+id/toolbar"
         android:layout_width="wrap_content"
         android:layout_height="88dp"
         android:background="?attr/actionBarDefault" />
@@ -26,7 +26,7 @@
         android:ems="10"
         android:hint="@string/search"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="@+id/view5"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintEnd_toStartOf="@+id/toolbarMenuIcon"
         app:layout_constraintHorizontal_bias="0.483"
         app:layout_constraintStart_toEndOf="@+id/toolbarLogoIcon"
@@ -38,7 +38,7 @@
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:src="@drawable/talkster_logo"
-        app:layout_constraintBottom_toBottomOf="@+id/view5"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline4"
         app:tint="?attr/actionBarDefaultIcon" />
@@ -50,7 +50,7 @@
         android:layout_marginEnd="8dp"
         android:background="@color/transparent"
         android:src="@drawable/menu_32"
-        app:layout_constraintBottom_toBottomOf="@+id/view5"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline4"
         app:tint="?attr/actionBarDefaultIcon" />
@@ -62,7 +62,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view5" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <View
         android:id="@+id/leftPager"
@@ -91,7 +91,7 @@
         android:background="@drawable/drawable_map_button"
         android:src="@drawable/add_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view5" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <ImageButton
         android:id="@+id/minusButton"

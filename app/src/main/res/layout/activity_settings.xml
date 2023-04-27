@@ -9,7 +9,7 @@
     tools:context=".SettingsActivity">
 
     <View
-        android:id="@+id/view7"
+        android:id="@+id/toolbar"
         android:layout_width="wrap_content"
         android:layout_height="88dp"
         android:background="?attr/actionBarDefault" />
@@ -27,7 +27,7 @@
         android:layout_height="32dp"
         android:layout_marginStart="16dp"
         android:background="@color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/view7"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline6"
         app:srcCompat="@drawable/arrow_back_24"
@@ -43,7 +43,7 @@
         android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/view7"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toEndOf="@+id/toolbarBackIcon"
         app:layout_constraintTop_toTopOf="@+id/guideline6" />
 
@@ -54,7 +54,7 @@
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="88dp">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

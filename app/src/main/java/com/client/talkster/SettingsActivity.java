@@ -27,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
     private ToolbarElements toolbarElements;
     private SettingsElements settingsElements;
 
-    private RelativeLayout subToolbar;
+    private ConstraintLayout subToolbar;
     private ConstraintLayout settingsLayout;
 
     private TextView loginText;

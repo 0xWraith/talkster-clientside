@@ -14,11 +14,11 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view6" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
 
     <View
-        android:id="@+id/view6"
+        android:id="@+id/toolbar"
         android:layout_width="wrap_content"
         android:layout_height="88dp"
         android:background="?attr/actionBarDefault" />
@@ -33,8 +33,8 @@
         android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/view6"
-        app:layout_constraintStart_toStartOf="@+id/view6"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -46,7 +46,7 @@
         android:padding="3dp"
         android:src="@drawable/blank_profile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view6"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:shapeAppearanceOverlay="@style/circleImage"
         app:strokeColor="@color/gunmetal2"
         app:strokeWidth="3dp" />

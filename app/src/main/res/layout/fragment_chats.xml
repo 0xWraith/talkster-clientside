@@ -28,7 +28,7 @@
         android:layout_height="match_parent">
 
         <View
-            android:id="@+id/view2"
+            android:id="@+id/toolbar"
             android:layout_width="wrap_content"
             android:layout_height="88dp"
             android:background="?attr/actionBarDefault" />
@@ -39,7 +39,7 @@
             android:layout_height="25dp"
             android:layout_marginStart="16dp"
             android:background="@color/transparent"
-            app:layout_constraintBottom_toBottomOf="@+id/view2"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline2"
             app:srcCompat="@drawable/menu_32"
@@ -55,7 +55,7 @@
             android:textColor="?attr/actionBarDefaultTitle"
             android:textSize="30sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/view2"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
             app:layout_constraintStart_toEndOf="@+id/toolbarMenuIcon"
             app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
@@ -66,7 +66,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view2">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/userChatList"
