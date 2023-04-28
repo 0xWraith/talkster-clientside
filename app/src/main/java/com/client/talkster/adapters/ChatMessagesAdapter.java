@@ -1,10 +1,10 @@
 package com.client.talkster.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.client.talkster.R;
 import com.client.talkster.classes.Message;
 import com.client.talkster.controllers.ThemeManager;
+import com.client.talkster.interfaces.IChatViewHolder;
 import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.utils.enums.MessageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +25,14 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private final long ownerID;
     private final Context context;
     private final List<Message> messages;
-    private final List<ChatMessageViewHolder> chatMessageViewHolderList;
+    private final List<IChatViewHolder> chatViewHolderList;
 
     public ChatMessagesAdapter(List<Message> messages, long ownerID, Context context)
     {
         this.ownerID = ownerID;
         this.context = context;
         this.messages = messages;
-        chatMessageViewHolderList = new ArrayList<>();
+        chatViewHolderList = new ArrayList<>();
     }
 
     public List<Message> getMessages() { return messages; }
@@ -39,15 +41,18 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        if(viewType == 0)
-        {
-            View view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_sender, parent, false);
-            return new SenderChatMessagesViewHolder(view);
-        }
-        else
-        {
-            View view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_receiver, parent, false);
-            return new ReceiverChatMessagesViewHolder(view);
+        View view;
+        switch(viewType) {
+            case 0:
+                view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_sender, parent, false);
+                return new SenderChatMessagesViewHolder(view);
+            case 1:
+                view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_receiver, parent, false);
+                return new ReceiverChatMessagesViewHolder(view);
+            case 2:
+                break;
+            case 3:
+                break;
         }
     }
 
@@ -56,21 +61,33 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     {
         Message message = messages.get(position);
 
-        ChatMessageViewHolder chatMessageViewHolder = (ChatMessageViewHolder) holder;
+        IChatViewHolder chatViewHolder = (IChatViewHolder) holder;
+        chatViewHolderList.add(chatViewHolder);
 
-        chatMessageViewHolderList.add(chatMessageViewHolder);
-        chatMessageViewHolder.chatMessageTime.setText(message.getOnlineTime());
-        chatMessageViewHolder.chatMessageText.setText(message.getMessageContent());
+        if(messages.get(position).getMessageType() == MessageType.TEXT_MESSAGE) {
+            ((ChatMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
+            ((ChatMessageViewHolder)chatViewHolder).chatMessageText.setText(message.getMessageContent());
+        } else {
+            ((ChatMediaMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
+            ((ChatMediaMessageViewHolder)chatViewHolder).chatFileButton.setText(message.getMessageContent().split(" ")[0]);
+            ((ChatMediaMessageViewHolder)chatViewHolder).filename = message.getMessageContent().split(" ")[1];
+        }
     }
 
 
     @Override
     public int getItemViewType(int position)
     {
-        if(messages.get(position).getSenderID() == ownerID)
-            return 0;
+        if(messages.get(position).getMessageType() == MessageType.TEXT_MESSAGE) {
+            if(messages.get(position).getSenderID() == ownerID)
+                return 0;
+            return 1;
+        } else {
+            if(messages.get(position).getSenderID() == ownerID)
+                return 2;
+            return 3;
+        }
 
-        return 1;
     }
 
     @Override
@@ -79,11 +96,11 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onThemeChanged()
     {
-        for (ChatMessageViewHolder chatMessageViewHolder : chatMessageViewHolderList)
-            chatMessageViewHolder.onThemeChanged();
+        for (IChatViewHolder chatViewHolder : chatViewHolderList)
+            chatViewHolder.onThemeChanged();
     }
 
-    private abstract class ChatMessageViewHolder extends RecyclerView.ViewHolder
+    private abstract class ChatMessageViewHolder extends RecyclerView.ViewHolder implements IChatViewHolder
     {
         protected TextView chatMessageText;
         protected TextView chatMessageTime;
@@ -93,7 +110,25 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             chatMessageText = itemView.findViewById(R.id.chatMessageText);
             chatMessageTime = itemView.findViewById(R.id.chatMessageTime);
         }
-        abstract void onThemeChanged();
+        @Override
+        public abstract void onThemeChanged();
+    }
+
+    private abstract class ChatMediaMessageViewHolder extends RecyclerView.ViewHolder implements IChatViewHolder
+    {
+        protected View chatMessageView;
+        protected Button chatFileButton;
+        protected TextView chatMessageTime;
+        protected String filename;
+        public ChatMediaMessageViewHolder(@NonNull View itemView)
+        {
+            super(itemView);
+            chatMessageView = itemView.findViewById(R.id.chatMessageView);
+            chatFileButton = itemView.findViewById(R.id.chatFileButton);
+            chatMessageTime = itemView.findViewById(R.id.chatMessageTime);
+        }
+        @Override
+        public abstract void onThemeChanged();
     }
 
     class SenderChatMessagesViewHolder extends ChatMessageViewHolder
@@ -104,7 +139,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         @Override
-        void onThemeChanged()
+        public void onThemeChanged()
         {
             chatMessageText.setBackground(ThemeManager.getSenderChatBubbleGradient());
             chatMessageTime.setTextColor(ThemeManager.getColor("chat_outTimeText"));
@@ -120,11 +155,43 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         @Override
-        void onThemeChanged()
+        public void onThemeChanged()
         {
             chatMessageText.setBackground(ThemeManager.getReceiverChatBubbleGradient());
             chatMessageTime.setTextColor(ThemeManager.getColor("chat_inTimeText"));
             chatMessageText.setTextColor(ThemeManager.getColor("chat_messageTextIn"));
+        }
+    }
+
+    class SenderChatMediaMessagesViewHolder extends ChatMediaMessageViewHolder
+    {
+        public SenderChatMediaMessagesViewHolder(@NonNull View itemView)
+        {
+            super(itemView);
+        }
+
+        @Override
+        public void onThemeChanged()
+        {
+            chatMessageView.setBackground(ThemeManager.getSenderChatBubbleGradient());
+            chatMessageTime.setTextColor(ThemeManager.getColor("chat_outTimeText"));
+            chatFileButton.setTextColor(ThemeManager.getColor("chat_messageTextOut"));
+        }
+    }
+
+    class ReceiverChatMediaMessagesViewHolder extends ChatMediaMessageViewHolder
+    {
+        public ReceiverChatMediaMessagesViewHolder(@NonNull View itemView)
+        {
+            super(itemView);
+        }
+
+        @Override
+        public void onThemeChanged()
+        {
+            chatMessageView.setBackground(ThemeManager.getReceiverChatBubbleGradient());
+            chatMessageTime.setTextColor(ThemeManager.getColor("chat_inTimeText"));
+            chatFileButton.setTextColor(ThemeManager.getColor("chat_messageTextIn"));
         }
     }
 }

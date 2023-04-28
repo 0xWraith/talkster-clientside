@@ -97,20 +97,21 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         return view;
     }
 
-    /*@Override
+    @Override
     public void onResume() {
         super.onResume();
-        if(doReload){
-            updateUserChats();
-            System.out.println("On Resume Run");
-        }
+        userNavbarAvatar.setImageBitmap(UserAccount.getInstance().getUser().getAvatar());
+//        if(doReload){
+//            updateUserChats();
+//            System.out.println("On Resume Run");
+//        }
     }
 
-    @Override
-    public void onPause(){
-        super.onPause();
-        doReload = true;
-    }*/
+//    @Override
+//    public void onPause(){
+//        super.onPause();
+//        doReload = true;
+//    }
 
     @Override
     public void getUIElements(View view)

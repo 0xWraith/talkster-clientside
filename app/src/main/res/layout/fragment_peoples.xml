@@ -249,7 +249,6 @@
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
-        android:drawableLeft="@drawable/add_24"
         android:drawableRight="@drawable/person_add_24"
         android:drawablePadding="0dp"
         android:paddingLeft="5dp"

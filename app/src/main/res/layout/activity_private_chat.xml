@@ -106,7 +106,7 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <View
-        android:id="@+id/chatView"
+        android:id="@+id/chatMessageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/chatMessagesList"

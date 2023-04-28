@@ -1,6 +1,7 @@
 package com.client.talkster.controllers.talkster;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -261,7 +262,11 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         peoplesLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
     
-    public void updateProfilePicture() { profileImageView.setImageBitmap(fileUtils.getProfilePicture(UserAccount.getInstance().getUser().getId())); }
+    public void updateProfilePicture() {
+        Bitmap profile = fileUtils.getProfilePicture(UserAccount.getInstance().getUser().getId());
+        profileImageView.setImageBitmap(profile);
+        UserAccount.getInstance().getUser().setAvatar(profile);
+    }
 
     private void updateUserName()
     {

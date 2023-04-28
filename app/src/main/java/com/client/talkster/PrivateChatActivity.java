@@ -18,7 +18,6 @@ import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -46,7 +45,6 @@ import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.Message;
-import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ToolbarElements;
@@ -114,7 +112,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         toolbarElements = new ToolbarElements();
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
-        chatView = findViewById(R.id.chatView);
+        chatView = findViewById(R.id.chatMessageView);
         chatLayout = findViewById(R.id.chatLayout);
         chatMuteIcon = findViewById(R.id.muteIcon);
         mediaButton = findViewById(R.id.mediaButton);
