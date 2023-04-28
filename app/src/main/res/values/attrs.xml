@@ -15,6 +15,7 @@
     <attr name="navBarIcon" format="color" />
     <attr name="navBarTabActiveIcon" format="color" />
     <attr name="navBarTabUnactiveIcon" format="color" />
+
     <attr name="chat_backgroundImage" format="integer" />
     <attr name="chat_name" format="color" />
     <attr name="chat_message" format="color" />
@@ -36,6 +37,10 @@
     <attr name="chat_outTimeText" format="color" />
     <attr name="chat_TextCursor" format="color" />
     <attr name="chat_TextCursorSelection" format="color" />
+    <attr name="chat_barIconColor" format="color" />
+    <attr name="chat_barIconColorActive" format="color" />
+    <attr name="chat_barBackground" format="color" />
+
     <attr name="radioBackground" format="color" />
     <attr name="radioBackgroundChecked" format="color" />
     <attr name="switchTrack" format="color" />

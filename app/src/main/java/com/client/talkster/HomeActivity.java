@@ -175,8 +175,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 String action = intent.getAction();
                 Bundle bundle = intent.getExtras();
 
-                Log.d("BROADCAST", "onReceive: " + action);
-
                 if(action.equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
                 {
                     MessageDTO messageDTO = (MessageDTO) bundle.get(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE);

@@ -195,7 +195,6 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         map.setOnInfoWindowClickListener(marker -> {
             long id = (long) marker.getTag();
-            Log.d("MapFragment", "onInfoWindowClick: " + id);
             APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
             apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, UserAccount.getInstance().getUserJWT().getAccessToken());
         });

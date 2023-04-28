@@ -12,6 +12,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
@@ -47,6 +49,7 @@ import com.client.talkster.classes.Message;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.controllers.OfflineActivity;
@@ -65,6 +68,7 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -72,20 +76,22 @@ import okhttp3.Response;
 public class PrivateChatActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IBroadcastRegister, IThemeManagerActivityListener
 {
     private Chat chat;
-    private ImageView chatMuteIcon;
-    private Menu privateChatActionMenu;
-    private TextView userNameText, userStatusText;
-    private ImageButton chatSendButton, backButton, mediaButton, closeMediaButton;
-    private Button galleryButton, cameraButton;
-    private EditText chatInputText;
-    private RecyclerView chatMessagesList;
-    private View chatView;
+    private ToolbarElements toolbarElements;
     private BroadcastReceiver messageReceiver;
-    private ShapeableImageView userAvatarImage;
     private ChatMessagesAdapter chatMessagesAdapter;
+
+
+    private View chatView, chatInputView;
+    private ImageView chatMuteIcon;
+    private EditText chatInputText;
+    private Menu privateChatActionMenu;
+    private ShapeableImageView userAvatarImage;
+    private Button galleryButton, cameraButton;
+    private TextView userNameText, userStatusText;
     private LinearLayoutManager recyclerLayoutManager;
-    private ConstraintLayout mediaChooserLayout;
-    private ImageButton menuButton;
+    private ConstraintLayout chatLayout, mediaChooserLayout;
+    private ImageButton chatSendButton, toolbarBackButton, mediaButton, closeMediaButton, toolbarMenuIcon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -103,40 +109,67 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     @Override
     public void getUIElements()
     {
+        RecyclerView chatMessagesList;
+
+        toolbarElements = new ToolbarElements();
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
-        chatMuteIcon = findViewById(R.id.muteIcon);
-        menuButton = findViewById(R.id.menuButton);
-        userNameText = findViewById(R.id.userNameText);
-        chatInputText = findViewById(R.id.chatInputText);
-        chatSendButton = findViewById(R.id.chatSendButton);
-        backButton = findViewById(R.id.backButton);
-        mediaButton = findViewById(R.id.mediaButton);
-        closeMediaButton = findViewById(R.id.closeMediaButton);
-        galleryButton = findViewById(R.id.galleryButton);
-        cameraButton = findViewById(R.id.cameraButton);
-        userStatusText = findViewById(R.id.userStatusText);
-        chatMessagesList = findViewById(R.id.chatMessagesList);
         chatView = findViewById(R.id.chatView);
+        chatLayout = findViewById(R.id.chatLayout);
+        chatMuteIcon = findViewById(R.id.muteIcon);
+        mediaButton = findViewById(R.id.mediaButton);
+        userNameText = findViewById(R.id.userNameText);
+        cameraButton = findViewById(R.id.cameraButton);
+        chatInputView = findViewById(R.id.chatInputView);
+        chatInputText = findViewById(R.id.chatInputText);
+        galleryButton = findViewById(R.id.galleryButton);
+        userStatusText = findViewById(R.id.userStatusText);
+        chatSendButton = findViewById(R.id.chatSendButton);
+        toolbarMenuIcon = findViewById(R.id.toolbarMenuIcon);
+        chatMessagesList = findViewById(R.id.chatMessagesList);
+        closeMediaButton = findViewById(R.id.closeMediaButton);
         userAvatarImage = findViewById(R.id.circularBackground);
-        recyclerLayoutManager = (LinearLayoutManager)chatMessagesList.getLayoutManager();
+        toolbarBackButton = findViewById(R.id.toolbarBackButton);
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
+        recyclerLayoutManager = (LinearLayoutManager) chatMessagesList.getLayoutManager();
+
+        toolbarElements.setToolbarTitle(userNameText);
+        toolbarElements.addToolbarIcon(toolbarMenuIcon);
+        toolbarElements.addToolbarIcon(toolbarBackButton);
+        toolbarElements.setToolbarSubtitle(userStatusText);
+        toolbarElements.setToolbar(findViewById(R.id.toolbar));
 
         if(userJWT.getID() == chat.getReceiverID())
         {
-            userNameText.setText("Saved messages");
+            userNameText.setText(R.string.saved_messages);
             userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
 
         }
-        else {
+        else
+        {
             userNameText.setText(chat.getReceiverName());
             userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
         }
 
-        userStatusText.setText("last seen at 12:35");
+        userStatusText.setText(String.format(Locale.getDefault(), getString(R.string.chat_last_seen), "12:35"));
 
         chatMessagesAdapter = new ChatMessagesAdapter(chat.getMessages(), userJWT.getID(), this);
         chatMessagesList.setAdapter(chatMessagesAdapter);
+
+        chatInputText.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+                changeSendButtonColor(charSequence.length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) { }
+        });
 
         chatSendButton.setOnClickListener(view ->
         {
@@ -163,12 +196,12 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             sendBroadcast(intent);
         });
 
-        backButton.setOnClickListener(view -> finish());
+        toolbarBackButton.setOnClickListener(view -> finish());
         closeMediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(0).setDuration(250));
         mediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250));
 
         Context wrapper = new ContextThemeWrapper(this, R.style.PrivateChat_PopupMenu);
-        PopupMenu popup = new PopupMenu(wrapper, menuButton);
+        PopupMenu popup = new PopupMenu(wrapper, toolbarMenuIcon);
 
         privateChatActionMenu = popup.getMenu();
         MenuInflater inflater = popup.getMenuInflater();
@@ -193,14 +226,19 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             else if(id == R.id.muteForeverItemID)
                 return muteForTime(-1);
 
+            else if(id == R.id.changeThemeItemID)
+            {
+                Intent intent = new Intent(this, ChatSettingsActivity.class);
+                startActivity(intent);
+
+                return false;
+            }
+
 
             return false;
         });
 
-        menuButton.setOnClickListener(view ->
-        {
-            popup.show();
-        });
+        toolbarMenuIcon.setOnClickListener(view -> popup.show());
 
         cameraButton.setOnClickListener(view -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
@@ -216,15 +254,20 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
                     .start(101);
         });
 
-        chatView.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
-            public boolean onTouch(View v, MotionEvent event) {
-                // ... Respond to touch events
-                mediaChooserLayout.animate().translationY(0).setDuration(250);
-                return false;
-            }
+        chatView.setOnTouchListener((v, event) -> {
+            mediaChooserLayout.animate().translationY(0).setDuration(250);
+            return false;
         });
         updateChatMuteUI();
+    }
+
+    private void changeSendButtonColor(boolean change)
+    {
+        if(!change)
+            chatSendButton.setColorFilter(ThemeManager.getColor("chat_barIconColor"));
+        else
+            chatSendButton.setColorFilter(ThemeManager.getColor("chat_messageAction"));
+
     }
 
     private boolean showMutePopupWindow()
@@ -479,6 +522,8 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
                 }
                 intent.putExtra(BundleExtraNames.CHAT_ACTION_MESSAGE_DATA, messageDTO);
                 sendBroadcast(intent);
+
+                response.close();
             }
         }
         catch (IOException e) { e.printStackTrace(); }
@@ -550,8 +595,21 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     }
 
     @Override
-    public void onThemeChanged() {
+    public void onThemeChanged()
+    {
+        setTheme(ThemeManager.getCurrentThemeStyle());
+        ThemeManager.reloadThemeColors(this);
 
+        chatMessagesAdapter.onThemeChanged();
+
+        ThemeManager.changeToolbarColor(toolbarElements);
+
+        chatLayout.setBackground(ThemeManager.getThemeImage(this));
+        chatMuteIcon.setColorFilter(ThemeManager.getColor("chat_muteIcon"));
+        chatInputView.setBackgroundColor(ThemeManager.getColor("chat_barBackground"));
+        mediaButton.setColorFilter(ThemeManager.getColor("chat_barIconColor"));
+
+        changeSendButtonColor(chatInputText.getText().length() > 0);
     }
 
     @Override

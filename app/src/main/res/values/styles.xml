@@ -103,7 +103,6 @@
         <item name="android:drawableTint">#FFFFFF</item>
         <item name="android:textColorHighlight">?attr/chat_TextCursorSelection</item>
         <item name="android:textCursorDrawable">@drawable/drawable_input_cursor</item>
-<!--        <item name="android:backgroundTint">@color/inputLoginCodeDark</item>-->
     </style>
 
     <style name="circleImage" parent="">
@@ -180,7 +179,6 @@
 
     </style>
 
-
     <style name="SettingsHeaderTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -196,6 +194,18 @@
         <item name="android:layout_height">25dp</item>
         <item name="tint">?attr/settings_iconColor</item>
         <item name="android:layout_marginRight">20dp</item>
+    </style>
+
+    <style name="ChatInputField">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:textColor">?attr/settings_text</item>
+        <item name="android:textColorHint">?attr/settings_subText</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">?attr/settings_text</item>
+        <item name="android:textColorHighlight">?attr/chat_TextCursorSelection</item>
+        <item name="android:textCursorDrawable">@drawable/drawable_input_cursor</item>
+        <item name="android:importantForAutofill">no</item>
     </style>
 
 <!--    <style name="PopupAnimation">-->
@@ -226,10 +236,7 @@
         <item name="chat_message">#828282</item>
         <item name="chat_divider">#000000</item>
         <item name="chat_messageAction">@color/aquamarine</item>
-        <!--        Todo set to chat date-->
-
         <item name="chat_date">#787878</item>
-        <!--        Todo -->
         <item name="chat_muteIcon">#55555f</item>
         <item name="chat_inBubble">#222023</item>
         <item name="chat_inBubbleSelected">#55405e</item>
@@ -244,6 +251,9 @@
         <item name="chat_outTimeText">#FFFFFF</item>
         <item name="chat_TextCursor">#b780d7</item>
         <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_barIconColor">#FFFFFF</item>
+        <item name="chat_barIconColorActive">?attr/chat_messageAction</item>
+        <item name="chat_barBackground">?attr/actionBarDefault</item>
 
         <item name="radioBackground">#606060</item>
         <item name="radioBackgroundChecked">@color/aquamarine</item>
@@ -267,8 +277,8 @@
         <item name="settings_subText">#8Af2f2f2</item>
 
 
-        <item name="android:statusBarColor">?attr/actionBarDefault</item>
-        <item name="android:navigationBarColor">?attr/actionBarDefault</item>
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:navigationBarColor">#FF000000</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
@@ -314,6 +324,9 @@
         <item name="chat_outTimeText">#FFFFFF</item>
         <item name="chat_TextCursor">#b780d7</item>
         <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_barIconColor">#FFFFFF</item>
+        <item name="chat_barIconColorActive">#c58fe4</item>
+        <item name="chat_barBackground">#262425</item>
 
         <item name="radioBackground">#606060</item>
         <item name="radioBackgroundChecked">#ba78dd</item>
@@ -339,7 +352,7 @@
         <item name="android:statusBarColor">#00000000</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:navigationBarColor">?attr/actionBarDefault</item>
+        <item name="android:navigationBarColor">#00000000</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
@@ -367,9 +380,7 @@
         <item name="chat_message">#232323</item>
         <item name="chat_divider">#000000</item>
         <item name="chat_messageAction">#a7637b</item>
-        <!--        Todo set to chat date-->
         <item name="chat_date">#787878</item>
-        <!--        Todo -->
         <item name="chat_muteIcon">#292929</item>
         <item name="chat_inBubble">#222023</item>
         <item name="chat_inBubbleSelected">#6E4352</item>
@@ -384,6 +395,9 @@
         <item name="chat_outTimeText">#FFFFFF</item>
         <item name="chat_TextCursor">#6E4352</item>
         <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_barIconColor">#494949</item>
+        <item name="chat_barIconColorActive">#a7637b</item>
+        <item name="chat_barBackground">#FFFFFF</item>
 
         <item name="radioBackground">#606060</item>
         <item name="radioBackgroundChecked">#6E4352</item>

@@ -100,6 +100,7 @@ public class ChangeBiographyActivity extends AppCompatActivity implements IActiv
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
         catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster", "Failed to parse: " + exception.getMessage()); }
+        finally { response.close(); }
     }
 
     @Override

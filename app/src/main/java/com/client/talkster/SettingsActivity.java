@@ -171,22 +171,24 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
         }
 
         else if(id == R.id.settingsChatBlock)
-        {
             intent = new Intent(this, ChatSettingsActivity.class);
-            startActivityForResult(intent, 1);
-        }
+
         else if(id == R.id.settingsUsernameBlock)
         {
             intent = new Intent(this, ChangeLoginActivity.class);
             startActivityForResult(intent, 1);
+            return;
         }
         else if(id == R.id.settingsBiographyBlock)
         {
             intent = new Intent(this, ChangeBiographyActivity.class);
             startActivityForResult(intent, 1);
+            return;
         }
         else
             return;
+
+        startActivity(intent);
 
     }
 
