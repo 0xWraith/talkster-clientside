@@ -24,6 +24,9 @@ public class APIEndpoints
     //-----------------------------------[Notifications]
     public final static String TALKSTER_API_NOTIFICATION_ADD_TOKEN = "/api/v1/notification/add-token";
     //-----------------------------------[Users]
-    public final static String TALKSTER_API_USER_UPDATE_NAME = "/api/v1/user/set-name";
     public final static String TALKSTER_API_USER_GET_NAME = "/api/v1/user/get-name";
+    public final static String TALKSTER_API_USER_UPDATE_NAME = "/api/v1/user/set-name";
+    public final static String TALKSTER_API_USER_CHECK_USERNAME = "/api/v1/user/check-username";
+    public final static String TALKSTER_API_USER_UPDATE_USERNAME = "/api/v1/user/update/username";
+    public final static String TALKSTER_API_USER_UPDATE_BIOGRAPHY = "/api/v1/user/update/biography";
 }

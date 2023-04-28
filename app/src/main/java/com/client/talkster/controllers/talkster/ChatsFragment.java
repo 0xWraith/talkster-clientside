@@ -64,7 +64,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     private ToolbarElements toolbarElements;
 
     private float x1,x2;
-    private boolean doReload = false;
+//    private boolean doReload = false;
     private final int MIN_DISTANCE = 300;
 
     private View rightPager;
@@ -97,7 +97,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         return view;
     }
 
-    @Override
+    /*@Override
     public void onResume() {
         super.onResume();
         if(doReload){
@@ -110,7 +110,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     public void onPause(){
         super.onPause();
         doReload = true;
-    }
+    }*/
 
     @Override
     public void getUIElements(View view)

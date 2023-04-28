@@ -81,4 +81,13 @@
     <string name="theme">Theme</string>
     <string name="switch_to_day_mode">Switch to Day mode</string>
     <string name="switch_to_night_mode">Switch to Night mode</string>
+    <string name="at">\@</string>
+    <string name="username_lowercase">username</string>
+    <string name="username_cant_exceed_32_characters">Username can\'t exceed 32 characters.</string>
+    <string name="you_can_choose_a_username_on_talkster_if_you_do_other_people_will_be_able_to_find_you_by_searching_for_your_username_you_can_also_share_your_username_with_friends_to_make_it_easier_for_them_to_find_you">You can choose a username on Talkster. If you do, other people will be able to find you by searching for your username. You can also share your username with friends to make it easier for them to find you.</string>
+    <string name="username_invalid">This username is invalid.</string>
+    <string name="username_checking">Checking username…</string>
+    <string name="username_taken">This username is already taken.</string>
+    <string name="username_available">%s is available.</string>
+    <string name="biography">Biography</string>
 </resources>

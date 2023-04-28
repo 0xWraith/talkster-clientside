@@ -13,6 +13,14 @@
         <item name="android:insetBottom">0dp</item>
     </style>
 
+    <style name="Toolbar">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">88dp</item>
+        <item name="android:background">?attr/actionBarDefault</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
     <style name="dialogCancelButton" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:background">@color/transparent</item>
         <item name="android:textColorHint">?attr/errorColor</item>
@@ -110,6 +118,7 @@
 
     <style name="SettingsBlock">
         <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingTop">15dp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:layout_width">match_parent</item>
@@ -149,6 +158,23 @@
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:textSize">14sp</item>
     </style>
+
+    <style name="SettingsBlockInput">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:textColor">?attr/settings_text</item>
+        <item name="android:textColorHint">?attr/settings_subText</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">?attr/settings_text</item>
+        <item name="android:textColorHighlight">?attr/chat_TextCursorSelection</item>
+        <item name="android:textCursorDrawable">@drawable/drawable_input_cursor</item>
+        <item name="android:importantForAutofill">no</item>
+    </style>
+
+    <style name="SettingsBlockInput.Biography">
+
+    </style>
+
 
     <style name="SettingsHeaderTextView">
         <item name="android:layout_width">wrap_content</item>

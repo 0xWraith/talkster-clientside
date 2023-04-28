@@ -1,8 +1,5 @@
 package com.client.talkster;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.theme.SettingsElements;
@@ -19,23 +19,20 @@ import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.IUpdateSettingsUI;
 
-public class SettingsActivity extends AppCompatActivity implements IActivity, View.OnClickListener, IThemeManagerActivityListener
+public class SettingsActivity extends AppCompatActivity implements IActivity, View.OnClickListener, IThemeManagerActivityListener, IUpdateSettingsUI
 {
 
 
     private ToolbarElements toolbarElements;
     private SettingsElements settingsElements;
 
+
+    private ImageView userAvatarImage;
     private RelativeLayout subToolbar;
     private ConstraintLayout settingsLayout;
-
-    private TextView loginText;
-    private TextView biographyText;
-    private TextView userNameText;
-    private TextView userMailText;
-    private TextView userStatusText;
-    private ImageView userAvatarImage;
+    private TextView loginText, biographyText, userNameText, userMailText, userStatusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -110,14 +107,11 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
         settingsElements.addSettingsSubText(findViewById(R.id.settingsSubText2));
         settingsElements.addSettingsSubText(findViewById(R.id.settingsSubText3));
 
-        loginText.setText(user.getLogin());
-        userMailText.setText(user.getMail());
+
         userNameText.setText(user.getFullName());
         userStatusText.setText(user.getStatus());
-        biographyText.setText(user.getBiography());
 
         toolbarBackIcon.setOnClickListener(this);
-        userAvatarImage.setImageBitmap(UserAccount.getInstance().getUser().getAvatar());
 
         settingsBlockItem = findViewById(R.id.settingsMailBlock);
         settingsBlockItem.setOnClickListener(this);
@@ -151,6 +145,11 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
 
         settingsBlockItem = findViewById(R.id.settingsBugBlock);
         settingsBlockItem.setOnClickListener(this);
+
+        updateMail();
+        updateUsername();
+        updateBiography();
+        updateProfilePicture();
     }
 
     @Override
@@ -162,16 +161,47 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
     @Override
     public void onClick(View view)
     {
+        Intent intent = null;
         int id = view.getId();
 
         if(id == R.id.toolbarBackIcon)
+        {
             finish();
+            return;
+        }
 
         else if(id == R.id.settingsChatBlock)
         {
-            Intent intent = new Intent(this, ChatSettingsActivity.class);
-            startActivity(intent);
+            intent = new Intent(this, ChatSettingsActivity.class);
+            startActivityForResult(intent, 1);
         }
+        else if(id == R.id.settingsUsernameBlock)
+        {
+            intent = new Intent(this, ChangeLoginActivity.class);
+            startActivityForResult(intent, 1);
+        }
+        else if(id == R.id.settingsBiographyBlock)
+        {
+            intent = new Intent(this, ChangeBiographyActivity.class);
+            startActivityForResult(intent, 1);
+        }
+        else
+            return;
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (!(requestCode == 1 && resultCode == RESULT_OK))
+            return;
+
+        updateMail();
+        updateUsername();
+        updateBiography();
+        updateProfilePicture();
 
     }
 
@@ -205,5 +235,25 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
     {
         ThemeManager.addListener(this);
         setTheme(ThemeManager.getCurrentThemeStyle());
+    }
+    @Override
+    public void updateMail() { userMailText.setText(UserAccount.getInstance().getUser().getMail()); }
+    @Override
+    public void updateUsername() { loginText.setText(String.format("@%s", UserAccount.getInstance().getUser().getUsername())); }
+
+    @Override
+    public void updateBiography() { biographyText.setText(UserAccount.getInstance().getUser().getBiography()); }
+
+    @Override
+    public void updateProfilePicture()
+    {
+        User user = UserAccount.getInstance().getUser();
+
+        if(user.getAvatar() != null)
+        {
+            userAvatarImage.setImageBitmap(user.getAvatar());
+            return;
+        }
+//        Todo default image
     }
 }

@@ -28,6 +28,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Talkster.First">
         <activity
+            android:name=".ChangeBiographyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeEmailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeLoginActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChatSettingsActivity"
             android:exported="false" />
         <activity

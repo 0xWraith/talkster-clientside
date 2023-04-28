@@ -44,9 +44,6 @@ public class ThemeManager
 
     public static void applyTheme(Context context, Theme theme)
     {
-        if(currentTheme == null)
-            prevTheme = theme;
-
         currentTheme = theme;
         notifyListeners();
 
@@ -141,7 +138,7 @@ public class ThemeManager
         themeColor.put("checkboxBackgroundChecked", MaterialColors.getColor(context, R.attr.checkboxBackgroundChecked, Color.BLACK));
 
         themeColor.put("dialogBackground", MaterialColors.getColor(context, R.attr.dialogBackground, Color.BLACK));
-        themeColor.put("errorColor", MaterialColors.getColor(context, R.attr.errorColor, Color.BLACK));
+        themeColor.put("errorColor", MaterialColors.getColor(context, R.attr.errorColor, Color.RED));
 
         loadButtonColors(context);
         loadSettingsColors(context);

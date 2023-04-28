@@ -10,7 +10,7 @@ public class User implements Parcelable
     private String firstname;
     private String lastname;
     private String mail;
-    private String login;
+    private String username;
     private String biography;
     private Bitmap avatar;
 
@@ -22,7 +22,7 @@ public class User implements Parcelable
         firstname = in.readString();
         lastname = in.readString();
         mail = in.readString();
-        login = in.readString();
+        username = in.readString();
         biography = in.readString();
         avatar = in.readParcelable(Bitmap.class.getClassLoader());
     }
@@ -51,11 +51,11 @@ public class User implements Parcelable
     public String getLastname() { return lastname; }
     public String getFirstname() { return firstname; }
     public String getFullName() { return firstname + " " + lastname; }
-    public String getLogin() { return login == null ? "Not created" : login; }
+    public String getUsername() { return username == null ? "Not created" : username; }
     public String getBiography() { return biography == null ? "Not created" : biography; }
 
     public void setMail(String mail) { this.mail = mail; }
-    public void setLogin(String login) { this.login = login; }
+    public void setUsername(String username) { this.username = username; }
     public void setAvatar(Bitmap avatar) { this.avatar = avatar; }
     public void setLastname(String lastname) { this.lastname = lastname; }
     public void setBiography(String biography) { this.biography = biography; }
@@ -74,7 +74,7 @@ public class User implements Parcelable
         dest.writeString(firstname);
         dest.writeString(lastname);
         dest.writeString(mail);
-        dest.writeString(login);
+        dest.writeString(username);
         dest.writeString(biography);
         dest.writeParcelable(avatar, flags);
     }
@@ -90,7 +90,7 @@ public class User implements Parcelable
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", mail='" + mail + '\'' +
-                ", login='" + login + '\'' +
+                ", login='" + username + '\'' +
                 ", biography='" + biography + '\'' +
                 ", avatar=" + avatar +
                 '}';
