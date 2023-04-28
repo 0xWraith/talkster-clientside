@@ -8,62 +8,52 @@
     android:background="?attr/windowBackgroundWhite"
     tools:context=".controllers.talkster.MapFragment" >
 
-    <RelativeLayout
+    <View
         android:id="@+id/toolbar"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="88dp"
-        android:background="?attr/actionBarDefault"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="?attr/actionBarDefault" />
+
+    <EditText
+        android:id="@+id/toolbarInput"
+        style="@style/LoginMailEditText"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:drawableEnd="@drawable/search_24"
+        android:drawableTint="?attr/actionBarDefaultIcon"
+        android:ems="10"
+        android:hint="@string/search"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toStartOf="@+id/toolbarMenuIcon"
+        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintStart_toEndOf="@+id/toolbarLogoIcon"
+        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+
+    <ImageView
+        android:id="@+id/toolbarLogoIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/talkster_logo"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:tint="?attr/actionBarDefaultIcon" />
 
-        <ImageView
-            android:id="@+id/toolbarLogoIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="31dp"
-            android:layout_marginBottom="9dp"
-            android:src="@drawable/talkster_logo"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/actionBarDefaultIcon" />
-
-        <EditText
-            android:id="@+id/toolbarInput"
-            style="@style/LoginMailEditText"
-            android:layout_width="40dp"
-            android:layout_height="48dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="39dp"
-            android:layout_marginBottom="8dp"
-            android:layout_toStartOf="@+id/toolbarMenuIcon"
-            android:layout_toEndOf="@+id/toolbarLogoIcon"
-            android:drawableEnd="@drawable/search_24"
-            android:drawableTint="?attr/actionBarDefaultIcon"
-            android:ems="10"
-            android:hint="@string/search"
-            android:inputType="textPersonName"
-            app:layout_constraintEnd_toStartOf="@+id/toolbarMenuIcon"
-            app:layout_constraintStart_toEndOf="@+id/toolbarLogoIcon" />
-
-        <ImageButton
-            android:id="@+id/toolbarMenuIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="31dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:background="@color/transparent"
-            android:src="@drawable/menu_32"
-            app:tint="?attr/actionBarDefaultIcon" />
-
-    </RelativeLayout>
+    <ImageButton
+        android:id="@+id/toolbarMenuIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/transparent"
+        android:src="@drawable/menu_32"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:tint="?attr/actionBarDefaultIcon" />
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
@@ -113,5 +103,12 @@
         android:src="@drawable/remove_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/plusButton" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

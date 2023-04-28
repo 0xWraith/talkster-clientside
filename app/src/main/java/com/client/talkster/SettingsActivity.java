@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
 
 
     private ImageView userAvatarImage;
-    private RelativeLayout subToolbar;
+    private ConstraintLayout subToolbar;
     private ConstraintLayout settingsLayout;
     private TextView loginText, biographyText, userNameText, userMailText, userStatusText;
 

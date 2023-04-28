@@ -8,50 +8,47 @@
     android:background="@drawable/drawable_chat_border"
     android:minHeight="66dp">
 
+    <ImageView
+        android:id="@+id/muteIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:foregroundGravity="center"
+        android:src="@drawable/mute"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/userNameText"
+        app:layout_constraintStart_toEndOf="@+id/userNameText"
+        app:layout_constraintTop_toTopOf="@+id/userNameText"
+        app:tint="?attr/chat_muteIcon" />
+
+    <TextView
+        android:id="@+id/userNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:text="Dmytro Dzhuha"
+        android:textColor="?attr/chat_name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/chatPreviewText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.042"
+        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/userAvatarImage"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/account_circle_64"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/blank_profile"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/circleImage"
         app:strokeColor="@null" />
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="24dp"
-        android:gravity="start"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/userNameText"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
-            android:text="Dmytro Dzhuha"
-            android:textColor="?attr/chat_name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.508"/>
-
-        <ImageView
-            android:id="@+id/muteIcon"
-            android:layout_width="20dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_toEndOf="@+id/userNameText"
-            android:foregroundGravity="center"
-            android:src="@drawable/mute"
-            android:visibility="visible"
-            app:tint="?attr/chat_muteIcon" />
-
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/chatPreviewText"
@@ -62,22 +59,10 @@
         android:singleLine="true"
         android:textColor="?attr/chat_message"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/circularBackground"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/circularBackground" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/circularBackground"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
-        android:src="@drawable/account_circle_64"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/circleImage"
-        app:strokeColor="@null" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
+        app:layout_constraintTop_toBottomOf="@+id/userNameText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

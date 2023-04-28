@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/themeItemLayout"
     android:layout_width="90dp"
     android:layout_height="140dp"
     android:layout_marginEnd="15dp">
 
-    <RelativeLayout
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/themePreview"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@drawable/drawable_theme_background"
-        android:paddingTop="10dp"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:paddingBottom="10dp">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/chat_backgroundImage"
+        app:strokeColor="?attr/settings_actionTextColor"
+        android:padding="1dp"
+        app:strokeWidth="2dp"
+        app:shapeAppearanceOverlay="@style/roundedImage"
+        app:layout_constraintBottom_toTopOf="@+id/themeNameText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:id="@+id/themeChatSenderPreview"
-            android:layout_width="50dp"
-            android:layout_height="25dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/drawable_theme_message_sender_preview" />
+    <View
+        android:id="@+id/themeChatSenderPreview"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/drawable_theme_message_sender_preview"
+        app:layout_constraintBottom_toTopOf="@+id/themeChatReceiverPreview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:id="@+id/themeChatReceiverPreview"
-            android:layout_width="50dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/themeChatSenderPreview"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/drawable_theme_message_receiver_preview" />
-    </RelativeLayout>
+    <View
+        android:id="@+id/themeChatReceiverPreview"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/drawable_theme_message_receiver_preview"
+        app:layout_constraintBottom_toBottomOf="@+id/themePreview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/themeChatSenderPreview" />
 
     <TextView
         android:id="@+id/themeNameText"
@@ -44,6 +53,9 @@
         android:text="?attr/themeName"
         android:textAlignment="center"
         android:textColor="?attr/settings_actionTextColor"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

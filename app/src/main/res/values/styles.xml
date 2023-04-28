@@ -111,6 +111,11 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="roundedImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">5%</item>
+    </style>
+
     <style name="PrivateChat.PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:itemBackground">@color/gunmetal</item>
@@ -194,8 +199,8 @@
     </style>
 
 <!--    <style name="PopupAnimation">-->
-<!--        <item name="android:windowExitAnimation">@anim/animation_popup_from_top_to_bottom</item>-->
 <!--        <item name="android:windowEnterAnimation">@anim/animation_popup_from_bottom_to_top</item>-->
+<!--        <item name="android:windowExitAnimation">@anim/animation_popup_from_top_to_bottom</item>-->
 <!--    </style>-->
 
     <style name="Theme.Talkster.First" parent="Theme.AppCompat.Light.NoActionBar">
