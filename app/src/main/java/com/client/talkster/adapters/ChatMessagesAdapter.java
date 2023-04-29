@@ -22,7 +22,6 @@ import com.client.talkster.classes.User;
 import com.client.talkster.classes.chat.message.Message;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IChatViewHolder;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.MessageType;
 import com.client.talkster.interfaces.chat.IGroupChatGetMessageSender;
@@ -50,7 +49,6 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     };
     
     private IGroupChatGetMessageSender groupChatGetMessageSender;
-    private final List<ChatMessageViewHolder> chatMessageViewHolderList;
 
     public ChatMessagesAdapter(List<Message> messages, long ownerID, EChatType type, Context context)
     {
@@ -121,25 +119,21 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         IChatViewHolder chatViewHolder = (IChatViewHolder) holder;
         chatViewHolderList.add(chatViewHolder);
-// TODO: FIx this mess
+
         if(messages.get(position).getMessageType() == MessageType.TEXT_MESSAGE) {
             ((ChatMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
             ((ChatMessageViewHolder)chatViewHolder).chatMessageText.setText(message.getMessageContent());
+            
+            if(type == EChatType.GROUP_CHAT && chatViewHolder instanceof ReceiverChatMessagesViewHolder && ((ReceiverChatMessagesViewHolder) chatViewHolder).chatMessageUsername != null)
+            {
+                User sender = groupChatGetMessageSender.getMessageSender(message);
+                ((ReceiverChatMessagesViewHolder) chatViewHolder).chatMessageUsername.setText(sender.getFullName());
+            }
         } else {
-            ((ChatMediaMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
-            ((ChatMediaMessageViewHolder)chatViewHolder).filename = message.getMessageContent();
-// BREAKLINE
-        chatMessageViewHolderList.add(chatMessageViewHolder);
-        chatMessageViewHolder.chatMessageTime.setText(message.getOnlineTime());
-        chatMessageViewHolder.chatMessageText.setText(message.getMessageContent());
-
-        if(type == EChatType.GROUP_CHAT && chatMessageViewHolder instanceof ReceiverChatMessagesViewHolder && ((ReceiverChatMessagesViewHolder) chatMessageViewHolder).chatMessageUsername != null)
-        {
-            User sender = groupChatGetMessageSender.getMessageSender(message);
-            ((ReceiverChatMessagesViewHolder) chatMessageViewHolder).chatMessageUsername.setText(sender.getFullName());
+            ((ChatMediaMessageViewHolder) chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
+            ((ChatMediaMessageViewHolder) chatViewHolder).filename = message.getMessageContent();
         }
     }
-// TODO: TILL now
 
     @Override
     public int getItemViewType(int position)
