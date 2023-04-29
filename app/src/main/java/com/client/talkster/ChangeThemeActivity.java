@@ -22,7 +22,7 @@ import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.enums.EThemeType;
 
 public class ChangeThemeActivity extends AppCompatActivity  implements IActivity, IThemeManagerActivityListener {

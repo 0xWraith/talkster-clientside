@@ -18,7 +18,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -45,10 +44,9 @@ import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.websocket.APIStompWebSocket;
 import com.client.talkster.classes.FileContent;
-import com.client.talkster.classes.Message;
-import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.chat.message.Message;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.OfflineActivity;
@@ -191,24 +189,6 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         {
             String message = chatInputText.getText().toString().trim();
             sendMessage(message, MessageType.TEXT_MESSAGE);
-
-            int length = message.length();
-
-            if(length == 0 || length > 4097)
-                return;
-
-            MessageDTO messageDTO = new MessageDTO();
-
-            chatInputText.setText("");
-            messageDTO.setchatid(chat.getId());
-            messageDTO.setmessagecontent(message);
-            messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getAccessToken());
-            messageDTO.setreceiverid(chat.getReceiverID());
-            messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
-            messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
-
-            APIStompWebSocket.getInstance().getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
         });
 
         toolbarBackButton.setOnClickListener(view -> finish());
@@ -320,9 +300,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         messageDTO.setmessagetype(messageType);
         messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
 
-        Intent intent = new Intent(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
-        intent.putExtra(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE, messageDTO);
-        sendBroadcast(intent);
+        APIStompWebSocket.getInstance().getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
     }
 
     private boolean checkPermissions() {
@@ -503,7 +481,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         else if (resultCode == Activity.RESULT_OK && requestCode == 6) {
             boolean isDeleted = data.getBooleanExtra("isDeleted", false);
             boolean isCleared = data.getBooleanExtra("isCleared", false);
-            chat = (Chat) data.getSerializableExtra(BundleExtraNames.USER_CHAT);
+            chat = (PrivateChat) data.getSerializableExtra(BundleExtraNames.USER_CHAT);
             if (isDeleted) {finish(); return;}
             if (isCleared) {clearChats();}
             updateChatMuteUI();

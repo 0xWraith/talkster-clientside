@@ -123,7 +123,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if(messages.get(position).getMessageType() == MessageType.TEXT_MESSAGE) {
             ((ChatMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
             ((ChatMessageViewHolder)chatViewHolder).chatMessageText.setText(message.getMessageContent());
-            
+
             if(type == EChatType.GROUP_CHAT && chatViewHolder instanceof ReceiverChatMessagesViewHolder && ((ReceiverChatMessagesViewHolder) chatViewHolder).chatMessageUsername != null)
             {
                 User sender = groupChatGetMessageSender.getMessageSender(message);

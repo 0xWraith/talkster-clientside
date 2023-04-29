@@ -361,7 +361,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             if (((PrivateChat)chat).getOwnerID() != userJWT.getID())
             {
                 ChatListAdapter.ChatViewHolder holder = chatListAdapter.viewHashMap.get(chatID);
-                FileUtils fileUtils = new FileUtils(userJWT);
+                FileUtils fileUtils = new FileUtils();
                 holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(((PrivateChat)chat).getReceiverID()));
             }
         }

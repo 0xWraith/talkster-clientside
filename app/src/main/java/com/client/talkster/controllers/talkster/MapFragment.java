@@ -31,7 +31,6 @@ import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;

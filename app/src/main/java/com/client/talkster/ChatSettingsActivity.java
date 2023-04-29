@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -33,9 +32,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.client.talkster.adapters.ThemeListAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.Chat;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.theme.CubicBezierInterpolator;
 import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.Theme;
@@ -47,21 +46,21 @@ import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.EPrivateChatAction;
-import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.enums.EThemeType;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+
 import okhttp3.Call;
 import okhttp3.Response;
 
 public class ChatSettingsActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IThemeManagerActivityListener
 {
-    private Chat chat;
+    private PrivateChat chat;
     private boolean isDeleted = false, isCleared = false;
     private boolean BLOCK_TOUCH = false;
     private ToolbarElements toolbarElements;
@@ -93,7 +92,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         if(bundle.isEmpty())
             return;
 
-        chat = (Chat) bundle.get(BundleExtraNames.USER_CHAT);
+        chat = (PrivateChat) bundle.get(BundleExtraNames.USER_CHAT);
     }
 
     private void sendResult() {
@@ -413,6 +412,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
 
                 intent.putExtra(BundleExtraNames.CHAT_ACTION_TYPE, action);
                 intent.putExtra(BundleExtraNames.CHAT_ACTION_CHAT_ID, chat.getId());
+                intent.putExtra(BundleExtraNames.CHAT_TYPE, chat.getType());
 
 
                 switch(action)
