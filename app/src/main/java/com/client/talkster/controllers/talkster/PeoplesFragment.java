@@ -1,6 +1,8 @@
 package com.client.talkster.controllers.talkster;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,13 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.material.imageview.ShapeableImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -37,6 +38,7 @@ import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.material.imageview.ShapeableImageView;
 
 public class PeoplesFragment extends Fragment implements IFragmentActivity, IThemeManagerFragmentListener
 {
@@ -58,6 +60,16 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA
+    };
+    private final String[] ALLOWED_TYPES = {
+            "image/png",
+            "image/jpg",
+            "image/jpeg"
+    };
 
 
     public PeoplesFragment() { }
@@ -68,7 +80,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         super.onCreate(savedInstanceState);
 
         FRAGMENT_CREATED = true;
-        fileUtils = new FileUtils(UserAccount.getInstance().getUserJWT());
+        fileUtils = new FileUtils();
     }
 
     @Override
@@ -158,7 +170,18 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         });
 
         imageEditButton.setOnClickListener(view1 -> {
-            mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
+            int permReadExt = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            int permWriteExt = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int permCamera = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+
+            if (permReadExt != PackageManager.PERMISSION_GRANTED
+                    && permWriteExt != PackageManager.PERMISSION_GRANTED
+                    && permCamera != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, 1);
+            }
+            else {
+                mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
+            }
         });
 
         closeMediaButton.setOnClickListener(view1 -> {
@@ -178,6 +201,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
             mediaChooserLayout.animate().translationY(0).setDuration(250);
             ImagePicker.Companion.with(getActivity())
                     .galleryOnly()
+                    .galleryMimeTypes(ALLOWED_TYPES)
                     .cropSquare()
                     .maxResultSize(256,256)
                     .start(101);

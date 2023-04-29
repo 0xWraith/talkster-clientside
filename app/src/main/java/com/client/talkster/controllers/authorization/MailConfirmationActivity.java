@@ -22,7 +22,7 @@ import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.AuthenticationDTO;
@@ -210,6 +210,7 @@ public class MailConfirmationActivity extends AppCompatActivity implements IActi
             if (apiUrl.contains(APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_VERIFY_USER)) {
                 Intent intent;
                 UserJWT userJWT;
+                UserAccount userAccount = UserAccount.getInstance();
 
                 switch (responseCode)
                 {
@@ -222,23 +223,24 @@ public class MailConfirmationActivity extends AppCompatActivity implements IActi
                         intent = new Intent(this, HomeActivity.class);
                         VerifiedUserDTO verifiedUserDTO = new Gson().fromJson(responseBody, VerifiedUserDTO.class);
 
-                        User user = verifiedUserDTO.getUser();
-                        userJWT = verifiedUserDTO.getUserJWT();
+                        userAccount.setUser(verifiedUserDTO.getUser());
+                        userAccount.setUserJWT(verifiedUserDTO.getUserJWT());
 
-                        intent.putExtra(BundleExtraNames.USER, user);
-                        UserAccountManager.saveAccount(this, userJWT);
+                        UserAccountManager.saveAccount(this, verifiedUserDTO.getUserJWT());
                         break;
 
                     case 202:
                         intent = new Intent(this, RegistrationActivity.class);
                         userJWT = new Gson().fromJson(responseBody, UserJWT.class);
+
+                        userAccount.setUserJWT(userJWT);
+
                         intent.putExtra(BundleExtraNames.USER_MAIL, authenticationDTO.getMail());
                         break;
 
                     default:
                         throw new IOException("Unexpected response " + response);
                 }
-                intent.putExtra(BundleExtraNames.USER_JWT, userJWT);
 
                 runOnUiThread(() -> {
                     startActivity(intent);

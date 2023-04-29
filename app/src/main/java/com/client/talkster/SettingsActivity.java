@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -171,7 +170,7 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
         }
 
         else if(id == R.id.settingsChatBlock)
-            intent = new Intent(this, ChatSettingsActivity.class);
+            intent = new Intent(this, ChangeThemeActivity.class);
 
         else if(id == R.id.settingsUsernameBlock)
         {

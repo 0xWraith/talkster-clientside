@@ -17,12 +17,11 @@ import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
-import com.client.talkster.utils.BundleExtraNames;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -89,14 +88,11 @@ public class OfflineActivity extends AppCompatActivity implements IAPIResponseHa
     public void showHomeScreen(VerifiedUserDTO verifiedUserDTO)
     {
         Intent intent = new Intent(this, HomeActivity.class);
-
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        User user = verifiedUserDTO.getUser();
-        UserJWT userJWT = verifiedUserDTO.getUserJWT();
-
-        intent.putExtra(BundleExtraNames.USER_JWT, userJWT);
-        intent.putExtra(BundleExtraNames.USER, user);
+        UserAccount userAccount = UserAccount.getInstance();
+        userAccount.setUser(verifiedUserDTO.getUser());
+        userAccount.setUserJWT(verifiedUserDTO.getUserJWT());
 
         startActivity(intent);
         finish();

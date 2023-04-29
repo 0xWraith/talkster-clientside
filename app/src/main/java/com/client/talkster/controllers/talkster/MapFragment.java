@@ -1,10 +1,11 @@
 package com.client.talkster.controllers.talkster;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -29,7 +31,6 @@ import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
 import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
@@ -69,10 +70,24 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     private View rightPager, leftPager;
     private ImageButton plusButton, minusButton;
 
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+
     public MapFragment() { }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        int permCoarseLoc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        int permFineLoc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (permCoarseLoc != PackageManager.PERMISSION_GRANTED
+                || permFineLoc != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, 1);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -278,7 +293,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     {
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
-        FileUtils fileUtils = new FileUtils(userJWT);
+        FileUtils fileUtils = new FileUtils();
         Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userJWT.getID()));
         if (userMarker != null) {
             userMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));

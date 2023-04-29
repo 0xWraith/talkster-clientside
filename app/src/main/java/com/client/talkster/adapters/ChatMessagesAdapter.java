@@ -1,6 +1,12 @@
 package com.client.talkster.adapters;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.client.talkster.R;
@@ -15,10 +22,17 @@ import com.client.talkster.classes.Message;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IChatViewHolder;
 import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.MessageType;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.muddz.styleabletoast.StyleableToast;
 
 public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements IThemeManagerFragmentListener
 {
@@ -26,7 +40,9 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private final Context context;
     private final List<Message> messages;
     private final List<IChatViewHolder> chatViewHolderList;
-
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
     public ChatMessagesAdapter(List<Message> messages, long ownerID, Context context)
     {
         this.ownerID = ownerID;
@@ -50,9 +66,13 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_receiver, parent, false);
                 return new ReceiverChatMessagesViewHolder(view);
             case 2:
-                break;
+                view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_sender, parent, false);
+                return new ReceiverChatMediaMessagesViewHolder(view);
             case 3:
-                break;
+                view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_receiver, parent, false);
+                return new ReceiverChatMediaMessagesViewHolder(view);
+            default:
+                return null;
         }
     }
 
@@ -69,8 +89,8 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ((ChatMessageViewHolder)chatViewHolder).chatMessageText.setText(message.getMessageContent());
         } else {
             ((ChatMediaMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
-            ((ChatMediaMessageViewHolder)chatViewHolder).chatFileButton.setText(message.getMessageContent().split(" ")[0]);
-            ((ChatMediaMessageViewHolder)chatViewHolder).filename = message.getMessageContent().split(" ")[1];
+            ((ChatMediaMessageViewHolder)chatViewHolder).filename = message.getMessageContent();
+
         }
     }
 
@@ -126,6 +146,9 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             chatMessageView = itemView.findViewById(R.id.chatMessageView);
             chatFileButton = itemView.findViewById(R.id.chatFileButton);
             chatMessageTime = itemView.findViewById(R.id.chatMessageTime);
+
+            chatFileButton.setOnClickListener(view -> new Thread(() -> saveFile(filename)).start());
+
         }
         @Override
         public abstract void onThemeChanged();
@@ -192,6 +215,37 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             chatMessageView.setBackground(ThemeManager.getReceiverChatBubbleGradient());
             chatMessageTime.setTextColor(ThemeManager.getColor("chat_inTimeText"));
             chatFileButton.setTextColor(ThemeManager.getColor("chat_messageTextIn"));
+        }
+    }
+
+    private void saveFile(String filename) {
+        int permWriteExt = ActivityCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permWriteExt != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((Activity) context, PERMISSIONS, 1);
+        } else {
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Talkster");
+            OutputStream outputStream;
+
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
+            Bitmap image = new FileUtils().downloadImage(filename);
+            if (image == null) {
+                return;
+            }
+
+            File file = new File(dir, filename.split("\\.")[0] + ".jpg");
+            try {
+                outputStream = new FileOutputStream(file);
+                image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            MediaScannerConnection.scanFile(context, new String[] { file.getPath() }, new String[] { "image/jpeg" }, null);
+            ((Activity)context).runOnUiThread(() -> StyleableToast.makeText(context.getApplicationContext(), "Image Downloaded!", R.style.customToast).show());
         }
     }
 }

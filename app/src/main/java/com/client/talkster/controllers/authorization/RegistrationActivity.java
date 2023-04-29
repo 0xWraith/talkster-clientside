@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.AuthenticationDTO;
@@ -36,7 +37,6 @@ import okhttp3.Response;
 public class RegistrationActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler
 {
 
-    private UserJWT userJWT;
     private Vibrator vibrator;
     private ImageButton continueButton;
     private EditText lastNameInput;
@@ -86,6 +86,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
             registrationDTO.setFirstname(firstName);
             registrationDTO.setMail(authenticationDTO.getMail());
 
+            UserJWT userJWT = UserAccount.getInstance().getUserJWT();
             apiHandler.apiPOST(TALKSTER_API_AUTH_ENDPOINT_REGISTER_USER, registrationDTO, userJWT.getAccessToken());
 
         });
@@ -99,7 +100,6 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
         if(bundle.isEmpty())
             return;
 
-        userJWT = (UserJWT) bundle.get(BundleExtraNames.USER_JWT);
         authenticationDTO = new AuthenticationDTO(bundle.get(BundleExtraNames.USER_MAIL).toString());
     }
 

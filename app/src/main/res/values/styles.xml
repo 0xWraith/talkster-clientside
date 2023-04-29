@@ -264,9 +264,9 @@
 
         <item name="button_textColor">#FFFFFF</item>
         <item name="button_iconColor">#FFFFFF</item>
-        <item name="button_BackgroundGradient1">@color/aquamarine</item>
+        <item name="button_BackgroundGradient1">#05f0ad</item>
         <item name="button_BackgroundGradient2">@color/aquamarine</item>
-        <item name="button_BackgroundGradient3">@color/aquamarine</item>
+        <item name="button_BackgroundGradient3">#05f0d8</item>
 
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>

@@ -3,10 +3,8 @@ package com.client.talkster.controllers.talkster;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -14,12 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -150,7 +146,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout.addDrawerListener(new ActionBarDrawerToggle(getActivity(), drawerLayout, R.string.open_menu, R.string.open_menu));
 
-        UserAccount.getInstance().getUser().setAvatar(new FileUtils(userJWT).getProfilePicture(userJWT.getID()));
+        UserAccount.getInstance().getUser().setAvatar(new FileUtils().getProfilePicture(userJWT.getID()));
         userNavbarAvatar.setImageBitmap(UserAccount.getInstance().getUser().getAvatar());
 
         userNavbarEmail.setText(user.getMail());
@@ -175,7 +171,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             @Override
             public void onItemLongClick(int position, View v) {
             }
-        }, new FileUtils(userJWT));
+        }, new FileUtils());
         userChatList.setAdapter(chatListAdapter);
 
         chatRefreshLayout.setOnRefreshListener(
@@ -309,7 +305,7 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
 
             if (chat.getOwnerID() != userJWT.getID()){
                 ChatListAdapter.ChatViewHolder holder = chatListAdapter.viewHashMap.get(chatID);
-                FileUtils fileUtils = new FileUtils(userJWT);
+                FileUtils fileUtils = new FileUtils();
                 holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
             }
 

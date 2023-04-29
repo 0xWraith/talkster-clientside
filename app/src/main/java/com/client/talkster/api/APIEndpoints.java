@@ -13,6 +13,7 @@ public class APIEndpoints
     public final static String TALKSTER_API_CHAT_GET_CHATS_INFO = "/api/v1/chat/user-chats";
     //-----------------------------------[Files]
     public final static String TALKSTER_API_FILE_UPLOAD = "/api/v1/file/upload";
+    public final static String TALKSTER_API_FILE_DOWNLOAD = "/api/v1/file/download";
     public final static String TALKSTER_API_FILE_GET_PROFILE = "/api/v1/file/get-profile";
     public final static String TALKSTER_API_FILE_UPDATE_PROFILE = "/api/v1/file/set-profile";
     public final static String TALKSTER_API_FILE_DELETE_PROFILE = "/api/v1/file/delete-profile";

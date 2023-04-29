@@ -206,12 +206,12 @@
                     <ImageView
                         android:id="@+id/settingsIcon1"
                         style="@style/SettingsBlockIcon"
-                        android:src="@drawable/ic_chat" />
+                        android:src="@drawable/ic_theme"/>
 
                     <TextView
                         android:id="@+id/settingsText1"
                         style="@style/SettingsBlockText"
-                        android:text="@string/chat_settings" />
+                        android:text="@string/change_theme" />
 
                 </LinearLayout>
 

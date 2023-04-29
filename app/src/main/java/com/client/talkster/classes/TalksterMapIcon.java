@@ -32,7 +32,7 @@ public class TalksterMapIcon
 
     public TalksterMapIcon(String title, LatLng position, UserJWT userJWT, long userID)
     {
-        FileUtils fileUtils = new FileUtils(userJWT);
+        FileUtils fileUtils = new FileUtils();
         BitmapDescriptor icon;
         Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userID));
         if (bitmap != null) {

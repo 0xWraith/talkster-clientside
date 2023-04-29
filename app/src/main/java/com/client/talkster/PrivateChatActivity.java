@@ -1,5 +1,6 @@
 package com.client.talkster;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -8,16 +9,15 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -27,7 +27,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,10 +48,11 @@ import com.client.talkster.classes.Message;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ToolbarElements;
-import com.client.talkster.controllers.ThemeManager;
-import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.controllers.OfflineActivity;
+import com.client.talkster.controllers.ThemeManager;
+import com.client.talkster.dto.FileDTO;
 import com.client.talkster.dto.MessageDTO;
+import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IBroadcastRegister;
@@ -60,6 +61,7 @@ import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.EPrivateChatAction;
 import com.client.talkster.utils.enums.MessageType;
+import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.Gson;
@@ -89,6 +91,18 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     private LinearLayoutManager recyclerLayoutManager;
     private ConstraintLayout chatLayout, mediaChooserLayout;
     private ImageButton chatSendButton, toolbarBackButton, mediaButton, closeMediaButton, toolbarMenuIcon;
+
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA
+    };
+
+    private final String[] ALLOWED_TYPES = {
+            "image/png",
+            "image/jpg",
+            "image/jpeg"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -126,7 +140,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         toolbarMenuIcon = findViewById(R.id.toolbarMenuIcon);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         closeMediaButton = findViewById(R.id.closeMediaButton);
-        userAvatarImage = findViewById(R.id.circularBackground);
+        userAvatarImage = findViewById(R.id.profileImage);
         toolbarBackButton = findViewById(R.id.toolbarBackButton);
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
         recyclerLayoutManager = (LinearLayoutManager) chatMessagesList.getLayoutManager();
@@ -146,7 +160,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         else
         {
             userNameText.setText(chat.getReceiverName());
-            userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
+            userAvatarImage.setImageBitmap(new FileUtils().getProfilePicture(chat.getReceiverID()));
         }
 
         userStatusText.setText(String.format(Locale.getDefault(), getString(R.string.chat_last_seen), "12:35"));
@@ -172,71 +186,67 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         chatSendButton.setOnClickListener(view ->
         {
             String message = chatInputText.getText().toString().trim();
+            sendMessage(message, MessageType.TEXT_MESSAGE);
 
-            int length = message.length();
-
-            if(length == 0 || length > 4097)
-                return;
-
-            MessageDTO messageDTO = new MessageDTO();
-
-            chatInputText.setText("");
-            messageDTO.setchatid(chat.getId());
-            messageDTO.setmessagecontent(message);
-            messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getAccessToken());
-            messageDTO.setreceiverid(chat.getReceiverID());
-            messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
-            messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
-
-            Intent intent = new Intent(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
-            intent.putExtra(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE, messageDTO);
-            sendBroadcast(intent);
         });
 
         toolbarBackButton.setOnClickListener(view -> finish());
         closeMediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(0).setDuration(250));
-        mediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250));
-
-        Context wrapper = new ContextThemeWrapper(this, R.style.PrivateChat_PopupMenu);
-        PopupMenu popup = new PopupMenu(wrapper, toolbarMenuIcon);
-
-        privateChatActionMenu = popup.getMenu();
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_private_chat, privateChatActionMenu);
-
-        popup.setOnMenuItemClickListener(item ->
-        {
-            int id = item.getItemId();
-
-            if(id == R.id.clearHistoryItemID)
-                return showActionDialog(EPrivateChatAction.CLEAR_CHAT_HISTORY);
-
-            else if(id == R.id.deleteChatItemID)
-                return showActionDialog(EPrivateChatAction.DELETE_CHAT);
-
-            else if(id == R.id.muteForItemID)
-                return showMutePopupWindow();
-
-            else if(id == R.id.unmuteItemID)
-                return muteForTime(0);
-
-            else if(id == R.id.muteForeverItemID)
-                return muteForTime(-1);
-
-            else if(id == R.id.changeThemeItemID)
-            {
-                Intent intent = new Intent(this, ChatSettingsActivity.class);
-                startActivity(intent);
-
-                return false;
+        mediaButton.setOnClickListener(view -> {
+            if (!checkPermissions()) {
+                ActivityCompat.requestPermissions(PrivateChatActivity.this, PERMISSIONS, 1);
             }
-
-
-            return false;
+            else {
+                mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
+            }
         });
 
-        toolbarMenuIcon.setOnClickListener(view -> popup.show());
+        toolbarMenuIcon.setOnClickListener(view -> {
+            Intent intent = new Intent(this, ChatSettingsActivity.class);
+            intent.putExtra(BundleExtraNames.USER_CHAT, chat);
+            startActivityForResult(intent, 6);
+        });
+
+//        Context wrapper = new ContextThemeWrapper(this, R.style.PrivateChat_PopupMenu);
+//        PopupMenu popup = new PopupMenu(wrapper, toolbarMenuIcon);
+
+//        privateChatActionMenu = popup.getMenu();
+//        MenuInflater inflater = popup.getMenuInflater();
+//        inflater.inflate(R.menu.menu_private_chat, privateChatActionMenu);
+
+//        popup.setOnMenuItemClickListener(item ->
+//        {
+//            int id = item.getItemId();
+//
+//            if(id == R.id.clearHistoryItemID)
+//                return showActionDialog(EPrivateChatAction.CLEAR_CHAT_HISTORY);
+//
+//            else if(id == R.id.deleteChatItemID)
+//                return showActionDialog(EPrivateChatAction.DELETE_CHAT);
+//
+//            else if(id == R.id.muteForItemID)
+//                return showMutePopupWindow();
+//
+//            else if(id == R.id.unmuteItemID)
+//                return muteForTime(0);
+//
+//            else if(id == R.id.muteForeverItemID)
+//                return muteForTime(-1);
+//
+//            else if(id == R.id.changeThemeItemID)
+//            {
+//                Intent intent = new Intent(this, ChatSettingsActivity.class);
+//                intent.putExtra(BundleExtraNames.USER_CHAT, chat);
+//                startActivityForResult(intent, 6);
+//
+//                return false;
+//            }
+//
+//
+//            return false;
+//        });
+//
+//        toolbarMenuIcon.setOnClickListener(view -> popup.show());
 
         cameraButton.setOnClickListener(view -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
@@ -249,6 +259,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             mediaChooserLayout.animate().translationY(0).setDuration(250);
             ImagePicker.Companion.with(PrivateChatActivity.this)
                     .galleryOnly()
+                    .galleryMimeTypes(ALLOWED_TYPES)
                     .start(101);
         });
 
@@ -266,6 +277,45 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         else
             chatSendButton.setColorFilter(ThemeManager.getColor("chat_messageAction"));
 
+    }
+
+    private void sendMessage(String message, MessageType messageType) {
+        int length = message.length();
+
+        if(length == 0 || length > 4097)
+            return;
+
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+        MessageDTO messageDTO = new MessageDTO();
+
+        if (messageType == MessageType.TEXT_MESSAGE) {
+            chatInputText.setText("");
+        }
+        messageDTO.setchatid(chat.getId());
+        messageDTO.setmessagecontent(message);
+        messageDTO.setsenderid(userJWT.getID());
+        messageDTO.setjwttoken(userJWT.getAccessToken());
+        messageDTO.setreceiverid(chat.getReceiverID());
+        messageDTO.setmessagetype(messageType);
+        messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
+
+        Intent intent = new Intent(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
+        intent.putExtra(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE, messageDTO);
+        sendBroadcast(intent);
+    }
+
+    private boolean checkPermissions() {
+        int permReadExt = ActivityCompat.checkSelfPermission(PrivateChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int permWriteExt = ActivityCompat.checkSelfPermission(PrivateChatActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permCamera = ActivityCompat.checkSelfPermission(PrivateChatActivity.this, Manifest.permission.CAMERA);
+
+        if (permReadExt != PackageManager.PERMISSION_GRANTED
+                || permWriteExt != PackageManager.PERMISSION_GRANTED
+                || permCamera != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private boolean showMutePopupWindow()
@@ -387,13 +437,13 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         if(chat.isMuted())
         {
             chatMuteIcon.setVisibility(View.VISIBLE);
-            privateChatActionMenu.findItem(R.id.muteItemID).setVisible(false);
-            privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(true);
+//            privateChatActionMenu.findItem(R.id.muteItemID).setVisible(false);
+//            privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(true);
             return;
         }
         chatMuteIcon.setVisibility(View.INVISIBLE);
-        privateChatActionMenu.findItem(R.id.muteItemID).setVisible(true);
-        privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(false);
+//        privateChatActionMenu.findItem(R.id.muteItemID).setVisible(true);
+//        privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(false);
     }
 
     @Override
@@ -419,18 +469,27 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 101) {
-            Uri uri = data.getData();
-            sendProfileImage(uri);
-
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
+        if (requestCode == 101) {
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = data.getData();
+                sendImage(uri);
+            } else if (resultCode == ImagePicker.RESULT_ERROR) {
+                Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (resultCode == Activity.RESULT_OK && requestCode == 6) {
+            boolean isDeleted = data.getBooleanExtra("isDeleted", false);
+            boolean isCleared = data.getBooleanExtra("isCleared", false);
+            chat = (Chat) data.getSerializableExtra(BundleExtraNames.USER_CHAT);
+            if (isDeleted) {finish(); return;}
+            if (isCleared) {clearChats();}
+            updateChatMuteUI();
         }
     }
 
-    private void sendProfileImage(Uri uri){
+    private void sendImage(Uri uri){
         FileContent fileContent = new FileContent();
         APIHandler<FileContent, PrivateChatActivity> apiHandler = new APIHandler<>(this);
         try {
@@ -443,6 +502,14 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             System.out.println("This Exception was thrown inside the sendImage method");
             e.printStackTrace();
         }
+    }
+
+    private void clearChats() {
+        int size = chatMessagesAdapter.getMessages().size();
+
+        chat.clearMessages();
+        chatMessagesAdapter.getMessages().clear();
+        chatMessagesAdapter.notifyItemRangeRemoved(0, size);
     }
 
     @Override
@@ -523,8 +590,20 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
                 response.close();
             }
+            else if (apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_UPLOAD)) {
+                if(responseCode != 200) {
+                    throw new UserUnauthorizedException("Unexpected message");
+                }
+                if(response.body() == null)
+                    throw new IOException("Unexpected response " + response);
+
+                String responseBody = response.body().string();
+                FileDTO fileDTO = new Gson().fromJson(responseBody, FileDTO.class);
+
+                sendMessage(fileDTO.getFilename(), MessageType.MEDIA_MESSAGE);
+            }
         }
-        catch (IOException e) { e.printStackTrace(); }
+        catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
     }
 
     @Override
@@ -557,11 +636,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
                         case CLEAR_CHAT_HISTORY:
                         {
-                            int size = chatMessagesAdapter.getMessages().size();
-
-                            chat.clearMessages();
-                            chatMessagesAdapter.getMessages().clear();
-                            chatMessagesAdapter.notifyItemRangeRemoved(0, size);
+                            clearChats();
                             break;
                         }
                         case DELETE_CHAT:

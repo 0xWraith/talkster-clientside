@@ -28,6 +28,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Talkster.First">
         <activity
+            android:name=".ChangeThemeActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChangeBiographyActivity"
             android:exported="false" />
         <activity
