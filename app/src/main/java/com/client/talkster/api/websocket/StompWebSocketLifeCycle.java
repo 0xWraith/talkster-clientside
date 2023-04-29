@@ -1,4 +1,4 @@
-package com.client.talkster.api;
+package com.client.talkster.api.websocket;
 
 import android.util.Log;
 
@@ -18,7 +18,7 @@ public class StompWebSocketLifeCycle<T> implements Action1<T>
         switch (event.getType())
         {
             case OPENED:
-                Log.d("OPENED", "Stomp connection opened");
+                Log.i("OPENED", "Stomp connection opened");
                 break;
 
             case ERROR:
@@ -26,7 +26,7 @@ public class StompWebSocketLifeCycle<T> implements Action1<T>
                 break;
 
             case CLOSED:
-                Log.d("CLOSED", "Stomp connection closed");
+                Log.w("CLOSED", "Stomp connection closed");
                 break;
         }
     }

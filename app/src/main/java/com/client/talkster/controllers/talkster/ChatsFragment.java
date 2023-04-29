@@ -3,10 +3,9 @@ package com.client.talkster.controllers.talkster;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.TypedValue;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -14,19 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.client.talkster.GroupChatActivity;
+import com.client.talkster.activities.CreateGroupActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.PrivateChatActivity;
 import com.client.talkster.R;
@@ -34,20 +34,24 @@ import com.client.talkster.SettingsActivity;
 import com.client.talkster.adapters.ChatListAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.classes.Chat;
-import com.client.talkster.classes.Message;
+import com.client.talkster.classes.chat.Chat;
+import com.client.talkster.classes.chat.GroupChat;
+import com.client.talkster.classes.chat.message.Message;
+import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.MessageDTO;
-import com.client.talkster.interfaces.IChatListener;
+import com.client.talkster.interfaces.chat.IChatListener;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.interfaces.chat.IGroupChatListener;
+import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
+import com.client.talkster.utils.enums.EChatType;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
@@ -58,9 +62,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener, NavigationView.OnNavigationItemSelectedListener, IThemeManagerFragmentListener
+public class ChatsFragment extends Fragment implements IFragmentActivity, IChatListener, NavigationView.OnNavigationItemSelectedListener, IThemeManagerFragmentListener, IGroupChatListener
 {
-    private HashMap<Long, Chat> chatHashMap;
+    private HashMap<Long, GroupChat> groupChatHashMap;
+    private HashMap<Long, PrivateChat> privateChatHashMap;
+
     private ToolbarElements toolbarElements;
 
     private float x1,x2;
@@ -121,7 +127,8 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         User user = UserAccount.getInstance().getUser();
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
-        chatHashMap = new HashMap<>();
+        groupChatHashMap = new HashMap<>();
+        privateChatHashMap = new HashMap<>();
         toolbarElements = new ToolbarElements();
 
         toolbarMenuIcon = view.findViewById(R.id.toolbarMenuIcon);
@@ -164,11 +171,21 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
             @Override
             public void onItemClick(int position, View v)
             {
-                Intent privateChatIntent = new Intent(getContext(), PrivateChatActivity.class);
+                Intent intent;
+                Chat chat = chatListAdapter.chatList.get(position);
 
-                privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chatListAdapter.chatList.get(position));
+                if(chat.getType() == EChatType.GROUP_CHAT)
+                    intent = new Intent(getContext(), GroupChatActivity.class);
 
-                startActivity(privateChatIntent);
+                else if(chat.getType() == EChatType.PRIVATE_CHAT)
+                    intent = new Intent(getContext(), PrivateChatActivity.class);
+
+                else
+                    return;
+
+                intent.putExtra(BundleExtraNames.USER_CHAT, chat);
+
+                startActivity(intent);
             }
 
             @Override
@@ -191,7 +208,8 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
 
-    private void updateUserChats(){
+    private void updateUserChats()
+    {
         APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
@@ -208,25 +226,43 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         userChatList.setVisibility(View.VISIBLE);
     }
 
-    private void onUserReceivedMessage(Message message)
+    private void onUserReceivedMessage(Message message, EChatType type)
     {
+        Chat chat;
         long chatID = message.getChatID();
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
-        APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
 
-        if(chatHashMap.containsKey(chatID))
+        if(type == EChatType.GROUP_CHAT)
+            chat = groupChatHashMap.getOrDefault(chatID, null);
+        else if(type == EChatType.PRIVATE_CHAT)
+            chat = privateChatHashMap.getOrDefault(chatID, null);
+        else
+            return;
+
+        if(chat == null)
         {
-            Chat chat = chatHashMap.get(chatID);
-            int chatIndex = chatListAdapter.chatList.indexOf(chat);
+            if(type == EChatType.GROUP_CHAT)
+                return;
 
-            switch (message.getMessageType())
-            {
-                case MEDIA_MESSAGE:
+            APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
+            apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getAccessToken());
+
+            return;
+        }
+
+        int chatIndex = chatListAdapter.chatList.indexOf(chat);
+
+        switch (message.getMessageType())
+        {
+            case MEDIA_MESSAGE:
                 case AUDIO_MESSAGE:
-                case TEXT_MESSAGE:
+                    case TEXT_MESSAGE:
                 {
 
+                    Log.e("Debug", chat.toString());
                     chat.getMessages().add(message);
+                    Log.e("Debug", chat.toString());
+
                     Collections.swap(chatListAdapter.chatList, chatIndex, 0);
 
                     chatListAdapter.notifyItemChanged(chatIndex);
@@ -245,20 +281,15 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
                     chatListAdapter.notifyItemRemoved(chatIndex);
                     break;
                 }
-            }
-
-            Intent intent = new Intent(BundleExtraNames.CHAT_PRIVATE_MESSAGE_RECEIVED);
-
-            intent.putExtra(BundleExtraNames.CHAT_ID, chatID);
-            intent.putExtra(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE, message);
-
-            if(getActivity() != null)
-                getActivity().sendBroadcast(intent);
-
-            return;
         }
 
-        apiHandler.apiGET(String.format(Locale.getDefault(),"%s/%d/%d", APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT, message.getChatID(), userJWT.getID()), userJWT.getAccessToken());
+        Intent intent = new Intent(BundleExtraNames.CHAT_PRIVATE_MESSAGE_RECEIVED);
+
+        intent.putExtra(BundleExtraNames.CHAT_ID, chatID);
+        intent.putExtra(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE, message);
+
+        if(getActivity() != null)
+            getActivity().sendBroadcast(intent);
     }
 
     private void initPager(){
@@ -286,7 +317,14 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
     @Override
     public void addChat(Chat chat)
     {
-        chatHashMap.put(chat.getId(), chat);
+
+        if(chat.getType() == EChatType.GROUP_CHAT)
+            groupChatHashMap.put(chat.getId(), (GroupChat) chat);
+        else if(chat.getType() == EChatType.PRIVATE_CHAT)
+            privateChatHashMap.put(chat.getId(), (PrivateChat) chat);
+        else
+            return;
+
         chatListAdapter.chatList.add(0, chat);
 
         updateChatListVisibility();
@@ -295,87 +333,111 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         chatListAdapter.notifyItemChanged(0);
     }
 
-    public void updateChat(Chat chat){
+    public void updateChat(Chat chat)
+    {
         long chatID = chat.getId();
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
 
-        if (chatHashMap.containsKey(chatID)) {
-            Chat oldChat = chatHashMap.get(chatID);
-            int chatIndex = chatListAdapter.chatList.indexOf(oldChat);
+        Chat oldChat = getChatByID(chatID, chat.getType());
 
-            oldChat.setReceiverFirstname(chat.getReceiverFirstname());
-            oldChat.setReceiverLastname(chat.getReceiverLastname());
-
-            if (chat.getOwnerID() != userJWT.getID()){
-                ChatListAdapter.ChatViewHolder holder = chatListAdapter.viewHashMap.get(chatID);
-                FileUtils fileUtils = new FileUtils(userJWT);
-                holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
-            }
-
-            chatListAdapter.notifyItemChanged(chatIndex);
-        }
-        else {
+        if(oldChat == null)
+        {
             APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
             apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT+"/"+chatID+"/"+userJWT.getID(), userJWT.getAccessToken());
+
+            return;
         }
+
+        int chatIndex = chatListAdapter.chatList.indexOf(oldChat);
+
+        if(oldChat.getType() == EChatType.PRIVATE_CHAT)
+        {
+            PrivateChat oldPrivateChat = (PrivateChat)oldChat;
+
+            oldPrivateChat.setReceiverFirstname(((PrivateChat)chat).getReceiverFirstname());
+            oldPrivateChat.setReceiverLastname(((PrivateChat)chat).getReceiverLastname());
+
+            if (((PrivateChat)chat).getOwnerID() != userJWT.getID())
+            {
+                ChatListAdapter.ChatViewHolder holder = chatListAdapter.viewHashMap.get(chatID);
+                FileUtils fileUtils = new FileUtils(userJWT);
+                holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(((PrivateChat)chat).getReceiverID()));
+            }
+        }
+
+            chatListAdapter.notifyItemChanged(chatIndex);
     }
 
     @Override
-    public void updateChatList(List<Chat> chatList)
+    public void updateChatList(List<PrivateChat> privateChats, List<GroupChat> groupChats)
     {
-        chatHashMap.clear();
+        clearChatHashmaps();
 
-        chatListAdapter.chatList = chatList;
-        chatList.forEach(chat -> chatHashMap.put(chat.getId(), chat));
+        chatListAdapter.chatList.clear();
+        chatListAdapter.chatList.addAll(privateChats);
+        chatListAdapter.chatList.addAll(groupChats);
+
+        chatListAdapter.chatList.sort((firstChat, secondChat) -> {
+
+            if(firstChat.getLastMessage() == null || secondChat.getLastMessage() == null)
+                return 0;
+
+            return firstChat.getLastMessage().getMessageTimestamp().compareTo(secondChat.getLastMessage().getMessageTimestamp());
+        });
+
+        Collections.reverse(chatListAdapter.chatList);
+
+        groupChats.forEach(chat -> groupChatHashMap.put(chat.getId(), chat));
+        privateChats.forEach(chat -> privateChatHashMap.put(chat.getId(), chat));
+
         updateChatListVisibility();
 
         chatListAdapter.notifyDataSetChanged();
     }
 
-    public void updateChatListInfo(List<Chat> chatList){
+    public void updateChatListInfo(List<Chat> chatList)
+    {
         chatList.forEach(this::updateChat);
     }
 
     @Override
-    public void onChatHistoryCleared(long chatID)
+    public void onChatHistoryCleared(long chatID, EChatType chatType)
     {
-        if(!chatHashMap.containsKey(chatID))
+        Chat chat = getChatByID(chatID, chatType);
+
+        if(chat == null)
             return;
 
-        Chat chat = chatHashMap.get(chatID);
-        int chatIndex = chatListAdapter.chatList.indexOf(chat);
-
         chat.clearMessages();
-        chatListAdapter.notifyItemChanged(chatIndex);
+        chatListAdapter.notifyItemChanged(chatListAdapter.chatList.indexOf(chat));
     }
 
     @Override
-    public void onChatDeleted(long chatID)
+    public void onChatDeleted(long chatID, EChatType chatType)
     {
-        if(!chatHashMap.containsKey(chatID))
+        Chat chat = getChatByID(chatID, chatType);
+
+        if(chat == null)
             return;
 
-        Chat chat = chatHashMap.get(chatID);
         int chatIndex = chatListAdapter.chatList.indexOf(chat);
 
         chatListAdapter.notifyItemRemoved(chatIndex);
-
         chatListAdapter.chatList.remove(chatIndex);
-        chatHashMap.remove(chatID);
 
+        removeChatByID(chatID, chatType);
     }
 
     @Override
-    public void onChatMuted(long chatID, long muteTime)
+    public void onChatMuted(long chatID, long muteTime, EChatType chatType)
     {
-        if(!chatHashMap.containsKey(chatID))
+        Chat chat = getChatByID(chatID, chatType);
+
+        if(chat == null)
             return;
 
-        Chat chat = chatHashMap.get(chatID);
-        int chatIndex = chatListAdapter.chatList.indexOf(chat);
-
         chat.setMuteTime(muteTime);
-        chatListAdapter.notifyItemChanged(chatIndex);
+        chatListAdapter.notifyItemChanged(chatListAdapter.chatList.indexOf(chat));
     }
 
     @Override
@@ -384,26 +446,27 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         ModelMapper modelMapper = new ModelMapper();
         Message message = modelMapper.map(new Gson().fromJson(messageRAW, MessageDTO.class), Message.class);
 
-        onUserReceivedMessage(message);
-    }
-
-    @Override
-    public void onSendPrivateMessage(Message message)
-    {
-
+        onUserReceivedMessage(message, EChatType.PRIVATE_CHAT);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
+        Intent intent = null;
         int id = item.getItemId();
 
         if(id == R.id.settingsItem)
-        {
-            Intent intent = new Intent(getActivity(), SettingsActivity.class);
-            startActivity(intent);
-        }
+            intent = new Intent(getActivity(), SettingsActivity.class);
 
+        else if(id == R.id.newGroupItem)
+            intent = new Intent(getActivity(), CreateGroupActivity.class);
+
+        else
+            return false;
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        startActivity(intent);
         return false;
     }
 
@@ -427,4 +490,47 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         navigationView.setItemTextColor(new ColorStateList(states, new int[] {ThemeManager.getColor("navBarText"), ThemeManager.getColor("navBarText") }));
         navigationView.setItemIconTintList(new ColorStateList(states, new int[] {ThemeManager.getColor("navBarIcon"), ThemeManager.getColor("navBarIcon") }));
     }
+
+    @Override
+    public void onGroupChatCreated(long groupChatID)
+    {
+
+    }
+
+    @Override
+    public void onGroupChatMessageReceived(String messageRAW)
+    {
+        ModelMapper modelMapper = new ModelMapper();
+        Message message = modelMapper.map(new Gson().fromJson(messageRAW, MessageDTO.class), Message.class);
+
+        onUserReceivedMessage(message, EChatType.GROUP_CHAT);
+    }
+
+    private void clearChatHashmaps()
+    {
+        groupChatHashMap.clear();
+        privateChatHashMap.clear();
+    }
+
+    private Chat getChatByID(long chatID, EChatType chatType)
+    {
+
+        if (chatType == EChatType.PRIVATE_CHAT)
+            return privateChatHashMap.get(chatID);
+
+        else if (chatType == EChatType.GROUP_CHAT)
+            return groupChatHashMap.get(chatID);
+
+        return null;
+    }
+
+    private void removeChatByID(long chatID, EChatType chatType)
+    {
+        if (chatType == EChatType.PRIVATE_CHAT)
+            privateChatHashMap.remove(chatID);
+
+        else if (chatType == EChatType.GROUP_CHAT)
+            groupChatHashMap.remove(chatID);
+    }
+
 }

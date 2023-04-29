@@ -1,33 +1,42 @@
-package com.client.talkster.api;
+package com.client.talkster.api.websocket;
 
 
-import android.util.Log;
-
-import androidx.fragment.app.Fragment;
-
-import com.client.talkster.classes.UserJWT;
+import com.client.talkster.api.APIConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
-import rx.functions.Action1;
-import ua.naiksoftware.stomp.LifecycleEvent;
 import ua.naiksoftware.stomp.Stomp;
-import ua.naiksoftware.stomp.StompHeader;
 import ua.naiksoftware.stomp.client.StompClient;
 import ua.naiksoftware.stomp.client.StompMessage;
 
 public class APIStompWebSocket
 {
+    private static volatile APIStompWebSocket INSTANCE;
+
     private final List<String> userTopics;
     private final StompClient webSocketClient;
     public static final String TALKSTER_WEBSOCKET_URL = APIConfig.TALKSTER_SERVER_WEBSOCKET_PROTOCOL + APIConfig.TALKSTER_SERVER_IP + ":" + APIConfig.TALKSTER_WEBSOCKET_SERVER_PORT + APIConfig.TALKSTER_SERVER_WEBSOCKET_ENDPOINT;
 
-    public APIStompWebSocket()
+    private APIStompWebSocket()
     {
         userTopics = new ArrayList<>();
         webSocketClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, TALKSTER_WEBSOCKET_URL);
+    }
+
+    public static APIStompWebSocket getInstance()
+    {
+        if(INSTANCE != null)
+            return INSTANCE;
+
+        synchronized (APIStompWebSocket.class)
+        {
+            if(INSTANCE == null)
+                INSTANCE = new APIStompWebSocket();
+
+            return INSTANCE;
+        }
     }
 
     public void connect()

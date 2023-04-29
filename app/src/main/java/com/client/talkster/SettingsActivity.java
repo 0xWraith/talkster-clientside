@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +17,7 @@ import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IActivity;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.interfaces.IUpdateSettingsUI;
 
 public class SettingsActivity extends AppCompatActivity implements IActivity, View.OnClickListener, IThemeManagerActivityListener, IUpdateSettingsUI

@@ -9,10 +9,10 @@ public class APIConfig
 //    public static final String TALKSTER_SERVER_IP = "10.10.1.103";
 //    public static final String TALKSTER_SERVER_IP = "192.168.1.17";
 //    public static final String TALKSTER_SERVER_IP = "147.175.160.234";
-    public static final String TALKSTER_SERVER_IP = "10.62.15.31";
+//    public static final String TALKSTER_SERVER_IP = "10.62.15.31";
 //    public static final String TALKSTER_SERVER_IP = "192.168.43.222";
 //    public static final String TALKSTER_SERVER_IP = "147.175.160.222";
-//    public static final String TALKSTER_SERVER_IP = "10.10.1.103";
+    public static final String TALKSTER_SERVER_IP = "10.10.1.103";
 //    public static final String TALKSTER_SERVER_IP = "192.168.1.157";
 //    public static final String TALKSTER_SERVER_IP = "147.175.160.88";
 //    public static final String TALKSTER_SERVER_IP = "10.62.28.243";

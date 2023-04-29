@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -23,10 +22,8 @@ import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.enums.EThemeType;
-
-import java.util.List;
 
 public class ChatSettingsActivity extends AppCompatActivity implements IActivity, IThemeManagerActivityListener
 {

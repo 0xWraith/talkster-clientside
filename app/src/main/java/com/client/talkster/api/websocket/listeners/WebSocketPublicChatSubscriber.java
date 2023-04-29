@@ -1,4 +1,4 @@
-package com.client.talkster.api;
+package com.client.talkster.api.websocket.listeners;
 
 import android.app.Activity;
 import android.widget.Toast;

@@ -91,4 +91,7 @@
     <string name="username_available">%s is available.</string>
     <string name="biography">Biography</string>
     <string name="chat_last_seen">last seen %s</string>
+    <string name="enter_group_name">Enter group name</string>
+    <string name="group_members_count">%d members</string>
+    <string name="group_created_chat_message">Group created. Say hi!</string>
 </resources>

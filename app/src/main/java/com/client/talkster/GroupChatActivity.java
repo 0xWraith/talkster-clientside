@@ -44,9 +44,11 @@ import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.websocket.APIStompWebSocket;
 import com.client.talkster.classes.FileContent;
-import com.client.talkster.classes.chat.PrivateChat;
+import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.classes.chat.GroupChat;
+import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.chat.message.Message;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.OfflineActivity;
@@ -56,6 +58,7 @@ import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IBroadcastRegister;
+import com.client.talkster.interfaces.chat.IGroupChatGetMessageSender;
 import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
@@ -73,9 +76,9 @@ import java.util.Locale;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class PrivateChatActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IBroadcastRegister, IThemeManagerActivityListener
+public class GroupChatActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IBroadcastRegister, IThemeManagerActivityListener
 {
-    private PrivateChat chat;
+    private GroupChat chat;
     private ToolbarElements toolbarElements;
     private BroadcastReceiver messageReceiver;
     private ChatMessagesAdapter chatMessagesAdapter;
@@ -98,7 +101,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         loadApplicationTheme();
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_private_chat);
+        setContentView(R.layout.activity_group_chat);
 
         getBundleElements();
         getUIElements();
@@ -139,21 +142,15 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         toolbarElements.setToolbarSubtitle(userStatusText);
         toolbarElements.setToolbar(findViewById(R.id.toolbar));
 
-        if(userJWT.getID() == chat.getReceiverID())
-        {
-            userNameText.setText(R.string.saved_messages);
-            userAvatarImage.setImageResource(R.drawable.img_favourites_chat);
+        userNameText.setText(chat.getGroupName());
+//        userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
 
-        }
-        else
-        {
-            userNameText.setText(chat.getReceiverName());
-            userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
-        }
+//        userStatusText.setText(String.format(Locale.getDefault(), getString(R.string.chat_last_seen), "12:35"));
 
-        userStatusText.setText(String.format(Locale.getDefault(), getString(R.string.chat_last_seen), "12:35"));
+        chatMessagesAdapter = new ChatMessagesAdapter(chat.getMessages(), userJWT.getID(), EChatType.GROUP_CHAT, this);
 
-        chatMessagesAdapter = new ChatMessagesAdapter(chat.getMessages(), userJWT.getID(), EChatType.PRIVATE_CHAT, this);
+        chatMessagesAdapter.setGroupChatGetMessageSender(message -> chat.getGroupMembers().stream().filter(user -> user.getId() == message.getSenderID()).findFirst().orElse(null));
+
         chatMessagesList.setAdapter(chatMessagesAdapter);
 
         chatInputText.addTextChangedListener(new TextWatcher()
@@ -162,10 +159,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
-            {
-                changeSendButtonColor(charSequence.length() > 0);
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { changeSendButtonColor(charSequence.length() > 0); }
 
             @Override
             public void afterTextChanged(Editable editable) { }
@@ -187,11 +181,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
             messageDTO.setmessagecontent(message);
             messageDTO.setsenderid(userJWT.getID());
             messageDTO.setjwttoken(userJWT.getAccessToken());
-            messageDTO.setreceiverid(chat.getReceiverID());
+            messageDTO.setreceiverid(chat.getId());
             messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
             messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
 
-            APIStompWebSocket.getInstance().getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
+            APIStompWebSocket.getInstance().getWebSocketClient().send("/app/group/message", new Gson().toJson(messageDTO)).subscribe();
         });
 
         toolbarBackButton.setOnClickListener(view -> finish());
@@ -209,13 +203,13 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         {
             int id = item.getItemId();
 
-            if(id == R.id.clearHistoryItemID)
-                return showActionDialog(EPrivateChatAction.CLEAR_CHAT_HISTORY);
+//            if(id == R.id.clearHistoryItemID)
+//                return showActionDialog(EPrivateChatAction.CLEAR_CHAT_HISTORY);
+//
+//            else if(id == R.id.deleteChatItemID)
+//                return showActionDialog(EPrivateChatAction.DELETE_CHAT);
 
-            else if(id == R.id.deleteChatItemID)
-                return showActionDialog(EPrivateChatAction.DELETE_CHAT);
-
-            else if(id == R.id.muteForItemID)
+            if(id == R.id.muteForItemID)
                 return showMutePopupWindow();
 
             else if(id == R.id.unmuteItemID)
@@ -240,14 +234,14 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
         cameraButton.setOnClickListener(view -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
-            ImagePicker.Companion.with(PrivateChatActivity.this)
+            ImagePicker.Companion.with(GroupChatActivity.this)
                     .cameraOnly()
                     .start(101);
         });
 
         galleryButton.setOnClickListener(view -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
-            ImagePicker.Companion.with(PrivateChatActivity.this)
+            ImagePicker.Companion.with(GroupChatActivity.this)
                     .galleryOnly()
                     .start(101);
         });
@@ -290,7 +284,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
                 2592000, 7776000,
                 31536000};
 
-        APIHandler<PrivateChatActionDTO, PrivateChatActivity> apiHandler = new APIHandler<>(this);
+        APIHandler<PrivateChatActionDTO, GroupChatActivity> apiHandler = new APIHandler<>(this);
 
         View popupView = getLayoutInflater().inflate(R.layout.popup_mute_timer_action, null);
         PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -320,7 +314,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
     private boolean muteForTime(int seconds)
     {
         UserJWT userJWT = UserAccount.getInstance().getUserJWT();
-        APIHandler<PrivateChatActionDTO, PrivateChatActivity> apiHandler = new APIHandler<>(this);
+        APIHandler<PrivateChatActionDTO, GroupChatActivity> apiHandler = new APIHandler<>(this);
         apiHandler.apiPOST(APIEndpoints.TALKSTER_API_CHAT_ACTION, new PrivateChatActionDTO(EPrivateChatAction.MUTE_CHAT, chat.getId(), userJWT.getID(), seconds), userJWT.getAccessToken());
 
         return true;
@@ -333,14 +327,14 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         recyclerLayoutManager.scrollToPositionWithOffset(chatMessagesAdapter.getItemCount() - 1,0);
     }
 
-    private boolean showActionDialog(EPrivateChatAction action)
+    /*private boolean showActionDialog(EPrivateChatAction action)
     {
         Dialog dialog;
         Button cancelButton;
         Button confirmButton;
         CheckBox confirmCheckBox;
         TextView confirmationTextView;
-        APIHandler<PrivateChatActionDTO, PrivateChatActivity> apiHandler;
+        APIHandler<PrivateChatActionDTO, GroupChatActivity> apiHandler;
 
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_private_chat_action);
@@ -380,7 +374,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
         dialog.show();
         return true;
-    }
+    }*/
 
     private void updateChatMuteUI()
     {
@@ -413,7 +407,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         if(bundle.isEmpty())
             return;
 
-        chat = (PrivateChat) bundle.get(BundleExtraNames.USER_CHAT);
+        chat = (GroupChat) bundle.get(BundleExtraNames.USER_CHAT);
     }
 
     @Override
@@ -432,7 +426,7 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
 
     private void sendProfileImage(Uri uri){
         FileContent fileContent = new FileContent();
-        APIHandler<FileContent, PrivateChatActivity> apiHandler = new APIHandler<>(this);
+        APIHandler<FileContent, GroupChatActivity> apiHandler = new APIHandler<>(this);
         try {
             ContentResolver cr = getContentResolver();
             fileContent.setContent(FileUtils.getBytes(uri, cr));
@@ -485,10 +479,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
                 {
                     messageDTO = new MessageDTO();
                     messageDTO.setchatid(privateChatActionDTO.getReceiverChatID());
-                    messageDTO.createActionMessage(action, userJWT.getID(), chat.getReceiverID(), userJWT.getAccessToken());
+                    messageDTO.createActionMessage(action, userJWT.getID(), chat.getId(), userJWT.getAccessToken());
                 }
 
                 intent.putExtra(BundleExtraNames.CHAT_ACTION_TYPE, action);
+                intent.putExtra(BundleExtraNames.CHAT_TYPE, EChatType.GROUP_CHAT);
                 intent.putExtra(BundleExtraNames.CHAT_ACTION_CHAT_ID, chat.getId());
 
 

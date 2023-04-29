@@ -18,14 +18,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class APIHandler<T, V>
+public class APIHandler<DTO, Activity>
 {
     Request request;
-    private final V activity;
+    private final Activity activity;
     private final OkHttpClient okHttpClient;
     public final String TALKSTER_SERVER_URL = APIConfig.TALKSTER_SERVER_INTERNET_PROTOCOL + APIConfig.TALKSTER_SERVER_IP + ":" + APIConfig.TALKSTER_SERVER_PORT;
 
-    public APIHandler(V activity)
+    public APIHandler(Activity activity)
     {
         this.activity = activity;
         okHttpClient = new OkHttpClient();
@@ -38,6 +38,8 @@ public class APIHandler<T, V>
                 .url(TALKSTER_SERVER_URL + apiUrl)
                 .addHeader("Authorization", jwtToken)
                 .build();
+
+        Log.d("APIHandler", "apiGET: " + request.toString());
 
         okHttpClient.newCall(request).enqueue(new Callback()
         {
@@ -94,7 +96,7 @@ public class APIHandler<T, V>
         });
     }
 
-    public void apiPOST(String apiUrl, T object, String jwtToken)
+    public void apiPOST(String apiUrl, DTO object, String jwtToken)
     {
         RequestBody body = RequestBody.create(APIConfig.JSON, new Gson().toJson(object));
 
@@ -104,6 +106,8 @@ public class APIHandler<T, V>
                 .addHeader("Authorization", jwtToken)
                 .post(body)
                 .build();
+
+        Log.d("APIHandler", "apiPOST: " + request.toString());
 
         okHttpClient.newCall(request).enqueue(new Callback()
         {
@@ -129,7 +133,7 @@ public class APIHandler<T, V>
         });
     }
 
-    public void apiDELETE(String apiUrl, T object, String jwtToken)
+    public void apiDELETE(String apiUrl, DTO object, String jwtToken)
     {
         RequestBody body = RequestBody.create(APIConfig.JSON, new Gson().toJson(object));
 
@@ -205,7 +209,7 @@ public class APIHandler<T, V>
         });
     }
 
-    public void apiPUT(String apiUrl, T object, String jwtToken)
+    public void apiPUT(String apiUrl, DTO object, String jwtToken)
     {
         RequestBody body = RequestBody.create(APIConfig.JSON, new Gson().toJson(object));
 
