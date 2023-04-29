@@ -35,7 +35,7 @@ import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.ChatCreateDTO;
 import com.client.talkster.dto.NameDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -159,7 +159,8 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
         initPager();
 
-        addFriendButton.setOnClickListener(view1 -> {
+        addFriendButton.setOnClickListener(view1 ->
+        {
             ChatCreateDTO chatCreateDTO = new ChatCreateDTO();
             MyApplication.hideKeyboard((AppCompatActivity) getActivity());
             APIHandler<ChatCreateDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());

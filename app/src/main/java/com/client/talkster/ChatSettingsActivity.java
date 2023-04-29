@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -50,11 +51,11 @@ import com.client.talkster.interfaces.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.EPrivateChatAction;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.enums.EThemeType;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Response;
 

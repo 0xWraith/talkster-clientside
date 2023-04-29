@@ -19,7 +19,7 @@ import com.client.talkster.classes.theme.ButtonElements;
 import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.classes.theme.ToolbarElements;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.Utils;
 import com.client.talkster.utils.enums.EThemeType;
 import com.client.talkster.utils.exceptions.ThemeNotFoundException;

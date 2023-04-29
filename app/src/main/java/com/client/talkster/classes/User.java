@@ -4,7 +4,13 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class User implements Serializable
 {
     private long id;
     private String firstname;
@@ -12,11 +18,16 @@ public class User implements Parcelable
     private String mail;
     private String username;
     private String biography;
+    private long imageID;
     private Bitmap avatar;
+    private final List<User> contacts;
 
-    public User() { }
+    public User()
+    {
+        contacts = new ArrayList<>();
+    }
 
-    private User(Parcel in)
+    /*private User(Parcel in)
     {
         id = in.readLong();
         firstname = in.readString();
@@ -25,49 +36,39 @@ public class User implements Parcelable
         username = in.readString();
         biography = in.readString();
         avatar = in.readParcelable(Bitmap.class.getClassLoader());
-    }
-
-    public User(long id, String firstname, String mail)
-    {
-        this.id = id;
-        this.mail = mail;
-        this.lastname = "";
-        this.firstname = firstname;
-    }
-
-    public User(long id, String firstname, String lastname, String mail)
-    {
-        this.id = id;
-        this.mail = mail;
-        this.lastname = lastname;
-        this.firstname = firstname;
-    }
+        contacts = in.createTypedArrayList(User.CREATOR);
+        imageID = in.readLong();
+    }*/
 
 
     public long getId() { return id; }
     public String getMail() { return mail; }
+    public long getImageID() { return imageID; }
     public Bitmap getAvatar() { return avatar; }
     public String getStatus() { return "Online"; }
     public String getLastname() { return lastname; }
     public String getFirstname() { return firstname; }
+    public List<User> getContacts() { return contacts; }
     public String getFullName() { return firstname + " " + lastname; }
     public String getUsername() { return username == null ? "Not created" : username; }
     public String getBiography() { return biography == null ? "Not created" : biography; }
 
     public void setMail(String mail) { this.mail = mail; }
-    public void setUsername(String username) { this.username = username; }
+    public void addContact(User user) { contacts.add(user); }
     public void setAvatar(Bitmap avatar) { this.avatar = avatar; }
+    public void setImageID(long imageID) { this.imageID = imageID; }
+    public void setUsername(String username) { this.username = username; }
     public void setLastname(String lastname) { this.lastname = lastname; }
     public void setBiography(String biography) { this.biography = biography; }
     public void setFirstname(String firstname) { this.firstname = firstname; }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>()
+    /*public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<>()
     {
-        public User[] newArray(int size) { return new User[size]; }
+        public User[] newArray(int size) {return new User[size]; }
         public User createFromParcel(Parcel in) { return new User(in); }
     };
 
-    @Override
+   @Override
     public void writeToParcel(Parcel dest, int flags)
     {
         dest.writeLong(id);
@@ -77,22 +78,26 @@ public class User implements Parcelable
         dest.writeString(username);
         dest.writeString(biography);
         dest.writeParcelable(avatar, flags);
+        dest.writeTypedList(contacts);
+        dest.writeLong(imageID);
     }
 
     @Override
-    public int describeContents() { return 0; }
+    public int describeContents() { return 0; }*/
 
+    @NonNull
     @Override
     public String toString()
     {
         return "User{" +
                 "id=" + id +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
                 ", mail='" + mail + '\'' +
-                ", login='" + username + '\'' +
-                ", biography='" + biography + '\'' +
                 ", avatar=" + avatar +
+                ", username='" + username + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", biography='" + biography + '\'' +
+                ", contacts=" + contacts +
                 '}';
     }
 }

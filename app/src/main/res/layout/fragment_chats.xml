@@ -31,7 +31,10 @@
             android:id="@+id/toolbar"
             android:layout_width="wrap_content"
             android:layout_height="88dp"
-            android:background="?attr/actionBarDefault" />
+            android:background="?attr/actionBarDefault"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/toolbarMenuIcon"

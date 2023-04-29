@@ -18,12 +18,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.client.talkster.R;
-import com.client.talkster.classes.Message;
+import com.client.talkster.classes.User;
+import com.client.talkster.classes.chat.message.Message;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IChatViewHolder;
 import com.client.talkster.interfaces.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.MessageType;
+import com.client.talkster.interfaces.chat.IGroupChatGetMessageSender;
+import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
+import com.client.talkster.utils.enums.EChatType;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,43 +41,77 @@ import io.github.muddz.styleabletoast.StyleableToast;
 public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements IThemeManagerFragmentListener
 {
     private final long ownerID;
+    private final EChatType type;
     private final Context context;
     private final List<Message> messages;
     private final List<IChatViewHolder> chatViewHolderList;
     private final String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    public ChatMessagesAdapter(List<Message> messages, long ownerID, Context context)
+    
+    private IGroupChatGetMessageSender groupChatGetMessageSender;
+    private final List<ChatMessageViewHolder> chatMessageViewHolderList;
+
+    public ChatMessagesAdapter(List<Message> messages, long ownerID, EChatType type, Context context)
     {
+        this.type = type;
         this.ownerID = ownerID;
         this.context = context;
         this.messages = messages;
         chatViewHolderList = new ArrayList<>();
+        groupChatGetMessageSender = null;
     }
 
     public List<Message> getMessages() { return messages; }
+
+    public void setGroupChatGetMessageSender(IGroupChatGetMessageSender groupChatGetMessageSender) { this.groupChatGetMessageSender = groupChatGetMessageSender; }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        View view;
-        switch(viewType) {
-            case 0:
-                view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_sender, parent, false);
-                return new SenderChatMessagesViewHolder(view);
-            case 1:
-                view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_receiver, parent, false);
-                return new ReceiverChatMessagesViewHolder(view);
-            case 2:
-                view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_sender, parent, false);
-                return new ReceiverChatMediaMessagesViewHolder(view);
-            case 3:
-                view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_receiver, parent, false);
-                return new ReceiverChatMediaMessagesViewHolder(view);
-            default:
-                return null;
+        if(type == EChatType.PRIVATE_CHAT)
+        {
+            View view;
+            switch(viewType) {
+                case 0:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_sender, parent, false);
+                    return new SenderChatMessagesViewHolder(view);
+                case 1:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_receiver, parent, false);
+                    return new ReceiverChatMessagesViewHolder(view);
+                case 2:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_sender, parent, false);
+                    return new ReceiverChatMediaMessagesViewHolder(view);
+                case 3:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_receiver, parent, false);
+                    return new ReceiverChatMediaMessagesViewHolder(view);
+                default:
+                    return null;
+            }
         }
+        else if(type == EChatType.GROUP_CHAT)
+        {
+            View view;
+            switch(viewType) {
+                case 0:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_message_sender, parent, false);
+                    return new SenderChatMessagesViewHolder(view);
+                case 1:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_group_chat_message_receiver, parent, false);
+                    return new ReceiverChatMessagesViewHolder(view);
+                case 2:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_sender, parent, false);
+                    return new ReceiverChatMediaMessagesViewHolder(view);
+                case 3:
+                    view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_receiver, parent, false);
+                    return new ReceiverChatMediaMessagesViewHolder(view);
+                default:
+                    return null;
+            }
+        }
+        else
+            return null;
     }
 
     @Override
@@ -83,17 +121,25 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         IChatViewHolder chatViewHolder = (IChatViewHolder) holder;
         chatViewHolderList.add(chatViewHolder);
-
+// TODO: FIx this mess
         if(messages.get(position).getMessageType() == MessageType.TEXT_MESSAGE) {
             ((ChatMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
             ((ChatMessageViewHolder)chatViewHolder).chatMessageText.setText(message.getMessageContent());
         } else {
             ((ChatMediaMessageViewHolder)chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
             ((ChatMediaMessageViewHolder)chatViewHolder).filename = message.getMessageContent();
+// BREAKLINE
+        chatMessageViewHolderList.add(chatMessageViewHolder);
+        chatMessageViewHolder.chatMessageTime.setText(message.getOnlineTime());
+        chatMessageViewHolder.chatMessageText.setText(message.getMessageContent());
 
+        if(type == EChatType.GROUP_CHAT && chatMessageViewHolder instanceof ReceiverChatMessagesViewHolder && ((ReceiverChatMessagesViewHolder) chatMessageViewHolder).chatMessageUsername != null)
+        {
+            User sender = groupChatGetMessageSender.getMessageSender(message);
+            ((ReceiverChatMessagesViewHolder) chatMessageViewHolder).chatMessageUsername.setText(sender.getFullName());
         }
     }
-
+// TODO: TILL now
 
     @Override
     public int getItemViewType(int position)
@@ -124,6 +170,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     {
         protected TextView chatMessageText;
         protected TextView chatMessageTime;
+
         public ChatMessageViewHolder(@NonNull View itemView)
         {
             super(itemView);
@@ -172,10 +219,16 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     class ReceiverChatMessagesViewHolder extends ChatMessageViewHolder
     {
+        protected TextView chatMessageUsername;
+
         public ReceiverChatMessagesViewHolder(@NonNull View itemView)
         {
             super(itemView);
+
+            if(type == EChatType.GROUP_CHAT)
+                chatMessageUsername = itemView.findViewById(R.id.chatMessageUsername);
         }
+
 
         @Override
         public void onThemeChanged()
@@ -183,6 +236,9 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             chatMessageText.setBackground(ThemeManager.getReceiverChatBubbleGradient());
             chatMessageTime.setTextColor(ThemeManager.getColor("chat_inTimeText"));
             chatMessageText.setTextColor(ThemeManager.getColor("chat_messageTextIn"));
+
+            if(chatMessageUsername != null)
+                chatMessageUsername.setTextColor(ThemeManager.getColor("chat_messageAction"));
         }
     }
 

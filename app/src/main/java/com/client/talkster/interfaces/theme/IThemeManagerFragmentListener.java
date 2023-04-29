@@ -1,4 +1,4 @@
-package com.client.talkster.interfaces;
+package com.client.talkster.interfaces.theme;
 
 @FunctionalInterface
 public interface IThemeManagerFragmentListener
