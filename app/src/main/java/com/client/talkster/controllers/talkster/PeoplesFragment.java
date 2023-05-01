@@ -331,6 +331,10 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         ThemeManager.changeSettingsColor(settingsElements);
         ThemeManager.changeInputColor(inputs);
 
+        if (lastNameView.getText() == getResources().getString(R.string.last_name_placeholder)){
+            lastNameView.setTextColor(ThemeManager.getColor("settings_subText"));
+        }
+
         peoplesLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
     

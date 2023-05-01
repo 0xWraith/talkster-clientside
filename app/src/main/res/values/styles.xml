@@ -275,7 +275,7 @@
 
         <item name="settings_actionTextColor">#099877</item>
         <item name="settings_iconColor">#8Af2f2f2</item>
-        <item name="settings_text">#FFFFFF</item>
+        <item name="settings_text">#FFFFFFFF</item>
         <item name="settings_subText">#8Af2f2f2</item>
 
 
@@ -347,7 +347,7 @@
 
         <item name="settings_actionTextColor">#c992eb</item>
         <item name="settings_iconColor">#8Af2f2f2</item>
-        <item name="settings_text">#FFFFFF</item>
+        <item name="settings_text">#FFFFFFFF</item>
         <item name="settings_subText">#8Af2f2f2</item>
 
         <item name="dialogBackground">#1e1e1e</item>
@@ -420,7 +420,7 @@
 
         <item name="settings_actionTextColor">#6E4352</item>
         <item name="settings_iconColor">#8A393939</item>
-        <item name="settings_text">#3C3C3C</item>
+        <item name="settings_text">#FF3C3C3C</item>
         <item name="settings_subText">#8A2B2B2B</item>
 
         <item name="dialogBackground">#1e1e1e</item>

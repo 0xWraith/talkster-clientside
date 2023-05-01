@@ -22,7 +22,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:drawableEnd="@drawable/search_24"
-        android:drawableTint="?attr/actionBarDefaultIcon"
+        android:drawableTint="?attr/settings_subText"
         android:ems="10"
         android:hint="@string/search"
         android:inputType="textPersonName"

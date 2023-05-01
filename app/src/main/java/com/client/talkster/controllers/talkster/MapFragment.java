@@ -3,6 +3,7 @@ package com.client.talkster.controllers.talkster;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -361,6 +362,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         toolbarLogoIcon.setColorFilter(ThemeManager.getColor("actionBarDefaultIcon"));
         mapLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
+        searchEditText.setCompoundDrawableTintList(ColorStateList.valueOf(ThemeManager.getColor("settings_subText")));
         ThemeManager.changeInputColor(inputs);
     }
 }
