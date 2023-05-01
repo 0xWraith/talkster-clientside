@@ -1,12 +1,15 @@
 package com.client.talkster.controllers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
 
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.classes.theme.ButtonElements;
 import com.client.talkster.classes.theme.SettingsElements;
@@ -36,8 +40,11 @@ public class ThemeManager
     private static Theme currentTheme = null;
     private static final List<Theme> themes = new ArrayList<>();
     private static final HashMap<String, Integer> themeColor = new HashMap<>();
+
+    private static final HashMap<String, Integer> themeDrawable = new HashMap<>();
     private static final List<IThemeManagerActivityListener> listeners = new ArrayList<>();
 
+    private static final int[] DRAWABLES = {R.attr.inputBackground};
 
     private static GradientDrawable roundedButtonGradient;
     private static GradientDrawable standardButtonGradient;
@@ -121,6 +128,18 @@ public class ThemeManager
 
         themeColor.put("dialogBackground", MaterialColors.getColor(context, R.attr.dialogBackground, Color.BLACK));
         themeColor.put("errorColor", MaterialColors.getColor(context, R.attr.errorColor, Color.RED));
+
+        //Fetches an array of the resource attributes
+        @SuppressLint("ResourceType")
+        TypedArray a = context.getTheme().obtainStyledAttributes(DRAWABLES);
+        try {
+            // Get the integer value associated with the attribute by Index in DRAWABLES
+            themeDrawable.put("inputBackground", a.getResourceId(0, 0));
+        } finally {
+            a.recycle();
+        }
+
+
 
         loadChatColors(context);
         loadButtonColors(context);
@@ -212,6 +231,7 @@ public class ThemeManager
     {
         return themeColor.getOrDefault(key, Color.BLACK);
     }
+    public static int getDrawable(String key) { return themeDrawable.getOrDefault(key, null); }
 
     public static GradientDrawable getRoundedButtonGradient() { return roundedButtonGradient; }
     public static GradientDrawable getStandardButtonGradient() { return standardButtonGradient; }
@@ -318,6 +338,13 @@ public class ThemeManager
 
         for (RelativeLayout settingsBlock : settingsElements.getSettingsBlocks())
             settingsBlock.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
+    }
+
+    public static void changeInputColor(List<EditText> inputs) {
+        for (EditText input : inputs) {
+            input.setBackground(MyApplication.getAppContext().getResources().getDrawable(ThemeManager.getDrawable("inputBackground")));
+            input.setTextColor(ThemeManager.getColor("settings_color"));
+        }
     }
 
     public static void changeColorState(BottomNavigationView bottomNavigation)

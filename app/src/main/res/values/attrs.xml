@@ -16,6 +16,8 @@
     <attr name="navBarTabActiveIcon" format="color" />
     <attr name="navBarTabUnactiveIcon" format="color" />
 
+    <attr name="inputBackground" format="reference" />
+
     <attr name="chat_backgroundImage" format="integer" />
     <attr name="chat_name" format="color" />
     <attr name="chat_message" format="color" />

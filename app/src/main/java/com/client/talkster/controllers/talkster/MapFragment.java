@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -45,7 +46,9 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate, IThemeManagerFragmentListener
 {
@@ -66,9 +69,11 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     private GoogleMap map;
     private MapView mapView;
     private Marker userMarker;
+    private EditText searchEditText;
     private ConstraintLayout mapLayout;
     private View rightPager, leftPager;
     private ImageButton plusButton, minusButton;
+    private List<EditText> inputs = new ArrayList<>();
 
     private final String[] PERMISSIONS = {
             android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -139,6 +144,9 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         toolbarElements.setToolbar(view.findViewById(R.id.toolbar));
         toolbarElements.addToolbarIcon(toolbarMenuIcon);
+
+        searchEditText = view.findViewById(R.id.toolbarInput);
+        inputs.add(searchEditText);
 
         initPager();
 
@@ -353,5 +361,6 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         toolbarLogoIcon.setColorFilter(ThemeManager.getColor("actionBarDefaultIcon"));
         mapLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
+        ThemeManager.changeInputColor(inputs);
     }
 }

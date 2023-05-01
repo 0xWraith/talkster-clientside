@@ -2,6 +2,7 @@ package com.client.talkster.controllers.talkster;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -21,15 +22,19 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.client.talkster.ChangeBiographyActivity;
+import com.client.talkster.ChangeLoginActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
+import com.client.talkster.SettingsActivity;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ButtonElements;
+import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.ChatCreateDTO;
@@ -40,6 +45,9 @@ import com.client.talkster.utils.FileUtils;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PeoplesFragment extends Fragment implements IFragmentActivity, IThemeManagerFragmentListener
 {
     private boolean FRAGMENT_CREATED = false;
@@ -47,17 +55,18 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     private FileUtils fileUtils;
     private ButtonElements buttonElements;
     private ToolbarElements toolbarElements;
+    private SettingsElements settingsElements;
     private ConstraintLayout peoplesLayout;
-
     private ShapeableImageView profileImageView;
     private View profileView, leftPager;
-    private TextView firstNameView, lastNameView;
-    private ImageButton lastNameEditButton, lastNameSaveButton;
+    private TextView firstNameView, lastNameView, usernameText, biographyText;
+    private ImageButton lastNameEditButton, lastNameSaveButton, settingsButton;
     private EditText firstNameEditText, lastNameEditText, mailEditText;
     private Button galleryButton, cameraButton, addFriendButton, deleteButton;
-    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
+    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton, usernameEditButton, biographyEditButton;
     private ConstraintLayout mediaChooserLayout, firstNameLayout, firstNameEditLayout, lastNameLayout, lastNameEditLayout;
 
+    private List<EditText> inputs = new ArrayList<>();
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
     private final String[] PERMISSIONS = {
@@ -100,6 +109,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
         buttonElements = new ButtonElements();
         toolbarElements = new ToolbarElements();
+        settingsElements = new SettingsElements();
 
         toolbarElements.setToolbar(view.findViewById(R.id.toolbar));
         toolbarElements.setToolbarTitle(view.findViewById(R.id.toolbarTitle));
@@ -114,6 +124,11 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         closeMediaButton = view.findViewById(R.id.closeMediaButton);
         mediaChooserLayout = view.findViewById(R.id.mediaChooserLayout);
         profileView = view.findViewById(R.id.profileView);
+        settingsButton = view.findViewById(R.id.settingsButton);
+        usernameText = view.findViewById(R.id.usernameText);
+        biographyText = view.findViewById(R.id.biographyText);
+        usernameEditButton = view.findViewById(R.id.usernameEditButton);
+        biographyEditButton = view.findViewById(R.id.biographyEditButton);
         
         firstNameLayout = view.findViewById(R.id.firstNameLayout);
         firstNameEditLayout = view.findViewById(R.id.firstNameEditLayout);
@@ -130,13 +145,30 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         firstNameEditText = view.findViewById(R.id.firstNameEditText);
         lastNameEditText = view.findViewById(R.id.lastNameEditText);
 
+        mailEditText = view.findViewById(R.id.mailEditText);
+
         buttonElements.addButton(addFriendButton, false);
         buttonElements.addImageButton(imageEditButton, true);
         buttonElements.addImageButton(firstNameEditButton, true);
         buttonElements.addImageButton(firstNameSaveButton, true);
         buttonElements.addImageButton(lastNameEditButton, true);
         buttonElements.addImageButton(lastNameSaveButton, true);
+        buttonElements.addImageButton(usernameEditButton, true);
+        buttonElements.addImageButton(biographyEditButton, true);
 
+        toolbarElements.addToolbarIcon(settingsButton);
+
+        settingsElements.addHeaderText(view.findViewById(R.id.addFriendTitle));
+        settingsElements.addHeaderText(view.findViewById(R.id.usernameTitle));
+        settingsElements.addHeaderText(view.findViewById(R.id.biographyTitle));
+        settingsElements.addSettingsSubText(usernameText);
+        settingsElements.addSettingsSubText(biographyText);
+        settingsElements.addSettingsText(firstNameView);
+        settingsElements.addSettingsText(lastNameView);
+
+        inputs.add(firstNameEditText);
+        inputs.add(lastNameEditText);
+        inputs.add(mailEditText);
 
         firstNameView.setText(user.getFirstname());
         firstNameEditText.setText(user.getFirstname());
@@ -153,11 +185,21 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
             lastNameEditText.setText(lastname);
         }
 
-        mailEditText = view.findViewById(R.id.mailEditText);
-
         leftPager = view.findViewById(R.id.leftPager);
 
         initPager();
+
+        settingsButton.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), SettingsActivity.class);
+        startActivity(intent);});
+
+        usernameEditButton.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), ChangeLoginActivity.class);
+            startActivity(intent);});
+
+        biographyEditButton.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), ChangeBiographyActivity.class);
+            startActivity(intent);});
 
         addFriendButton.setOnClickListener(view1 ->
         {
@@ -273,6 +315,9 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     public void onResume(){
         super.onResume();
         updateProfilePicture();
+        User user = UserAccount.getInstance().getUser();
+        usernameText.setText("@"+user.getUsername());
+        biographyText.setText(user.getBiography());
     }
 
     @Override
@@ -283,6 +328,8 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
         ThemeManager.changeButtonsColor(buttonElements);
         ThemeManager.changeToolbarColor(toolbarElements);
+        ThemeManager.changeSettingsColor(settingsElements);
+        ThemeManager.changeInputColor(inputs);
 
         peoplesLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
@@ -310,10 +357,10 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         firstNameView.setText(first);
         if (!last.isBlank()){
             lastNameView.setText(last);
-            lastNameView.setTextColor(getResources().getColor(R.color.previewMainText));
+            lastNameView.setTextColor(ThemeManager.getColor("settings_text"));
         } else {
             lastNameView.setText(R.string.last_name_placeholder);
-            lastNameView.setTextColor(getResources().getColor(R.color.previewSecondaryText));
+            lastNameView.setTextColor(ThemeManager.getColor("settings_subText"));
             lastNameEditText.setText("");
         }
         NameDTO nameDTO = new NameDTO();

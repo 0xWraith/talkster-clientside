@@ -78,7 +78,7 @@
     </style>
 
     <style name="EditText">
-        <item name="android:background">@drawable/drawable_input</item>
+        <item name="android:background">@drawable/drawable_input_dark</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">@color/previewSecondaryText</item>
         <item name="android:padding">8dp</item>
@@ -94,7 +94,7 @@
     </style>
 
     <style name="LoginMailEditText">
-        <item name="android:background">@drawable/drawable_input</item>
+        <item name="android:background">?attr/inputBackground</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">@color/previewSecondaryText</item>
         <item name="android:padding">12dp</item>
@@ -222,6 +222,8 @@
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
 
+        <item name="inputBackground">@drawable/drawable_input_dark</item>
+
         <item name="navBarBackground">#262425</item>
         <item name="navBarHeaderBackground">#35A07B</item>
         <item name="navBarText">#FFFFFF</item>
@@ -239,18 +241,18 @@
         <item name="chat_date">#787878</item>
         <item name="chat_muteIcon">#55555f</item>
         <item name="chat_inBubble">#222023</item>
-        <item name="chat_inBubbleSelected">#55405e</item>
+        <item name="chat_inBubbleSelected">@color/aquamarine_dark_2</item>
         <item name="chat_outBubble">#FFFFFF</item>
-        <item name="chat_outBubbleGradient1">#8FA457</item>
-        <item name="chat_outBubbleGradient2">#4FA149</item>
-        <item name="chat_outBubbleGradient3">#35A07B</item>
+        <item name="chat_outBubbleGradient1">#04c887</item>
+        <item name="chat_outBubbleGradient2">#04C89A</item>
+        <item name="chat_outBubbleGradient3">#04c8b4</item>
         <item name="chat_outBubbleSelected">#FFFFFF</item>
         <item name="chat_messageTextIn">#fafafa</item>
         <item name="chat_messageTextOut">#FFFFFF</item>
         <item name="chat_inTimeText">#807e81</item>
         <item name="chat_outTimeText">#FFFFFF</item>
-        <item name="chat_TextCursor">#b780d7</item>
-        <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_TextCursor">@color/aquamarine</item>
+        <item name="chat_TextCursorSelection">@color/aquamarine_dark_2</item>
         <item name="chat_barIconColor">#FFFFFF</item>
         <item name="chat_barIconColorActive">?attr/chat_messageAction</item>
         <item name="chat_barBackground">?attr/actionBarDefault</item>
@@ -291,6 +293,8 @@
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
+
+        <item name="inputBackground">@drawable/drawable_input_dark</item>
 
         <item name="navBarBackground">#262425</item>
         <item name="navBarHeaderBackground">#90CC84FF</item>
@@ -337,9 +341,9 @@
 
         <item name="button_textColor">#FFFFFF</item>
         <item name="button_iconColor">#FFFFFF</item>
-        <item name="button_BackgroundGradient1">#c992eb</item>
+        <item name="button_BackgroundGradient1">#a25acc</item>
         <item name="button_BackgroundGradient2">#c992eb</item>
-        <item name="button_BackgroundGradient3">#c992eb</item>
+        <item name="button_BackgroundGradient3">#f7a3f5</item>
 
         <item name="settings_actionTextColor">#c992eb</item>
         <item name="settings_iconColor">#8Af2f2f2</item>
@@ -364,6 +368,8 @@
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
+
+        <item name="inputBackground">@drawable/drawable_input_light</item>
 
         <item name="navBarBackground">#FFFFFF</item>
         <item name="navBarHeaderBackground">#a7637b</item>
