@@ -7,6 +7,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -64,6 +66,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     private Bundle mapViewBundle = null;
     private ToolbarElements toolbarElements;
     private LocationAdapter userLastLocation;
+    private HashMap<Long, String> usernames = new HashMap<>();
     private HashMap<Long, Marker> userMarkers = new HashMap<>();
 
     private ImageView toolbarLogoIcon;
@@ -170,6 +173,35 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
                 zoom = map.getMinZoomLevel();
             map.animateCamera( CameraUpdateFactory.zoomTo(zoom) );
         });
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+                if(charSequence.length() == 0)
+                {
+                    userMarkers.forEach((aLong, marker) -> marker.setVisible(true));
+                    return;
+                }
+
+                usernames.forEach((aLong, s) -> {
+
+                    Marker marker = userMarkers.getOrDefault(aLong, null);
+
+                    if(marker == null)
+                        return;
+
+                    marker.setVisible(s.toLowerCase().contains(charSequence.toString().toLowerCase()));
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) { }
+        });
+
     }
 
     @Override
@@ -292,7 +324,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         if(id == userJWT.getID())
             return;
 
-        if(userMarkers.containsKey(id)) {
+        if(userMarkers.containsKey(id))
+        {
             userMarkers.get(id).setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
             userMarkers.get(id).setTitle(locationDTO.getUsername());
         }
@@ -300,6 +333,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             userMarkers.put(id, map.addMarker(new TalksterMapIcon(locationDTO.getUsername(), new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, id).getMarkerOptions()));
             userMarkers.get(id).setTag(id);
         }
+
+        usernames.put(id, locationDTO.getUsername());
     }
 
     public void updateMarkerIcons()
@@ -308,10 +343,12 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         FileUtils fileUtils = new FileUtils();
         Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userJWT.getID()));
-        if (userMarker != null) {
+
+        if (userMarker != null)
             userMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
-        }
-        for (Long id : userMarkers.keySet()){
+
+        for (Long id : userMarkers.keySet())
+        {
             bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(id));
             userMarkers.get(id).setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
         }
