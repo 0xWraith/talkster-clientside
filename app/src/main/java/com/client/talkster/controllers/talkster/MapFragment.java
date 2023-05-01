@@ -184,6 +184,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
                 if(charSequence.length() == 0)
                 {
                     userMarkers.forEach((aLong, marker) -> marker.setVisible(true));
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(userMarker.getPosition(), ZOOM_LEVEL));
                     return;
                 }
 
@@ -195,6 +196,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
                         return;
 
                     marker.setVisible(s.toLowerCase().contains(charSequence.toString().toLowerCase()));
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
                 });
             }
 
