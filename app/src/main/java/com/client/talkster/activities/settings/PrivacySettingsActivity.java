@@ -6,6 +6,7 @@ import androidx.appcompat.widget.SwitchCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
@@ -44,13 +45,18 @@ public class PrivacySettingsActivity extends AppCompatActivity implements IActiv
     @Override
     public void getUIElements()
     {
+        SwitchCompat mapTrackerSwitch;
+        ImageButton toolbarBackButton;
         User user = UserAccount.getInstance().getUser();
 
-        SwitchCompat mapTrackerSwitch;
 
         mapTrackerSwitch = findViewById(R.id.mapTrackerSwitch);
+        toolbarBackButton = findViewById(R.id.toolbarBackButton);
+
 
         mapTrackerSwitch.setChecked(user.getMapTracker());
+        toolbarBackButton.setOnClickListener(v -> finish());
+
         mapTrackerSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
         {
             Intent intent = new Intent(this, LocationService.class);

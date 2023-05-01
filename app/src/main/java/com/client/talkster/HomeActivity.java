@@ -111,7 +111,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         getBundleElements();
         getUIElements();
-        bottomNavigation.setSelectedItemId(R.id.mapMenuID);
     }
 
     @Override

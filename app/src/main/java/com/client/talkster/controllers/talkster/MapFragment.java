@@ -54,6 +54,7 @@ import java.util.List;
 public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate, IThemeManagerFragmentListener
 {
 
+    private boolean FRAGMENT_CREATED = false;
 
     private float x1,x2;
     private boolean setLocation = false;
@@ -84,7 +85,10 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     public MapFragment() { }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
+        FRAGMENT_CREATED = true;
+
         super.onCreate(savedInstanceState);
         int permCoarseLoc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
         int permFineLoc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
@@ -358,6 +362,9 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     @Override
     public void onThemeChanged()
     {
+        if(!FRAGMENT_CREATED)
+            return;
+
         ThemeManager.changeToolbarColor(toolbarElements);
 
         toolbarLogoIcon.setColorFilter(ThemeManager.getColor("actionBarDefaultIcon"));
