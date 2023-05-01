@@ -680,6 +680,8 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         chatMuteIcon.setColorFilter(ThemeManager.getColor("chat_muteIcon"));
         chatInputView.setBackgroundColor(ThemeManager.getColor("chat_barBackground"));
         mediaButton.setColorFilter(ThemeManager.getColor("chat_barIconColor"));
+        chatInputText.setTextColor(ThemeManager.getColor("settings_text"));
+        chatInputText.setHintTextColor(ThemeManager.getColor("settings_subText"));
 
         changeSendButtonColor(chatInputText.getText().length() > 0);
     }

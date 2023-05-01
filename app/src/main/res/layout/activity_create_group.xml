@@ -10,18 +10,11 @@
     <View
         android:id="@+id/toolbar"
         android:layout_width="wrap_content"
-        android:layout_height="88dp"
+        android:layout_height="64dp"
         android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="24dp" />
 
     <ImageButton
         android:id="@+id/toolbarBackIcon"
@@ -31,7 +24,7 @@
         android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/arrow_back_24"
         app:tint="@android:color/white" />
 
@@ -47,7 +40,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toEndOf="@+id/toolbarBackIcon"
-        app:layout_constraintTop_toTopOf="@+id/guideline6" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/contactsRecyclerView"

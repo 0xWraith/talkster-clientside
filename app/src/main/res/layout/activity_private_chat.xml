@@ -11,7 +11,7 @@
     <View
         android:id="@+id/toolbar"
         android:layout_width="wrap_content"
-        android:layout_height="88dp"
+        android:layout_height="64dp"
         android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +25,7 @@
         android:background="@color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/chatMessagesList"
         app:layout_constraintStart_toStartOf="@+id/toolbar"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/arrow_back_24"
         app:tint="@android:color/white" />
 
@@ -37,7 +37,7 @@
         android:src="@drawable/account_circle_64"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toEndOf="@+id/toolbarBackButton"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/circleImage"
         app:strokeColor="@null" />
 
@@ -84,7 +84,7 @@
         android:background="@color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/chatMessagesList"
         app:layout_constraintEnd_toEndOf="@+id/toolbar"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/menu_32"
         app:tint="@android:color/white" />
 
@@ -224,12 +224,5 @@
         app:layout_constraintTop_toTopOf="@+id/chatInputView"
         app:srcCompat="@drawable/image_24"
         app:tint="?attr/chat_barIconColor" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

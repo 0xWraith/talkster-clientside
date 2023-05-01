@@ -20,7 +20,7 @@
     <View
         android:id="@+id/toolbar"
         android:layout_width="wrap_content"
-        android:layout_height="88dp"
+        android:layout_height="64dp"
         android:background="?attr/actionBarDefault" />
 
     <TextView
@@ -35,7 +35,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="@+id/toolbar"
-        app:layout_constraintTop_toTopOf="@+id/guideline5" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/settingsButton"
@@ -45,7 +45,7 @@
         android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/menu_32"
         app:tint="?attr/actionBarDefaultTitle" />
 
@@ -358,13 +358,6 @@
             app:srcCompat="@drawable/close_24"
             app:tint="@android:color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="24dp" />
 
     <TextView
         android:id="@+id/biographyText"

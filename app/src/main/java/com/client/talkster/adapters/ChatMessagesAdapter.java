@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -128,6 +129,8 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             {
                 User sender = groupChatGetMessageSender.getMessageSender(message);
                 ((ReceiverChatMessagesViewHolder) chatViewHolder).chatMessageUsername.setText(sender.getFullName());
+                FileUtils fileUtils = new FileUtils();
+                ((ReceiverChatMessagesViewHolder) chatViewHolder).userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(sender.getId()));
             }
         } else {
             ((ChatMediaMessageViewHolder) chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
@@ -214,6 +217,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     class ReceiverChatMessagesViewHolder extends ChatMessageViewHolder
     {
         protected TextView chatMessageUsername;
+        protected ImageView userAvatarImage;
 
         public ReceiverChatMessagesViewHolder(@NonNull View itemView)
         {
@@ -221,6 +225,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             if(type == EChatType.GROUP_CHAT)
                 chatMessageUsername = itemView.findViewById(R.id.chatMessageUsername);
+                userAvatarImage = itemView.findViewById(R.id.userAvatarImage);
         }
 
 

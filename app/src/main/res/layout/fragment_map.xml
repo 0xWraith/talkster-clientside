@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mapLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mapLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/windowBackgroundWhite"
-    tools:context=".controllers.talkster.MapFragment" >
+    tools:context=".controllers.talkster.MapFragment">
 
     <View
         android:id="@+id/toolbar"
         android:layout_width="wrap_content"
-        android:layout_height="88dp"
-        android:background="?attr/actionBarDefault" />
+        android:layout_height="64dp"
+        android:background="?attr/actionBarDefault"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/toolbarInput"
@@ -30,7 +31,7 @@
         app:layout_constraintEnd_toStartOf="@+id/toolbarMenuIcon"
         app:layout_constraintHorizontal_bias="0.483"
         app:layout_constraintStart_toEndOf="@+id/toolbarLogoIcon"
-        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+        app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
     <ImageView
         android:id="@+id/toolbarLogoIcon"
@@ -40,7 +41,7 @@
         android:src="@drawable/talkster_logo"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/actionBarDefaultIcon" />
 
     <ImageButton
@@ -52,7 +53,7 @@
         android:src="@drawable/menu_32"
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/actionBarDefaultIcon" />
 
     <com.google.android.gms.maps.MapView
@@ -103,12 +104,5 @@
         android:src="@drawable/remove_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/plusButton" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
