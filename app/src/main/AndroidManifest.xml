@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.client.talkster">
 
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -27,16 +26,16 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Talkster.First" >
-
+        android:theme="@style/Theme.Talkster.First">
+        <activity
+            android:name=".GroupChatSettingsActivity"
+            android:exported="false" />
         <activity
             android:name=".GroupChatActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".activities.CreateGroupSettingsActivity"
             android:exported="false" />
-
         <activity
             android:name=".activities.CreateGroupActivity"
             android:exported="false" />
@@ -95,7 +94,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="locked" >
+            android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -109,7 +108,7 @@
 
         <service
             android:name=".api.MyFirebaseMessagingService"
-            android:exported="false" >
+            android:exported="false">
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@mipmap/ic_launcher_round" />

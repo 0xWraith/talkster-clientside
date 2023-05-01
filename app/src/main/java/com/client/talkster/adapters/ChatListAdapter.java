@@ -71,7 +71,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     private void groupChatBind(ChatViewHolder holder, GroupChat chat)
     {
         holder.userNameText.setText(chat.getGroupName());
-        holder.userAvatarImage.setImageResource(R.drawable.blank_profile);
+        holder.userAvatarImage.setImageResource(R.drawable.group_chat);
 
         if(chat.getMessages().size() == 0)
         {

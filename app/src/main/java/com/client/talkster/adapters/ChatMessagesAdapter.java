@@ -100,7 +100,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     return new ReceiverChatMessagesViewHolder(view);
                 case 2:
                     view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_sender, parent, false);
-                    return new ReceiverChatMediaMessagesViewHolder(view);
+                    return new SenderChatMediaMessagesViewHolder(view);
                 case 3:
                     view = LayoutInflater.from(context).inflate(R.layout.component_chat_media_message_receiver, parent, false);
                     return new ReceiverChatMediaMessagesViewHolder(view);

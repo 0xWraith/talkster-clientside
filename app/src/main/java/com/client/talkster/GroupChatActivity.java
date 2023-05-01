@@ -2,7 +2,6 @@ package com.client.talkster;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -20,9 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -44,7 +41,6 @@ import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.api.websocket.APIStompWebSocket;
 import com.client.talkster.classes.FileContent;
-import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.chat.GroupChat;
@@ -53,25 +49,25 @@ import com.client.talkster.classes.chat.message.Message;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.controllers.ThemeManager;
+import com.client.talkster.dto.FileDTO;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IBroadcastRegister;
-import com.client.talkster.interfaces.chat.IGroupChatGetMessageSender;
 import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.EChatType;
 import com.client.talkster.utils.enums.EPrivateChatAction;
 import com.client.talkster.utils.enums.MessageType;
+import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -85,9 +81,9 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
 
 
     private View chatView, chatInputView;
-    private ImageView chatMuteIcon;
+    private ImageView chatMuteIcon, profileImage;
     private EditText chatInputText;
-    private Menu privateChatActionMenu;
+//    private Menu privateChatActionMenu;
     private ShapeableImageView userAvatarImage;
     private Button galleryButton, cameraButton;
     private TextView userNameText, userStatusText;
@@ -131,10 +127,11 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
         toolbarMenuIcon = findViewById(R.id.toolbarMenuIcon);
         chatMessagesList = findViewById(R.id.chatMessagesList);
         closeMediaButton = findViewById(R.id.closeMediaButton);
-        userAvatarImage = findViewById(R.id.circularBackground);
+        userAvatarImage = findViewById(R.id.profileImage);
         toolbarBackButton = findViewById(R.id.toolbarBackButton);
         mediaChooserLayout = findViewById(R.id.mediaChooserLayout);
         recyclerLayoutManager = (LinearLayoutManager) chatMessagesList.getLayoutManager();
+        profileImage = findViewById(R.id.profileImage);
 
         toolbarElements.setToolbarTitle(userNameText);
         toolbarElements.addToolbarIcon(toolbarMenuIcon);
@@ -143,6 +140,8 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
         toolbarElements.setToolbar(findViewById(R.id.toolbar));
 
         userNameText.setText(chat.getGroupName());
+        userStatusText.setText(chat.getGroupMembers().size() + " members");
+        profileImage.setImageResource(R.drawable.group_chat);
 //        userAvatarImage.setImageBitmap(new FileUtils(userJWT).getProfilePicture(chat.getReceiverID()));
 
 //        userStatusText.setText(String.format(Locale.getDefault(), getString(R.string.chat_last_seen), "12:35"));
@@ -168,69 +167,56 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
         chatSendButton.setOnClickListener(view ->
         {
             String message = chatInputText.getText().toString().trim();
-
-            int length = message.length();
-
-            if(length == 0 || length > 4097)
-                return;
-
-            MessageDTO messageDTO = new MessageDTO();
-
-            chatInputText.setText("");
-            messageDTO.setchatid(chat.getId());
-            messageDTO.setmessagecontent(message);
-            messageDTO.setsenderid(userJWT.getID());
-            messageDTO.setjwttoken(userJWT.getAccessToken());
-            messageDTO.setreceiverid(chat.getId());
-            messageDTO.setmessagetype(MessageType.TEXT_MESSAGE);
-            messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
-
-            APIStompWebSocket.getInstance().getWebSocketClient().send("/app/group/message", new Gson().toJson(messageDTO)).subscribe();
+            sendMessage(message, MessageType.TEXT_MESSAGE);
         });
 
         toolbarBackButton.setOnClickListener(view -> finish());
         closeMediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(0).setDuration(250));
         mediaButton.setOnClickListener(view -> mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250));
 
-        Context wrapper = new ContextThemeWrapper(this, R.style.PrivateChat_PopupMenu);
-        PopupMenu popup = new PopupMenu(wrapper, toolbarMenuIcon);
-
-        privateChatActionMenu = popup.getMenu();
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_private_chat, privateChatActionMenu);
-
-        popup.setOnMenuItemClickListener(item ->
-        {
-            int id = item.getItemId();
-
-//            if(id == R.id.clearHistoryItemID)
-//                return showActionDialog(EPrivateChatAction.CLEAR_CHAT_HISTORY);
+//        Context wrapper = new ContextThemeWrapper(this, R.style.PrivateChat_PopupMenu);
+//        PopupMenu popup = new PopupMenu(wrapper, toolbarMenuIcon);
 //
-//            else if(id == R.id.deleteChatItemID)
-//                return showActionDialog(EPrivateChatAction.DELETE_CHAT);
+//        privateChatActionMenu = popup.getMenu();
+//        MenuInflater inflater = popup.getMenuInflater();
+//        inflater.inflate(R.menu.menu_private_chat, privateChatActionMenu);
 
-            if(id == R.id.muteForItemID)
-                return showMutePopupWindow();
+//        popup.setOnMenuItemClickListener(item ->
+//        {
+//            int id = item.getItemId();
+//
+////            if(id == R.id.clearHistoryItemID)
+////                return showActionDialog(EPrivateChatAction.CLEAR_CHAT_HISTORY);
+////
+////            else if(id == R.id.deleteChatItemID)
+////                return showActionDialog(EPrivateChatAction.DELETE_CHAT);
+//
+//            if(id == R.id.muteForItemID)
+//                return showMutePopupWindow();
+//
+//            else if(id == R.id.unmuteItemID)
+//                return muteForTime(0);
+//
+//            else if(id == R.id.muteForeverItemID)
+//                return muteForTime(-1);
+//
+//            else if(id == R.id.changeThemeItemID)
+//            {
+//                Intent intent = new Intent(this, ChatSettingsActivity.class);
+//                startActivity(intent);
+//
+//                return false;
+//            }
+//
+//
+//            return false;
+//        });
 
-            else if(id == R.id.unmuteItemID)
-                return muteForTime(0);
-
-            else if(id == R.id.muteForeverItemID)
-                return muteForTime(-1);
-
-            else if(id == R.id.changeThemeItemID)
-            {
-                Intent intent = new Intent(this, ChatSettingsActivity.class);
-                startActivity(intent);
-
-                return false;
-            }
-
-
-            return false;
+        toolbarMenuIcon.setOnClickListener(view -> {
+            Intent intent = new Intent(this, GroupChatSettingsActivity.class);
+            intent.putExtra(BundleExtraNames.USER_CHAT, chat);
+            startActivityForResult(intent, 6);
         });
-
-        toolbarMenuIcon.setOnClickListener(view -> popup.show());
 
         cameraButton.setOnClickListener(view -> {
             mediaChooserLayout.animate().translationY(0).setDuration(250);
@@ -260,6 +246,29 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
         else
             chatSendButton.setColorFilter(ThemeManager.getColor("chat_messageAction"));
 
+    }
+
+    private void sendMessage(String message, MessageType messageType) {
+        int length = message.length();
+
+        if(length == 0 || length > 4097)
+            return;
+
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+        MessageDTO messageDTO = new MessageDTO();
+
+        if (messageType == MessageType.TEXT_MESSAGE) {
+            chatInputText.setText("");
+        }
+        messageDTO.setchatid(chat.getId());
+        messageDTO.setmessagecontent(message);
+        messageDTO.setsenderid(userJWT.getID());
+        messageDTO.setjwttoken(userJWT.getAccessToken());
+        messageDTO.setreceiverid(chat.getId());
+        messageDTO.setmessagetype(messageType);
+        messageDTO.setmessagetimestamp(OffsetDateTime.now().toString());
+
+        APIStompWebSocket.getInstance().getWebSocketClient().send("/app/group/message", new Gson().toJson(messageDTO)).subscribe();
     }
 
     private boolean showMutePopupWindow()
@@ -381,13 +390,13 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
         if(chat.isMuted())
         {
             chatMuteIcon.setVisibility(View.VISIBLE);
-            privateChatActionMenu.findItem(R.id.muteItemID).setVisible(false);
-            privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(true);
+//            privateChatActionMenu.findItem(R.id.muteItemID).setVisible(false);
+//            privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(true);
             return;
         }
         chatMuteIcon.setVisibility(View.INVISIBLE);
-        privateChatActionMenu.findItem(R.id.muteItemID).setVisible(true);
-        privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(false);
+//        privateChatActionMenu.findItem(R.id.muteItemID).setVisible(true);
+//        privateChatActionMenu.findItem(R.id.unmuteItemID).setVisible(false);
     }
 
     @Override
@@ -413,18 +422,25 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 101) {
-            Uri uri = data.getData();
-            sendProfileImage(uri);
-
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
+        if (requestCode == 101) {
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = data.getData();
+                sendImage(uri);
+            } else if (resultCode == ImagePicker.RESULT_ERROR) {
+                Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (resultCode == Activity.RESULT_OK && requestCode == 6) {
+            boolean isDeleted = data.getBooleanExtra("isDeleted", false);
+            chat = (GroupChat) data.getSerializableExtra(BundleExtraNames.USER_CHAT);
+            if (isDeleted) {finish(); return;}
+            updateChatMuteUI();
         }
     }
 
-    private void sendProfileImage(Uri uri){
+    private void sendImage(Uri uri){
         FileContent fileContent = new FileContent();
         APIHandler<FileContent, GroupChatActivity> apiHandler = new APIHandler<>(this);
         try {
@@ -518,8 +534,20 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
 
                 response.close();
             }
+            else if (apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_UPLOAD)) {
+                if(responseCode != 200) {
+                    throw new UserUnauthorizedException("Unexpected message");
+                }
+                if(response.body() == null)
+                    throw new IOException("Unexpected response " + response);
+
+                String responseBody = response.body().string();
+                FileDTO fileDTO = new Gson().fromJson(responseBody, FileDTO.class);
+
+                sendMessage(fileDTO.getFilename(), MessageType.MEDIA_MESSAGE);
+            }
         }
-        catch (IOException e) { e.printStackTrace(); }
+        catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
     }
 
     @Override

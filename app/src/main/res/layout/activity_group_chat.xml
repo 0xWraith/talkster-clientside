@@ -30,7 +30,7 @@
         app:tint="@android:color/white" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/circularBackground"
+        android:id="@+id/profileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
@@ -49,8 +49,8 @@
         android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/circularBackground"
-        app:layout_constraintTop_toTopOf="@+id/circularBackground" />
+        app:layout_constraintStart_toEndOf="@+id/profileImage"
+        app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
     <ImageView
         android:id="@+id/muteIcon"
@@ -72,9 +72,9 @@
         android:layout_marginEnd="8dp"
         android:textColor="?attr/actionBarDefaultSubtitle"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/circularBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/profileImage"
         app:layout_constraintEnd_toStartOf="@+id/toolbarMenuIcon"
-        app:layout_constraintStart_toEndOf="@+id/circularBackground" />
+        app:layout_constraintStart_toEndOf="@+id/profileImage" />
 
     <ImageButton
         android:id="@+id/toolbarMenuIcon"
