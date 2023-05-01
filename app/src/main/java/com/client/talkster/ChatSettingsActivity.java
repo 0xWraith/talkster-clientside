@@ -151,6 +151,8 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         toolbarElements.addToolbarIcon(toolbarBackButton);
 
         settingsElements.addHeaderText(findViewById(R.id.headerText2));
+        settingsElements.addHeaderText(findViewById(R.id.headerText3));
+
         settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock1));
         settingsElements.addSettingsIcon(findViewById(R.id.settingsModeIcon));
         settingsElements.addSettingsText(findViewById(R.id.settingsModeText));

@@ -50,6 +50,7 @@ public class UserGPSLocationHandler
     }
 
     public void start() { initFusedLocationProviderClient(); }
+    public void stop() { LocationServices.getFusedLocationProviderClient(context).removeLocationUpdates(locationCallback); }
 
     @SuppressLint("MissingPermission")
     private void initFusedLocationProviderClient()

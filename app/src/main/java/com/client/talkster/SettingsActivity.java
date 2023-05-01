@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.client.talkster.activities.settings.PrivacySettingsActivity;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.theme.SettingsElements;
@@ -184,6 +185,10 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
             startActivityForResult(intent, 1);
             return;
         }
+
+        else if(id == R.id.settingsSecurityBlock)
+            intent = new Intent(this, PrivacySettingsActivity.class);
+
         else
             return;
 

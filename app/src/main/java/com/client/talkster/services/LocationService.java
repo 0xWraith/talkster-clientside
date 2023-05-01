@@ -41,7 +41,7 @@ public class LocationService extends Service implements IGPSPositionUpdate
     {
         if(Objects.equals(intent.getAction(), BundleExtraNames.LOCATION_SERVICE_START))
             start();
-        else
+        else if(Objects.equals(intent.getAction(), BundleExtraNames.LOCATION_SERVICE_STOP))
             stop();
 
         return super.onStartCommand(intent, flags, startId);
@@ -49,6 +49,10 @@ public class LocationService extends Service implements IGPSPositionUpdate
 
     private void stop()
     {
+        Log.d("LocationService", "stop");
+        userGPSLocationHandler.stop();
+        stopForeground(true);
+        stopSelf();
     }
 
     private void start()

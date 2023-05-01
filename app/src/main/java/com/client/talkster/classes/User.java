@@ -20,11 +20,14 @@ public class User implements Serializable
     private String biography;
     private long imageID;
     private Bitmap avatar;
+    private boolean mapTracker;
     private final List<User> contacts;
+    private final List<Long> contactIDs;
 
     public User()
     {
         contacts = new ArrayList<>();
+        contactIDs = new ArrayList<>();
     }
 
     /*private User(Parcel in)
@@ -49,18 +52,28 @@ public class User implements Serializable
     public String getLastname() { return lastname; }
     public String getFirstname() { return firstname; }
     public List<User> getContacts() { return contacts; }
+    public boolean getMapTracker() { return mapTracker; }
+    public List<Long> getContactIDs() { return contactIDs; }
     public String getFullName() { return firstname + " " + lastname; }
     public String getUsername() { return username == null ? "Not created" : username; }
     public String getBiography() { return biography == null ? "Not created" : biography; }
 
+    public void setId(long id) { this.id = id; }
     public void setMail(String mail) { this.mail = mail; }
-    public void addContact(User user) { contacts.add(user); }
+    public void addContact(User user)
+    {
+        contacts.add(user);
+
+        if (!contactIDs.contains(user.getId()))
+            contactIDs.add(user.getId());
+    }
     public void setAvatar(Bitmap avatar) { this.avatar = avatar; }
     public void setImageID(long imageID) { this.imageID = imageID; }
     public void setUsername(String username) { this.username = username; }
     public void setLastname(String lastname) { this.lastname = lastname; }
     public void setBiography(String biography) { this.biography = biography; }
     public void setFirstname(String firstname) { this.firstname = firstname; }
+    public void setMapTracker(boolean mapTracker) { this.mapTracker = mapTracker; }
 
     /*public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<>()
     {

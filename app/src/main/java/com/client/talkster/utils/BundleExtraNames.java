@@ -8,6 +8,7 @@ public class BundleExtraNames
     public static final String USER_JWT = "com.client.user_jwt_class";
     public static final String USER_CHAT = "com.client.user_chat_class";
     public static final String LOCATION_SERVICE_BROADCAST = "com.client.ACTION_LOCATION_SERVICE";
+    public static final String LOCATION_SERVICE_STOP = "com.client.ACTION_LOCATION_SERVICE_STOP";
     public static final String LOCATION_SERVICE_START = "com.client.ACTION_LOCATION_SERVICE_START";
     public static final String LOCATION_SERVICE_POSITION = "com.client.ACTION_LOCATION_SERVICE_POSITION";
 

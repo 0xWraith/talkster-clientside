@@ -7,11 +7,11 @@ import com.client.talkster.interfaces.IMapWebSocketHandler;
 import rx.Subscriber;
 import ua.naiksoftware.stomp.client.StompMessage;
 
-public class WebSocketPublicMapSubscriber extends Subscriber<StompMessage>
+public class WebSocketMapSubscriber extends Subscriber<StompMessage>
 {
     private Activity activity;
 
-    public WebSocketPublicMapSubscriber(Activity activity)
+    public WebSocketMapSubscriber(Activity activity)
     {
         this.activity = activity;
     }
@@ -31,7 +31,7 @@ public class WebSocketPublicMapSubscriber extends Subscriber<StompMessage>
     @Override
     public void onNext(StompMessage stompMessage)
     {
-        activity.runOnUiThread(() -> {
+        activity.runOnUiThread(() ->  {
 
             if(activity instanceof IMapWebSocketHandler)
                 ((IMapWebSocketHandler) activity).onMapMessageReceived(stompMessage.getPayload());

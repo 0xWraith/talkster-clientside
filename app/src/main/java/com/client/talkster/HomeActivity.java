@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.Group;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -28,7 +27,7 @@ import com.client.talkster.api.websocket.APIStompWebSocket;
 import com.client.talkster.api.websocket.listeners.WebSocketGroupChatCreatedSubscriber;
 import com.client.talkster.api.websocket.listeners.WebSocketGroupChatSubscriber;
 import com.client.talkster.api.websocket.listeners.WebSocketPrivateChatSubscriber;
-import com.client.talkster.api.websocket.listeners.WebSocketPublicMapSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketMapSubscriber;
 import com.client.talkster.classes.FileContent;
 import com.client.talkster.classes.chat.Chat;
 import com.client.talkster.classes.chat.GroupChat;
@@ -56,6 +55,7 @@ import com.client.talkster.interfaces.IMapGPSPositionUpdate;
 import com.client.talkster.interfaces.IMapWebSocketHandler;
 import com.client.talkster.interfaces.chat.IGroupChatListener;
 import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
+import com.client.talkster.services.LocationService;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.EChatType;
@@ -147,10 +147,22 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         initializeBottomNavigation();
         initializeSocketConnection();
 
-//        Intent intent = new Intent(this, LocationService.class);
-//        intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
-//        startService(intent);
+        User user = UserAccount.getInstance().getUser();
+        List<User> contacts = user.getContacts();
+        List<Long> contactIDs = user.getContactIDs();
 
+        contacts.forEach(contact ->
+        {
+            if(!contactIDs.contains(contact.getId()))
+                contactIDs.add(contact.getId());
+        });
+
+        if(user.getMapTracker())
+        {
+            Intent intent = new Intent(this, LocationService.class);
+            intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
+            startService(intent);
+        }
     }
 
     private void initializeSocketConnection()
@@ -161,7 +173,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         webSocketGroupChatSubscriber = new WebSocketGroupChatSubscriber(this);
         apiStompWebSocket.addTopic("/user/" + userId + "/private", new WebSocketPrivateChatSubscriber(this));
         apiStompWebSocket.addTopic("/user/" + userId + "/group/created", new WebSocketGroupChatCreatedSubscriber(this));
-        apiStompWebSocket.addTopic("/map/public", new WebSocketPublicMapSubscriber(this));
+        apiStompWebSocket.addTopic("/user/" + userId + "/map", new WebSocketMapSubscriber(this));
 
         apiStompWebSocket.connect();
     }
@@ -238,6 +250,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                     return;
 
                 UserAccount userAccount = UserAccount.getInstance();
+
                 User user = userAccount.getUser();
                 UserJWT userJWT = userAccount.getUserJWT();
 
@@ -245,7 +258,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
                 iMapGPSPositionUpdate.onMapGPSPositionUserUpdate(location);
 
-                LocationDTO locationDTO = new LocationDTO(user.getId(), user.getFullName(), userJWT.getAccessToken(), location);
+                LocationDTO locationDTO = new LocationDTO(user.getId(), user.getFullName(), userJWT.getAccessToken(), user.getContactIDs(), location);
                 apiStompWebSocket.getWebSocketClient().send("/app/map", new Gson().toJson(locationDTO)).subscribe();
             }
         };
@@ -352,16 +365,19 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             }
             else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_CREATE))
             {
-                if(responseCode != 200){
-                    if(responseCode == 409){
+                if(responseCode != 200)
+                {
+                    if(responseCode == 409)
                         runOnUiThread(() -> StyleableToast.makeText(this, "Friend already added!", R.style.friendAlreadyAdded).show());
-                    }
-                    if(responseCode == 404){
+
+                    if(responseCode == 404)
                         runOnUiThread(() -> StyleableToast.makeText(this, "Friend not found!", R.style.friendNotFound).show());
-                    }
-                    else{throw new UserUnauthorizedException("Unexpected response " + response);}
+
+                    else
+                        throw new UserUnauthorizedException("Unexpected response " + response);
                 }
-                else{
+                else
+                {
                     String responseBody = response.body().string();
                     PrivateChat chat = new Gson().fromJson(responseBody, PrivateChat.class);
                     runOnUiThread(() -> StyleableToast.makeText(this, "Friend added!", R.style.friendAdded).show());
@@ -433,6 +449,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 ModelMapper modelMapper = new ModelMapper();
                 String responseBody = response.body().string();
                 UserDTO user = new Gson().fromJson(responseBody, UserDTO.class);
+
+                System.out.println(user);
+                System.out.println(modelMapper.map(user, User.class));
 
                 UserAccount.getInstance().getUser().addContact(modelMapper.map(user, User.class));
             }

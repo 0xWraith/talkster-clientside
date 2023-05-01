@@ -465,9 +465,8 @@ public class ChatsFragment extends Fragment implements IFragmentActivity, IChatL
         else
             return false;
 
-        drawerLayout.closeDrawer(GravityCompat.START);
-
         startActivity(intent);
+        drawerLayout.closeDrawer(GravityCompat.START);
         return false;
     }
 

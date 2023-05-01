@@ -95,4 +95,6 @@
     <string name="enter_group_name">Enter group name</string>
     <string name="group_members_count">%d members</string>
     <string name="group_created_chat_message">Group created. Say hi!</string>
+    <string name="map_settings">Map settings</string>
+    <string name="position_tracker">Position tracker</string>
 </resources>

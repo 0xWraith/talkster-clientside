@@ -27,6 +27,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Talkster.First">
+
+        <activity
+            android:name=".activities.settings.PrivacySettingsActivity"
+            android:exported="false" />
+
         <activity
             android:name=".GroupChatSettingsActivity"
             android:exported="false" />
