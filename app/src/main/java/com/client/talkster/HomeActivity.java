@@ -450,9 +450,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 String responseBody = response.body().string();
                 UserDTO user = new Gson().fromJson(responseBody, UserDTO.class);
 
-                System.out.println(user);
-                System.out.println(modelMapper.map(user, User.class));
-
                 UserAccount.getInstance().getUser().addContact(modelMapper.map(user, User.class));
             }
             else if(apiUrl.contains(APIEndpoints.TALKSTER_API_GROUP_GET))
