@@ -76,7 +76,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/settingsBlock2"
+        android:id="@+id/settingsBlock3"
         style="@style/SettingsBlock"
         android:paddingEnd="0dp"
         android:layout_marginTop="0dp"

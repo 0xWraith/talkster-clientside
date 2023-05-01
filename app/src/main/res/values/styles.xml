@@ -283,12 +283,12 @@
         <item name="errorColor">#cc4747</item>
 
         <item name="settings_actionTextColor">#099877</item>
-        <item name="settings_iconColor">#8Af2f2f2</item>
+        <item name="settings_iconColor">#ff999999</item>
         <item name="settings_text">#FFFFFFFF</item>
         <item name="settings_subText">#8Af2f2f2</item>
 
 
-        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
         <item name="android:navigationBarColor">#FF000000</item>
 <!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
@@ -355,14 +355,14 @@
         <item name="button_BackgroundGradient3">#f7a3f5</item>
 
         <item name="settings_actionTextColor">#c992eb</item>
-        <item name="settings_iconColor">#8Af2f2f2</item>
+        <item name="settings_iconColor">#ff999999</item>
         <item name="settings_text">#FFFFFFFF</item>
         <item name="settings_subText">#8Af2f2f2</item>
 
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
-        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:navigationBarColor">#FF000000</item>
@@ -428,14 +428,14 @@
         <item name="button_BackgroundGradient3">#6E4352</item>
 
         <item name="settings_actionTextColor">#6E4352</item>
-        <item name="settings_iconColor">#8A393939</item>
+        <item name="settings_iconColor">#ff575757</item>
         <item name="settings_text">#FF3C3C3C</item>
         <item name="settings_subText">#8A2B2B2B</item>
 
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
-        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:navigationBarColor">#FF000000</item>
@@ -443,7 +443,7 @@
     </style>
     
     <style name="customToast">
-        <item name="stColorBackground">@color/aquamarine</item>
+        <item name="stColorBackground">?attr/chat_messageAction</item>
         <item name="stTextColor">@android:color/white</item>
         <item name="stTextBold">true</item>
         <item name="stRadius">10dp</item>

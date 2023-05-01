@@ -36,7 +36,6 @@ import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.chat.GroupChat;
-import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.theme.CubicBezierInterpolator;
 import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.Theme;
@@ -154,7 +153,7 @@ public class GroupChatSettingsActivity extends AppCompatActivity implements IAct
         settingsElements.addSettingsIcon(findViewById(R.id.settingsModeIcon));
         settingsElements.addSettingsText(findViewById(R.id.settingsModeText));
 
-        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock2));
+        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock3));
         settingsElements.addSettingsText(findViewById(R.id.unmuteText));
         settingsElements.addSettingsText(findViewById(R.id.muteForeverText));
         settingsElements.addSettingsText(findViewById(R.id.muteForText));

@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.github.muddz.styleabletoast.StyleableToast;
@@ -45,6 +46,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private final Context context;
     private final List<Message> messages;
     private final List<IChatViewHolder> chatViewHolderList;
+    private HashMap<Long, Bitmap> userAvatars = new HashMap<>();
     private final String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -59,6 +61,22 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.messages = messages;
         chatViewHolderList = new ArrayList<>();
         groupChatGetMessageSender = null;
+    }
+
+    public ChatMessagesAdapter(List<Message> messages, long ownerID, EChatType type, Context context, List<User> members)
+    {
+        this.type = type;
+        this.ownerID = ownerID;
+        this.context = context;
+        this.messages = messages;
+        chatViewHolderList = new ArrayList<>();
+        groupChatGetMessageSender = null;
+
+        FileUtils fileUtils = new FileUtils();
+        for (User member : members){
+            Bitmap bitmap = fileUtils.getProfilePicture(member.getId());
+            userAvatars.put(member.getId(), bitmap);
+        }
     }
 
     public List<Message> getMessages() { return messages; }
@@ -129,8 +147,10 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             {
                 User sender = groupChatGetMessageSender.getMessageSender(message);
                 ((ReceiverChatMessagesViewHolder) chatViewHolder).chatMessageUsername.setText(sender.getFullName());
-                FileUtils fileUtils = new FileUtils();
-                ((ReceiverChatMessagesViewHolder) chatViewHolder).userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(sender.getId()));
+                Bitmap avatar = userAvatars.get(sender.getId());
+                if (avatar != null){
+                    ((ReceiverChatMessagesViewHolder) chatViewHolder).userAvatarImage.setImageBitmap(avatar);
+                }
             }
         } else {
             ((ChatMediaMessageViewHolder) chatViewHolder).chatMessageTime.setText(message.getOnlineTime());
@@ -223,9 +243,10 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         {
             super(itemView);
 
-            if(type == EChatType.GROUP_CHAT)
+            if(type == EChatType.GROUP_CHAT) {
                 chatMessageUsername = itemView.findViewById(R.id.chatMessageUsername);
                 userAvatarImage = itemView.findViewById(R.id.userAvatarImage);
+            }
         }
 
 

@@ -26,12 +26,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.client.talkster.activities.settings.PrivacySettingsActivity;
 import com.client.talkster.adapters.ThemeListAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.chat.PrivateChat;
@@ -41,12 +44,14 @@ import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.controllers.ThemeManager;
+import com.client.talkster.dto.EmptyDTO;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.dto.PrivateChatActionDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
 import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
+import com.client.talkster.services.LocationService;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.client.talkster.utils.enums.EPrivateChatAction;
@@ -68,6 +73,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
     private ThemeListAdapter themeAdapter;
     private ImageView themeTransitionImage, profileImage;
     private ConstraintLayout chatSettingsLayout;
+    private SwitchCompat mapTrackerSwitch;
 
     private LinearLayout unmuteBlock, muteForeverBlock, muteForBlock, clearHistoryBlock, deleteChatBlock;
     private TextView profileText;
@@ -136,6 +142,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         toolbarBackButton = findViewById(R.id.toolbarBackButton);
         chatSettingsLayout = findViewById(R.id.chatSettingsLayout);
         themeTransitionImage = findViewById(R.id.themeTransitionImage);
+        mapTrackerSwitch = findViewById(R.id.mapTrackerSwitch);
 
         unmuteBlock = findViewById(R.id.unmuteBlock);
         muteForeverBlock = findViewById(R.id.muteForeverBlock);
@@ -150,6 +157,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         toolbarElements.setToolbarTitle(findViewById(R.id.toolbarTitle));
         toolbarElements.addToolbarIcon(toolbarBackButton);
 
+        settingsElements.addHeaderText(findViewById(R.id.headerText1));
         settingsElements.addHeaderText(findViewById(R.id.headerText2));
         settingsElements.addHeaderText(findViewById(R.id.headerText3));
 
@@ -157,7 +165,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         settingsElements.addSettingsIcon(findViewById(R.id.settingsModeIcon));
         settingsElements.addSettingsText(findViewById(R.id.settingsModeText));
 
-        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock2));
+        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock3));
         settingsElements.addSettingsText(findViewById(R.id.unmuteText));
         settingsElements.addSettingsText(findViewById(R.id.muteForeverText));
         settingsElements.addSettingsText(findViewById(R.id.muteForText));
@@ -168,6 +176,10 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         settingsElements.addSettingsIcon(findViewById(R.id.muteForIcon));
         settingsElements.addSettingsIcon(findViewById(R.id.clearHistoryIcon));
         settingsElements.addSettingsIcon(findViewById(R.id.deleteChatIcon));
+
+        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock2));
+        settingsElements.addSettingsIcon(findViewById(R.id.positionIcon));
+        settingsElements.addSettingsText(findViewById(R.id.positionText));
 
         profileText.setText(chat.getReceiverName());
         profileImage.setImageBitmap(FileUtils.circleCrop(new FileUtils().getProfilePicture(chat.getReceiverID())));
@@ -186,6 +198,26 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         });
         deleteChatBlock.setOnClickListener(view -> {
             showActionDialog(EPrivateChatAction.DELETE_CHAT);
+        });
+
+        User user = UserAccount.getInstance().getUser();
+        mapTrackerSwitch.setChecked(user.getMapTracker());
+
+        mapTrackerSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
+        {
+            Intent intent = new Intent(this, LocationService.class);
+
+            user.setMapTracker(isChecked);
+
+            if(isChecked)
+                intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
+            else
+                intent.setAction(BundleExtraNames.LOCATION_SERVICE_STOP);
+
+            APIHandler<EmptyDTO, ChatSettingsActivity> apiHandler = new APIHandler<>(this);
+            apiHandler.apiPUT(String.format("%s/%b", APIEndpoints.TALKSTER_API_USER_UPDATE_MAP_TRACKER, isChecked), new EmptyDTO(), UserAccount.getInstance().getUserJWT().getAccessToken());
+
+            startService(intent);
         });
 
         themeAdapter = new ThemeListAdapter(this, new IRecyclerViewItemClickListener()
@@ -376,6 +408,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
 
         ThemeManager.changeToolbarColor(toolbarElements);
         ThemeManager.changeSettingsColor(settingsElements);
+        ThemeManager.changeSwitchColor(mapTrackerSwitch);
         findViewById(R.id.profileBlock).setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
         profileText.setTextColor(ThemeManager.getColor("navBarText"));
     }

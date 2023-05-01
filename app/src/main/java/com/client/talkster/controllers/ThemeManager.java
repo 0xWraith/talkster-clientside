@@ -3,6 +3,7 @@ package com.client.talkster.controllers;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -16,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
@@ -300,6 +302,21 @@ public class ThemeManager
 
         button.setTextColor(ThemeManager.getColor("button_textColor"));
         button.setBackground(ThemeManager.getRoundedButtonGradient());
+    }
+
+    public static void changeSwitchColor(SwitchCompat switchCompat)
+    {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_enabled, android.R.attr.state_checked },
+                new int[] { android.R.attr.state_enabled, -android.R.attr.state_checked }
+        };
+        int[] colors = new int[] {
+                ThemeManager.getColor("switchTrackChecked"),
+                ThemeManager.getColor("switchTrack")
+        };
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        switchCompat.setTrackTintList(colorStateList);
+        switchCompat.setThumbTintList(colorStateList);
     }
 
     public static void changeToolbarColor(ToolbarElements toolbarElements)

@@ -180,14 +180,55 @@
             </RelativeLayout>
 
             <RelativeLayout
+
                 android:id="@+id/settingsBlock2"
+                style="@style/SettingsBlock"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock1">
+
+                <TextView
+                    android:id="@+id/headerText1"
+                    style="@style/SettingsHeaderTextView"
+                    android:text="@string/map_settings" />
+
+                <LinearLayout
+                    android:id="@+id/positionBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:layout_below="@+id/headerText1"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/positionIcon"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/map_24" />
+
+                    <TextView
+                        android:id="@+id/positionText"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/position_tracker" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/mapTrackerSwitch"
+                        style="@style/switchStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/settingsBlock3"
                 style="@style/SettingsBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settingsBlock1">
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock2">
 
                 <TextView
                     android:id="@+id/headerText3"
@@ -226,7 +267,7 @@
                         android:id="@+id/muteForeverIcon"
                         style="@style/SettingsBlockIcon"
                         android:src="@drawable/ic_mute"
-                        app:tint="?attr/settings_iconColor"/>
+                        app:tint="?attr/settings_iconColor" />
 
                     <TextView
                         android:id="@+id/muteForeverText"
@@ -266,7 +307,7 @@
                         android:id="@+id/clearHistoryIcon"
                         style="@style/SettingsBlockIcon"
                         android:src="@drawable/ic_clear"
-                        app:tint="?attr/settings_iconColor"/>
+                        app:tint="?attr/settings_iconColor" />
 
                     <TextView
                         android:id="@+id/clearHistoryText"
@@ -286,7 +327,7 @@
                         android:id="@+id/deleteChatIcon"
                         style="@style/SettingsBlockIcon"
                         android:src="@drawable/ic_delete"
-                        app:tint="?attr/settings_iconColor"/>
+                        app:tint="?attr/settings_iconColor" />
 
                     <TextView
                         android:id="@+id/deleteChatText"

@@ -99,7 +99,7 @@ public class SettingsActivity extends AppCompatActivity implements IActivity, Vi
 
 
         settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock1));
-        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock2));
+        settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock3));
         settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock3));
         settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock4));
 

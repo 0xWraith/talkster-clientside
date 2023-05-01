@@ -146,7 +146,7 @@ public class GroupChatActivity extends AppCompatActivity implements IActivity, I
 
 //        userStatusText.setText(String.format(Locale.getDefault(), getString(R.string.chat_last_seen), "12:35"));
 
-        chatMessagesAdapter = new ChatMessagesAdapter(chat.getMessages(), userJWT.getID(), EChatType.GROUP_CHAT, this);
+        chatMessagesAdapter = new ChatMessagesAdapter(chat.getMessages(), userJWT.getID(), EChatType.GROUP_CHAT, this, chat.getGroupMembers());
 
         chatMessagesAdapter.setGroupChatGetMessageSender(message -> chat.getGroupMembers().stream().filter(user -> user.getId() == message.getSenderID()).findFirst().orElse(null));
 
