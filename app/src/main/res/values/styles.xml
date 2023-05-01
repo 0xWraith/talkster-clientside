@@ -290,7 +290,7 @@
 
         <item name="android:statusBarColor">#00000000</item>
         <item name="android:navigationBarColor">#FF000000</item>
-        <item name="android:windowTranslucentStatus">true</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
 
@@ -366,7 +366,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:navigationBarColor">#FF000000</item>
-        <item name="android:windowTranslucentStatus">true</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
     <style name="Theme.Talkster.Third" parent="Theme.AppCompat.Light.NoActionBar">
@@ -439,7 +439,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:navigationBarColor">#FF000000</item>
-        <item name="android:windowTranslucentStatus">true</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
     
     <style name="customToast">
