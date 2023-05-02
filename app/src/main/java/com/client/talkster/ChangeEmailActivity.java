@@ -1,5 +1,6 @@
 package com.client.talkster;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,6 +17,7 @@ import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.UserChangeLoginDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
@@ -221,6 +223,10 @@ public class ChangeEmailActivity extends AppCompatActivity implements IActivity,
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl)
     {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+        startActivity(intent);
+        finish();
     }
 }

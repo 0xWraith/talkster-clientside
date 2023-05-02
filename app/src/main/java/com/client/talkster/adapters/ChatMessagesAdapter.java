@@ -1,11 +1,14 @@
 package com.client.talkster.adapters;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.chat.message.Message;
@@ -299,6 +303,13 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (permWriteExt != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) context, PERMISSIONS, 1);
         } else {
+            ConnectivityManager cm = (ConnectivityManager) MyApplication.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            if (!(cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected())) {
+                ((Activity)context).runOnUiThread(() -> StyleableToast.makeText(context.getApplicationContext(), "Downloaded failed!", R.style.customToast).show());
+                return;
+            }
+
             File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Talkster");
             OutputStream outputStream;
 

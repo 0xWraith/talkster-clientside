@@ -42,7 +42,13 @@ public class APIStompWebSocket
     public void connect()
     {
         webSocketClient.lifecycle().subscribe(new StompWebSocketLifeCycle<>());
-        webSocketClient.connect();
+        try {
+            webSocketClient.connect();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public List<String> getUserTopics() { return userTopics; }

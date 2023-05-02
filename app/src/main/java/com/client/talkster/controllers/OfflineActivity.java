@@ -17,6 +17,11 @@ import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
+import com.client.talkster.api.websocket.APIStompWebSocket;
+import com.client.talkster.api.websocket.listeners.WebSocketGroupChatCreatedSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketGroupChatSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketMapSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketPrivateChatSubscriber;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.dto.VerifiedUserDTO;
@@ -129,6 +134,7 @@ public class OfflineActivity extends AppCompatActivity implements IAPIResponseHa
     public void onResponse(@NonNull Call call, @NonNull Response response, @NonNull String apiUrl) {
         try
         {
+
             if(response.body() == null)
                 throw new IOException("Unexpected response " + response);
 

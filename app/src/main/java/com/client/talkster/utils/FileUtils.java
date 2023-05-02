@@ -1,6 +1,7 @@
 package com.client.talkster.utils;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +25,7 @@ import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
@@ -64,9 +66,18 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
         APIHandler<Object, FileUtils> apiHandler = new APIHandler<>(this);
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE+"/"+userID, userJWT.getAccessToken());
         imageReceived = false;
+        int dt = 0;
         while(!imageReceived) {
             try {
                 Thread.sleep(100);
+                dt+=1;
+                if (dt >= 10) {
+                    BitmapFactory.Options bfo = new BitmapFactory.Options();
+                    bfo.inScaled = false;
+                    image = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
+                            R.drawable.blank_profile, bfo);
+                    imageReceived = true;
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -200,7 +211,8 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
 
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl) {
-
+        image = null;
+        imageReceived = true;
     }
 
     @Override

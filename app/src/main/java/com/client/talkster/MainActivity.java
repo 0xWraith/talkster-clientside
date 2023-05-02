@@ -29,6 +29,7 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 
+import io.reactivex.plugins.RxJavaPlugins;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        RxJavaPlugins.setErrorHandler(e -> { e.printStackTrace(); });
         createApplicationThemes();
         setTheme(ThemeManager.getCurrentThemeStyle());
 

@@ -1,5 +1,6 @@
 package com.client.talkster.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.client.talkster.api.websocket.APIStompWebSocket;
 import com.client.talkster.classes.chat.GroupChat;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.CreateGroupDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
@@ -145,5 +147,11 @@ public class CreateGroupSettingsActivity extends AppCompatActivity implements IA
     }
 
     @Override
-    public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl) { }
+    public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl) {
+        Intent intent = new Intent(this, OfflineActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        startActivity(intent);
+        finish();
+    }
 }
