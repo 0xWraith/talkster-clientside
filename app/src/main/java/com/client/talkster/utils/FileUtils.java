@@ -1,6 +1,8 @@
 package com.client.talkster.utils;
 
 import android.content.ContentResolver;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,6 +13,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -20,7 +23,9 @@ import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
+import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
@@ -37,21 +42,42 @@ import okhttp3.Response;
 public class FileUtils implements IActivity, IAPIResponseHandler {
 
     //extends AppCompatActivity
-    private UserJWT userJWT;
+    private UserJWT userJWT = UserAccount.getInstance().getUserJWT();
     private boolean imageReceived;
     private Bitmap image;
 
     public FileUtils() {}
 
-    public FileUtils(UserJWT userJWT) {this.userJWT = userJWT;}
+    public Bitmap downloadImage(String filename){
+        APIHandler<Object, FileUtils> apiHandler = new APIHandler<>(this);
+        apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_DOWNLOAD+"/"+filename, userJWT.getAccessToken());
+        imageReceived = false;
+        while(!imageReceived) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return image;
+    }
 
     public Bitmap getProfilePicture(long userID){
         APIHandler<Object, FileUtils> apiHandler = new APIHandler<>(this);
         apiHandler.apiGET(APIEndpoints.TALKSTER_API_FILE_GET_PROFILE+"/"+userID, userJWT.getAccessToken());
         imageReceived = false;
+        int dt = 0;
         while(!imageReceived) {
             try {
                 Thread.sleep(100);
+                dt+=1;
+                if (dt >= 10) {
+                    BitmapFactory.Options bfo = new BitmapFactory.Options();
+                    bfo.inScaled = false;
+                    image = BitmapFactory.decodeResource(MyApplication.getAppContext().getResources(),
+                            R.drawable.blank_profile, bfo);
+                    imageReceived = true;
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -73,15 +99,31 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
     }
 
     public static MediaType getType(Uri uri, ContentResolver cr){
-        String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
-                .toString());
+        String fileExtension;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            //If scheme is a content
+            fileExtension = MimeTypeMap.getSingleton().getExtensionFromMimeType(cr.getType(uri));
+        } else {
+            //If it is a file
+            fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
+        }
         MediaType mediaType = MediaType.get(MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                 fileExtension.toLowerCase()));
         return mediaType;
     }
 
     public static String getFilename(Uri uri, ContentResolver cr){
-        return uri.getLastPathSegment();
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            Cursor cursor =
+                    cr.query(uri, null, null, null, null);
+            int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            cursor.moveToFirst();
+            String filename = cursor.getString(nameIndex);
+            return filename;
+        }
+        else {
+            return uri.getLastPathSegment();
+        }
     }
 
     public static Bitmap getMarker(Bitmap bitmap){
@@ -151,14 +193,26 @@ public class FileUtils implements IActivity, IAPIResponseHandler {
                     imageReceived = true;
                 }
             }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_DOWNLOAD))
+            {
+                if (responseCode != 200){
+                    image = null;
+                    imageReceived = true;
+                    throw new UserUnauthorizedException("Unexpected response " + response);
+                } else {
+                    image = BitmapFactory.decodeStream(response.body().byteStream());
+                    imageReceived = true;
+                }
+            }
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
-        catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster", "Failed to parse: " + exception.getMessage()); }
+        catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster: ", "Failed to parse: " + exception.getMessage()); }
     }
 
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException exception, @NonNull String apiUrl) {
-
+        image = null;
+        imageReceived = true;
     }
 
     @Override

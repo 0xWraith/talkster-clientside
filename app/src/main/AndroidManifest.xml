@@ -27,6 +27,35 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Talkster.First">
+
+        <activity
+            android:name=".activities.settings.PrivacySettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".GroupChatSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GroupChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.CreateGroupSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.CreateGroupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeThemeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeBiographyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeEmailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeLoginActivity"
+            android:exported="false" />
         <activity
             android:name=".ChatSettingsActivity"
             android:exported="false" />
@@ -44,7 +73,8 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false"
-            android:screenOrientation="locked" />
+            android:screenOrientation="locked"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".utils.FileUtils"
             android:exported="false"

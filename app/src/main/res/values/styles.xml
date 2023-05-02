@@ -13,6 +13,14 @@
         <item name="android:insetBottom">0dp</item>
     </style>
 
+    <style name="Toolbar">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">88dp</item>
+        <item name="android:background">?attr/actionBarDefault</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
     <style name="dialogCancelButton" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:background">@color/transparent</item>
         <item name="android:textColorHint">?attr/errorColor</item>
@@ -60,6 +68,15 @@
         <item name="android:layout_marginTop">10dp</item>
     </style>
 
+    <style name="switchStyle">
+        <item name="trackTint">@color/switch_state</item>
+        <item name="thumbTint">@color/switch_state</item>
+        <item name="android:textColor">@color/previewMainText</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
     <style name="LoginEditText">
         <item name="android:textColor">@color/previewMainText</item>
         <item name="android:textSize">20sp</item>
@@ -70,7 +87,7 @@
     </style>
 
     <style name="EditText">
-        <item name="android:background">@drawable/drawable_input</item>
+        <item name="android:background">@drawable/drawable_input_dark</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">@color/previewSecondaryText</item>
         <item name="android:padding">8dp</item>
@@ -86,7 +103,7 @@
     </style>
 
     <style name="LoginMailEditText">
-        <item name="android:background">@drawable/drawable_input</item>
+        <item name="android:background">?attr/inputBackground</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textColorHint">@color/previewSecondaryText</item>
         <item name="android:padding">12dp</item>
@@ -95,12 +112,16 @@
         <item name="android:drawableTint">#FFFFFF</item>
         <item name="android:textColorHighlight">?attr/chat_TextCursorSelection</item>
         <item name="android:textCursorDrawable">@drawable/drawable_input_cursor</item>
-<!--        <item name="android:backgroundTint">@color/inputLoginCodeDark</item>-->
     </style>
 
     <style name="circleImage" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="roundedImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">5%</item>
     </style>
 
     <style name="PrivateChat.PopupMenu" parent="Widget.AppCompat.PopupMenu">
@@ -110,6 +131,7 @@
 
     <style name="SettingsBlock">
         <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingTop">15dp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:layout_width">match_parent</item>
@@ -150,6 +172,22 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="SettingsBlockInput">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:textColor">?attr/settings_text</item>
+        <item name="android:textColorHint">?attr/settings_subText</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">?attr/settings_text</item>
+        <item name="android:textColorHighlight">?attr/chat_TextCursorSelection</item>
+        <item name="android:textCursorDrawable">@drawable/drawable_input_cursor</item>
+        <item name="android:importantForAutofill">no</item>
+    </style>
+
+    <style name="SettingsBlockInput.Biography">
+
+    </style>
+
     <style name="SettingsHeaderTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -167,9 +205,21 @@
         <item name="android:layout_marginRight">20dp</item>
     </style>
 
+    <style name="ChatInputField">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:textColor">?attr/settings_text</item>
+        <item name="android:textColorHint">?attr/settings_subText</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">?attr/settings_text</item>
+        <item name="android:textColorHighlight">?attr/chat_TextCursorSelection</item>
+        <item name="android:textCursorDrawable">@drawable/drawable_input_cursor</item>
+        <item name="android:importantForAutofill">no</item>
+    </style>
+
 <!--    <style name="PopupAnimation">-->
-<!--        <item name="android:windowExitAnimation">@anim/animation_popup_from_top_to_bottom</item>-->
 <!--        <item name="android:windowEnterAnimation">@anim/animation_popup_from_bottom_to_top</item>-->
+<!--        <item name="android:windowExitAnimation">@anim/animation_popup_from_top_to_bottom</item>-->
 <!--    </style>-->
 
     <style name="Theme.Talkster.First" parent="Theme.AppCompat.Light.NoActionBar">
@@ -180,6 +230,8 @@
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
+
+        <item name="inputBackground">@drawable/drawable_input_dark</item>
 
         <item name="navBarBackground">#262425</item>
         <item name="navBarHeaderBackground">#35A07B</item>
@@ -195,24 +247,24 @@
         <item name="chat_message">#828282</item>
         <item name="chat_divider">#000000</item>
         <item name="chat_messageAction">@color/aquamarine</item>
-        <!--        Todo set to chat date-->
-
         <item name="chat_date">#787878</item>
-        <!--        Todo -->
         <item name="chat_muteIcon">#55555f</item>
         <item name="chat_inBubble">#222023</item>
-        <item name="chat_inBubbleSelected">#55405e</item>
+        <item name="chat_inBubbleSelected">@color/aquamarine_dark_2</item>
         <item name="chat_outBubble">#FFFFFF</item>
-        <item name="chat_outBubbleGradient1">#8FA457</item>
-        <item name="chat_outBubbleGradient2">#4FA149</item>
-        <item name="chat_outBubbleGradient3">#35A07B</item>
+        <item name="chat_outBubbleGradient1">#04c887</item>
+        <item name="chat_outBubbleGradient2">#04C89A</item>
+        <item name="chat_outBubbleGradient3">#04c8b4</item>
         <item name="chat_outBubbleSelected">#FFFFFF</item>
         <item name="chat_messageTextIn">#fafafa</item>
         <item name="chat_messageTextOut">#FFFFFF</item>
         <item name="chat_inTimeText">#807e81</item>
         <item name="chat_outTimeText">#FFFFFF</item>
-        <item name="chat_TextCursor">#b780d7</item>
-        <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_TextCursor">@color/aquamarine</item>
+        <item name="chat_TextCursorSelection">@color/aquamarine_dark_2</item>
+        <item name="chat_barIconColor">#FFFFFF</item>
+        <item name="chat_barIconColorActive">?attr/chat_messageAction</item>
+        <item name="chat_barBackground">?attr/actionBarDefault</item>
 
         <item name="radioBackground">#606060</item>
         <item name="radioBackgroundChecked">@color/aquamarine</item>
@@ -223,22 +275,22 @@
 
         <item name="button_textColor">#FFFFFF</item>
         <item name="button_iconColor">#FFFFFF</item>
-        <item name="button_BackgroundGradient1">@color/aquamarine</item>
+        <item name="button_BackgroundGradient1">#05f0ad</item>
         <item name="button_BackgroundGradient2">@color/aquamarine</item>
-        <item name="button_BackgroundGradient3">@color/aquamarine</item>
+        <item name="button_BackgroundGradient3">#05f0d8</item>
 
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
         <item name="settings_actionTextColor">#099877</item>
-        <item name="settings_iconColor">#8Af2f2f2</item>
-        <item name="settings_text">#FFFFFF</item>
+        <item name="settings_iconColor">#ff999999</item>
+        <item name="settings_text">#FFFFFFFF</item>
         <item name="settings_subText">#8Af2f2f2</item>
 
 
-        <item name="android:statusBarColor">?attr/actionBarDefault</item>
-        <item name="android:navigationBarColor">?attr/actionBarDefault</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">#FF000000</item>
+        <item name="android:navigationBarColor">#FF000000</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
 
@@ -250,6 +302,8 @@
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
+
+        <item name="inputBackground">@drawable/drawable_input_dark</item>
 
         <item name="navBarBackground">#262425</item>
         <item name="navBarHeaderBackground">#90CC84FF</item>
@@ -283,6 +337,9 @@
         <item name="chat_outTimeText">#FFFFFF</item>
         <item name="chat_TextCursor">#b780d7</item>
         <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_barIconColor">#FFFFFF</item>
+        <item name="chat_barIconColorActive">#c58fe4</item>
+        <item name="chat_barBackground">#262425</item>
 
         <item name="radioBackground">#606060</item>
         <item name="radioBackgroundChecked">#ba78dd</item>
@@ -293,23 +350,23 @@
 
         <item name="button_textColor">#FFFFFF</item>
         <item name="button_iconColor">#FFFFFF</item>
-        <item name="button_BackgroundGradient1">#c992eb</item>
+        <item name="button_BackgroundGradient1">#a25acc</item>
         <item name="button_BackgroundGradient2">#c992eb</item>
-        <item name="button_BackgroundGradient3">#c992eb</item>
+        <item name="button_BackgroundGradient3">#f7a3f5</item>
 
         <item name="settings_actionTextColor">#c992eb</item>
-        <item name="settings_iconColor">#8Af2f2f2</item>
-        <item name="settings_text">#FFFFFF</item>
+        <item name="settings_iconColor">#ff999999</item>
+        <item name="settings_text">#FFFFFFFF</item>
         <item name="settings_subText">#8Af2f2f2</item>
 
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
-        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:navigationBarColor">?attr/actionBarDefault</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:navigationBarColor">#FF000000</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
     <style name="Theme.Talkster.Third" parent="Theme.AppCompat.Light.NoActionBar">
@@ -320,6 +377,8 @@
         <item name="actionBarDefaultIcon">#FFFFFF</item>
         <item name="actionBarDefaultTitle">#FFFFFF</item>
         <item name="actionBarDefaultSubtitle">#8Af2f2f2</item>
+
+        <item name="inputBackground">@drawable/drawable_input_light</item>
 
         <item name="navBarBackground">#FFFFFF</item>
         <item name="navBarHeaderBackground">#a7637b</item>
@@ -336,9 +395,7 @@
         <item name="chat_message">#232323</item>
         <item name="chat_divider">#000000</item>
         <item name="chat_messageAction">#a7637b</item>
-        <!--        Todo set to chat date-->
         <item name="chat_date">#787878</item>
-        <!--        Todo -->
         <item name="chat_muteIcon">#292929</item>
         <item name="chat_inBubble">#222023</item>
         <item name="chat_inBubbleSelected">#6E4352</item>
@@ -353,6 +410,9 @@
         <item name="chat_outTimeText">#FFFFFF</item>
         <item name="chat_TextCursor">#6E4352</item>
         <item name="chat_TextCursorSelection">#69c18ade</item>
+        <item name="chat_barIconColor">#494949</item>
+        <item name="chat_barIconColorActive">#a7637b</item>
+        <item name="chat_barBackground">#FFFFFF</item>
 
         <item name="radioBackground">#606060</item>
         <item name="radioBackgroundChecked">#6E4352</item>
@@ -368,22 +428,22 @@
         <item name="button_BackgroundGradient3">#6E4352</item>
 
         <item name="settings_actionTextColor">#6E4352</item>
-        <item name="settings_iconColor">#8A393939</item>
-        <item name="settings_text">#3C3C3C</item>
+        <item name="settings_iconColor">#ff575757</item>
+        <item name="settings_text">#FF3C3C3C</item>
         <item name="settings_subText">#8A2B2B2B</item>
 
         <item name="dialogBackground">#1e1e1e</item>
         <item name="errorColor">#cc4747</item>
 
-        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:statusBarColor">#FF000000</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:navigationBarColor">#00000000</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:navigationBarColor">#FF000000</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
     
     <style name="customToast">
-        <item name="stColorBackground">@color/aquamarine</item>
+        <item name="stColorBackground">?attr/chat_messageAction</item>
         <item name="stTextColor">@android:color/white</item>
         <item name="stTextBold">true</item>
         <item name="stRadius">10dp</item>

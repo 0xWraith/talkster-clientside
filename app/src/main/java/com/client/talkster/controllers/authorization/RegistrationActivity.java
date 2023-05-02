@@ -2,6 +2,7 @@ package com.client.talkster.controllers.authorization;
 
 import static com.client.talkster.api.APIEndpoints.TALKSTER_API_AUTH_ENDPOINT_REGISTER_USER;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -17,10 +18,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.R;
 import com.client.talkster.api.APIHandler;
+import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.controllers.OfflineActivity;
 import com.client.talkster.dto.AuthenticationDTO;
 import com.client.talkster.dto.RegistrationDTO;
+import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.utils.BundleExtraNames;
@@ -30,13 +34,13 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 
+import io.github.muddz.styleabletoast.StyleableToast;
 import okhttp3.Call;
 import okhttp3.Response;
 
 public class RegistrationActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler
 {
 
-    private UserJWT userJWT;
     private Vibrator vibrator;
     private ImageButton continueButton;
     private EditText lastNameInput;
@@ -61,6 +65,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
         firstNameInput = findViewById(R.id.firstNameInput);
         continueButton = findViewById(R.id.continueButton);
 
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         continueButton.setOnClickListener(view ->
         {
@@ -86,6 +91,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
             registrationDTO.setFirstname(firstName);
             registrationDTO.setMail(authenticationDTO.getMail());
 
+            UserJWT userJWT = UserAccount.getInstance().getUserJWT();
             apiHandler.apiPOST(TALKSTER_API_AUTH_ENDPOINT_REGISTER_USER, registrationDTO, userJWT.getAccessToken());
 
         });
@@ -99,7 +105,6 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
         if(bundle.isEmpty())
             return;
 
-        userJWT = (UserJWT) bundle.get(BundleExtraNames.USER_JWT);
         authenticationDTO = new AuthenticationDTO(bundle.get(BundleExtraNames.USER_MAIL).toString());
     }
 
@@ -107,6 +112,7 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
     {
         vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
         field.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_mail_input_error));
+        runOnUiThread(() -> StyleableToast.makeText(this, "Invalid input!", R.style.customToast).show());
     }
 
     @Override
@@ -133,11 +139,17 @@ public class RegistrationActivity extends AppCompatActivity implements IActivity
             if(responseCode != 200)
                 throw new IOException("Unexpected response " + response);
 
-            UserJWT userJWT = new Gson().fromJson(responseBody, UserJWT.class);
+            VerifiedUserDTO verifiedUserDTO = new Gson().fromJson(responseBody, VerifiedUserDTO.class);
+
+            UserAccount userAccount = UserAccount.getInstance();
+            userAccount.setUser(verifiedUserDTO.getUser());
+            userAccount.setUserJWT(verifiedUserDTO.getUserJWT());
+
             Intent homeIntent = new Intent(this, HomeActivity.class);
 
-            UserAccountManager.saveAccount(this, userJWT);
-            homeIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
+            UserAccountManager.saveAccount(this, verifiedUserDTO.getUserJWT());
+
+            //homeIntent.putExtra(BundleExtraNames.USER_JWT, userJWT);
 
             startActivity(homeIntent);
             finish();

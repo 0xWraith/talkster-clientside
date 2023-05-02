@@ -5,14 +5,14 @@
     android:id="@+id/progressb"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".controllers.OfflineActivity">
 
     <View
         android:id="@+id/view4"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,7 +23,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="20dp"
         android:text="@string/appname"
-        android:textColor="@color/previewMainText"
+        android:textColor="?attr/actionBarDefaultTitle"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/view4"
@@ -31,11 +31,11 @@
         app:layout_constraintTop_toTopOf="@+id/view4" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/circularBackground"
+        android:id="@+id/profileImage"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:layout_margin="8dp"
-        android:background="@color/erie_black2"
+        android:background="?attr/actionBarDefault"
         app:layout_constraintBottom_toTopOf="@+id/textView9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,18 +47,19 @@
         android:id="@+id/imageView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/circularBackground"
-        app:layout_constraintEnd_toEndOf="@+id/circularBackground"
-        app:layout_constraintStart_toStartOf="@+id/circularBackground"
-        app:layout_constraintTop_toTopOf="@+id/circularBackground"
-        app:srcCompat="@drawable/wifi_off_128" />
+        app:layout_constraintBottom_toBottomOf="@+id/profileImage"
+        app:layout_constraintEnd_toEndOf="@+id/profileImage"
+        app:layout_constraintStart_toStartOf="@+id/profileImage"
+        app:layout_constraintTop_toTopOf="@+id/profileImage"
+        app:srcCompat="@drawable/wifi_off_128"
+        app:tint="?attr/actionBarDefaultTitle"/>
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/offline_header"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/settings_text"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -73,7 +74,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/offline_description"
         android:textAlignment="center"
-        android:textColor="@color/previewSecondaryText"
+        android:textColor="?attr/settings_subText"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@+id/textView9"
         app:layout_constraintStart_toStartOf="@+id/textView9"
@@ -88,6 +89,7 @@
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="72dp"
         android:text="Retry"
+        android:textColor="?attr/button_textColor"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

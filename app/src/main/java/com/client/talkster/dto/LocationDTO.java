@@ -4,6 +4,8 @@ import android.location.Location;
 
 import com.client.talkster.adapters.LocationAdapter;
 
+import java.util.List;
+
 public class LocationDTO
 {
     private long userid;
@@ -12,22 +14,14 @@ public class LocationDTO
     private String jwttoken;
     private double latitude;
     private double longitude;
+    private final List<Long> sendto;
 
-    public LocationDTO() {}
+    public LocationDTO() { sendto = null; }
 
-    public LocationDTO(long userid, String username, String jwttoken, LocationAdapter locationAdapter)
+    public LocationDTO(long userid, String username, String jwttoken, List<Long> sendto, Location location)
     {
         this.userid = userid;
-        this.username = username;
-        this.jwttoken = jwttoken;
-        this.speed = locationAdapter.getSpeed();
-        this.latitude = locationAdapter.getLatitude();
-        this.longitude = locationAdapter.getLongitude();
-    }
-
-    public LocationDTO(long userid, String username, String jwttoken, Location location)
-    {
-        this.userid = userid;
+        this.sendto = sendto;
         this.username = username;
         this.jwttoken = jwttoken;
         this.speed = location.getSpeed() * 3.6;
@@ -37,6 +31,7 @@ public class LocationDTO
 
     public long getuserid() { return userid; }
     public double getSpeed() { return speed; }
+    public List<Long> getSendto() { return sendto; }
     public String getUsername() { return username; }
     public double getLatitude() { return latitude; }
     public double getLongitude() { return longitude; }

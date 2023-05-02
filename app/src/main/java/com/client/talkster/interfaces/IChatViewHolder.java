@@ -1,7 +1,5 @@
 package com.client.talkster.interfaces;
 
-@FunctionalInterface
-public interface IThemeManagerFragmentListener
-{
+public interface IChatViewHolder {
     void onThemeChanged();
 }

@@ -8,59 +8,55 @@
     android:background="?attr/windowBackgroundGray"
     tools:context=".SettingsActivity">
 
-    <RelativeLayout
+    <View
         android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="88dp"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
         android:background="?attr/actionBarDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/toolbarBackIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="31dp"
-            android:background="@color/transparent"
-            app:srcCompat="@drawable/arrow_back_24"
-            app:tint="@android:color/white" />
+    <ImageButton
+        android:id="@+id/toolbarBackIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/arrow_back_24"
+        app:tint="@android:color/white" />
 
-        <TextView
-            android:id="@+id/toolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_toEndOf="@+id/toolbarBackIcon"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="31dp"
-            android:gravity="center"
-            android:text="@string/settings"
-            android:textColor="?attr/actionBarDefaultTitle"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/toolbarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:gravity="center"
+        android:text="@string/settings"
+        android:textColor="?attr/actionBarDefaultTitle"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toEndOf="@+id/toolbarBackIcon"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:overScrollMode="never"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/subToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="88dp"
@@ -75,38 +71,46 @@
                     android:id="@+id/userAvatarImage"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="10dp"
                     android:src="@drawable/account_circle_64"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/circleImage"
                     app:strokeColor="@null" />
 
                 <TextView
                     android:id="@+id/userNameText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_toEndOf="@+id/userAvatarImage"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginEnd="16dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="wraith"
                     android:textColor="?attr/actionBarDefaultTitle"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@+id/userStatusText"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/userStatusText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_toEndOf="@+id/userAvatarImage"
-                    android:layout_below="@id/userNameText"
+                    android:layout_marginEnd="16dp"
                     android:text="online"
                     android:textColor="?attr/actionBarDefaultSubtitle"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/userAvatarImage"
+                    app:layout_constraintTop_toBottomOf="@+id/userNameText" />
 
-            </RelativeLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <RelativeLayout
                 android:id="@+id/settingsBlock1"
@@ -123,12 +127,12 @@
                 <LinearLayout
                     android:id="@+id/settingsMailBlock"
                     style="@style/SettingsBlockItem"
-                    android:orientation="vertical"
-                    android:layout_below="@+id/headerText1">
+                    android:layout_below="@+id/headerText1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/userMailText"
-                        style="@style/SettingsBlockText"/>
+                        style="@style/SettingsBlockText" />
 
                     <TextView
                         android:id="@+id/settingsSubText1"
@@ -140,12 +144,12 @@
                 <LinearLayout
                     android:id="@+id/settingsUsernameBlock"
                     style="@style/SettingsBlockItem"
-                    android:orientation="vertical"
-                    android:layout_below="@+id/settingsMailBlock">
+                    android:layout_below="@+id/settingsMailBlock"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/loginText"
-                        style="@style/SettingsBlockText"/>
+                        style="@style/SettingsBlockText" />
 
                     <TextView
                         android:id="@+id/settingsSubText2"
@@ -157,12 +161,12 @@
                 <LinearLayout
                     android:id="@+id/settingsBiographyBlock"
                     style="@style/SettingsBlockItem"
-                    android:orientation="vertical"
-                    android:layout_below="@+id/settingsUsernameBlock">
+                    android:layout_below="@+id/settingsUsernameBlock"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/biographyText"
-                        style="@style/SettingsBlockText"/>
+                        style="@style/SettingsBlockText" />
 
                     <TextView
                         android:id="@+id/settingsSubText3"
@@ -189,26 +193,26 @@
                 <LinearLayout
                     android:id="@+id/settingsChatBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/headerText2">
+                    android:layout_below="@+id/headerText2"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon1"
                         style="@style/SettingsBlockIcon"
-                        android:src="@drawable/ic_chat" />
+                        android:src="@drawable/ic_theme"/>
 
                     <TextView
                         android:id="@+id/settingsText1"
                         style="@style/SettingsBlockText"
-                        android:text="@string/chat_settings" />
+                        android:text="@string/change_theme" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/settingsSecurityBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/settingsChatBlock">
+                    android:layout_below="@+id/settingsChatBlock"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon2"
@@ -225,8 +229,8 @@
                 <LinearLayout
                     android:id="@+id/settingsNotificationBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/settingsSecurityBlock">
+                    android:layout_below="@+id/settingsSecurityBlock"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon3"
@@ -243,8 +247,8 @@
                 <LinearLayout
                     android:id="@+id/settingsDevicesBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/settingsNotificationBlock">
+                    android:layout_below="@+id/settingsNotificationBlock"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon4"
@@ -261,8 +265,8 @@
                 <LinearLayout
                     android:id="@+id/settingsLanguageBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/settingsDevicesBlock">
+                    android:layout_below="@+id/settingsDevicesBlock"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon5"
@@ -285,7 +289,7 @@
                 style="@style/SettingsBlock"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settingsBlock2">
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock3">
 
                 <TextView
                     android:id="@+id/headerText3"
@@ -295,8 +299,8 @@
                 <LinearLayout
                     android:id="@+id/settingsFAQBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/headerText3">
+                    android:layout_below="@+id/headerText3"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon6"
@@ -313,8 +317,8 @@
                 <LinearLayout
                     android:id="@+id/settingsPolicyBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/settingsFAQBlock">
+                    android:layout_below="@+id/settingsFAQBlock"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon7"
@@ -345,8 +349,8 @@
                 <LinearLayout
                     android:id="@+id/settingsBugBlock"
                     style="@style/SettingsBlockItem.Icon"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/headerText4">
+                    android:layout_below="@+id/headerText4"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/settingsIcon8"

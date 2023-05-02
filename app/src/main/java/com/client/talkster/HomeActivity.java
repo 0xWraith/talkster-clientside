@@ -23,13 +23,15 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.client.talkster.adapters.ViewPagerAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.api.APIStompWebSocket;
-import com.client.talkster.api.WebSocketPrivateChatSubscriber;
-import com.client.talkster.api.WebSocketPublicChatSubscriber;
-import com.client.talkster.api.WebSocketPublicMapSubscriber;
-import com.client.talkster.classes.Chat;
+import com.client.talkster.api.websocket.APIStompWebSocket;
+import com.client.talkster.api.websocket.listeners.WebSocketGroupChatCreatedSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketGroupChatSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketPrivateChatSubscriber;
+import com.client.talkster.api.websocket.listeners.WebSocketMapSubscriber;
 import com.client.talkster.classes.FileContent;
-import com.client.talkster.classes.Message;
+import com.client.talkster.classes.chat.Chat;
+import com.client.talkster.classes.chat.GroupChat;
+import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
@@ -38,19 +40,25 @@ import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.controllers.talkster.ChatsFragment;
 import com.client.talkster.controllers.talkster.MapFragment;
 import com.client.talkster.controllers.talkster.PeoplesFragment;
+import com.client.talkster.dto.EmptyDTO;
 import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.dto.MessageDTO;
 import com.client.talkster.dto.TokenDTO;
+import com.client.talkster.dto.UserChatsDTO;
+import com.client.talkster.dto.UserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IActivity;
 import com.client.talkster.interfaces.IBroadcastRegister;
-import com.client.talkster.interfaces.IChatListener;
-import com.client.talkster.interfaces.IChatWebSocketHandler;
+import com.client.talkster.interfaces.chat.IChatListener;
+import com.client.talkster.interfaces.chat.IChatWebSocketHandler;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
 import com.client.talkster.interfaces.IMapWebSocketHandler;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.chat.IGroupChatListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
+import com.client.talkster.services.LocationService;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
+import com.client.talkster.utils.enums.EChatType;
 import com.client.talkster.utils.enums.EPrivateChatAction;
 import com.client.talkster.utils.exceptions.UserUnauthorizedException;
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -59,34 +67,36 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import org.modelmapper.ModelMapper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.github.muddz.styleabletoast.StyleableToast;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler, IMapWebSocketHandler, IBroadcastRegister, IThemeManagerActivityListener
+public class HomeActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IChatWebSocketHandler, IMapWebSocketHandler, IBroadcastRegister, IThemeManagerActivityListener, IGroupChatListener
 {
 
     private String FCMToken;
-    private UserAccount userAccount;
     private IChatListener iChatListener;
     private ArrayList<Fragment> fragments;
     private APIStompWebSocket apiStompWebSocket;
     private BroadcastReceiver chatBroadCastReceiver;
     private BroadcastReceiver locationBroadCastReceiver;
     private IMapGPSPositionUpdate iMapGPSPositionUpdate;
+    private WebSocketGroupChatSubscriber webSocketGroupChatSubscriber;
 
     private MapFragment mapFragment;
     private ChatsFragment chatsFragment;
     private PeoplesFragment peoplesFragment;
     private ViewPager2 homeViewPager;
     private BottomNavigationView bottomNavigation;
-
 
 
     private ConstraintLayout homeLayout;
@@ -101,7 +111,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
         getBundleElements();
         getUIElements();
-        bottomNavigation.setSelectedItemId(R.id.mapMenuID);
     }
 
     @Override
@@ -118,9 +127,9 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     public void getUIElements()
     {
 
-        mapFragment = new MapFragment(UserAccount.getInstance().getUserJWT());
-        chatsFragment = new ChatsFragment(UserAccount.getInstance().getUserJWT(), UserAccount.getInstance().getUser());
-        peoplesFragment = new PeoplesFragment(UserAccount.getInstance().getUserJWT(), UserAccount.getInstance().getUser());
+        mapFragment = new MapFragment();
+        chatsFragment = new ChatsFragment();
+        peoplesFragment = new PeoplesFragment();
 
         iChatListener = chatsFragment;
         iMapGPSPositionUpdate = mapFragment;
@@ -137,21 +146,33 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         initializeBottomNavigation();
         initializeSocketConnection();
 
-//        Intent intent = new Intent(this, LocationService.class);
-//        intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
-//        startService(intent);
+        User user = UserAccount.getInstance().getUser();
+        List<User> contacts = user.getContacts();
+        List<Long> contactIDs = user.getContactIDs();
 
+        contacts.forEach(contact ->
+        {
+            if(!contactIDs.contains(contact.getId()))
+                contactIDs.add(contact.getId());
+        });
+
+        if(user.getMapTracker())
+        {
+            Intent intent = new Intent(this, LocationService.class);
+            intent.setAction(BundleExtraNames.LOCATION_SERVICE_START);
+            startService(intent);
+        }
     }
 
     private void initializeSocketConnection()
     {
-        userAccount = UserAccount.getInstance();
-        apiStompWebSocket = new APIStompWebSocket();
-        peoplesFragment.apiStompWebSocket = apiStompWebSocket;
+        long userId = UserAccount.getInstance().getUser().getId();
+        apiStompWebSocket = APIStompWebSocket.getInstance();
 
-        apiStompWebSocket.addTopic("/chatroom/public", new WebSocketPublicChatSubscriber(this));
-        apiStompWebSocket.addTopic("/user/"+ userAccount.getUser().getId() +"/private", new WebSocketPrivateChatSubscriber(this));
-        apiStompWebSocket.addTopic("/map/public", new WebSocketPublicMapSubscriber(this));
+        webSocketGroupChatSubscriber = new WebSocketGroupChatSubscriber(this);
+        apiStompWebSocket.addTopic("/user/" + userId + "/private", new WebSocketPrivateChatSubscriber(this));
+        apiStompWebSocket.addTopic("/user/" + userId + "/group/created", new WebSocketGroupChatCreatedSubscriber(this));
+        apiStompWebSocket.addTopic("/user/" + userId + "/map", new WebSocketMapSubscriber(this));
 
         apiStompWebSocket.connect();
     }
@@ -176,39 +197,35 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 String action = intent.getAction();
                 Bundle bundle = intent.getExtras();
 
-                Log.d("BROADCAST", "onReceive: " + action);
-
-                if(action.equals(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST))
-                {
-                    MessageDTO messageDTO = (MessageDTO) bundle.get(BundleExtraNames.CHAT_SEND_MESSAGE_BUNDLE);
-                    apiStompWebSocket.getWebSocketClient().send("/app/private-message", new Gson().toJson(messageDTO)).subscribe();
-                }
-                else if(action.equals(BundleExtraNames.CHAT_ACTION_BROADCAST))
+                if(action.equals(BundleExtraNames.CHAT_ACTION_BROADCAST))
                 {
                     long chatID;
+                    EChatType chatType;
                     MessageDTO messageDTO;
                     EPrivateChatAction actionType;
 
+                    chatType = (EChatType)bundle.get(BundleExtraNames.CHAT_TYPE);
                     chatID = (long)bundle.get(BundleExtraNames.CHAT_ACTION_CHAT_ID);
                     messageDTO = bundle.getParcelable(BundleExtraNames.CHAT_ACTION_MESSAGE_DATA);
                     actionType = (EPrivateChatAction) bundle.get(BundleExtraNames.CHAT_ACTION_TYPE);
+
 
                     switch(actionType)
                     {
                         case CLEAR_CHAT_HISTORY:
                         {
-                            iChatListener.onChatHistoryCleared(chatID);
+                            iChatListener.onChatHistoryCleared(chatID, chatType);
                             break;
                         }
 
                         case DELETE_CHAT:
                         {
-                            iChatListener.onChatDeleted(chatID);
+                            iChatListener.onChatDeleted(chatID, chatType);
                             break;
                         }
                         case MUTE_CHAT:
                         {
-                            iChatListener.onChatMuted(chatID, messageDTO.getreceiverid());
+                            iChatListener.onChatMuted(chatID, messageDTO.getreceiverid(), chatType);
                             return;
                         }
                     }
@@ -231,7 +248,8 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
                 if(!action.equals(BundleExtraNames.LOCATION_SERVICE_BROADCAST))
                     return;
 
-                userAccount = UserAccount.getInstance();
+                UserAccount userAccount = UserAccount.getInstance();
+
                 User user = userAccount.getUser();
                 UserJWT userJWT = userAccount.getUserJWT();
 
@@ -239,13 +257,12 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
                 iMapGPSPositionUpdate.onMapGPSPositionUserUpdate(location);
 
-                LocationDTO locationDTO = new LocationDTO(user.getId(), user.getFullName(), userJWT.getAccessToken(), location);
+                LocationDTO locationDTO = new LocationDTO(user.getId(), user.getFullName(), userJWT.getAccessToken(), user.getContactIDs(), location);
                 apiStompWebSocket.getWebSocketClient().send("/app/map", new Gson().toJson(locationDTO)).subscribe();
             }
         };
 
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BundleExtraNames.CHAT_SEND_MESSAGE_BROADCAST);
         intentFilter.addAction(BundleExtraNames.CHAT_ACTION_BROADCAST);
 
         registerReceiver(chatBroadCastReceiver, intentFilter);
@@ -323,21 +340,23 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             if(response.body() == null)
                 throw new IOException("Unexpected response " + response);
 
-
             int responseCode = response.code();
-
 
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT))
             {
                 String responseBody = response.body().string();
-                Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                PrivateChat chat = new Gson().fromJson(responseBody, PrivateChat.class);
                 runOnUiThread (() -> iChatListener.addChat(chat));
             }
-            if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO))
+            else if(apiUrl.equals(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO))
             {
+
                 if(responseCode != 200)
                     throw new UserUnauthorizedException("Unexpected response " + response);
+
+
                 String responseBody = response.body().string();
+
                 Chat[] chats = new Gson().fromJson(responseBody, Chat[].class);
                 List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
 
@@ -345,64 +364,112 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             }
             else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_CREATE))
             {
-                if(responseCode != 200){
-                    if(responseCode == 409){
+                if(responseCode != 200)
+                {
+                    if(responseCode == 409)
                         runOnUiThread(() -> StyleableToast.makeText(this, "Friend already added!", R.style.friendAlreadyAdded).show());
-                    }
-                    if(responseCode == 404){
+
+                    if(responseCode == 404)
                         runOnUiThread(() -> StyleableToast.makeText(this, "Friend not found!", R.style.friendNotFound).show());
-                    }
-                    else{throw new UserUnauthorizedException("Unexpected response " + response);}
+
+                    else
+                        throw new UserUnauthorizedException("Unexpected response " + response);
                 }
-                else{
+                else
+                {
                     String responseBody = response.body().string();
-                    Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                    PrivateChat chat = new Gson().fromJson(responseBody, PrivateChat.class);
                     runOnUiThread(() -> StyleableToast.makeText(this, "Friend added!", R.style.friendAdded).show());
                     runOnUiThread (() -> iChatListener.addChat(chat));
+
+                    APIHandler<EmptyDTO, HomeActivity> apiHandler = new APIHandler<>(this);
+                    apiHandler.apiGET(String.format(Locale.getDefault(), "%s/%d", APIEndpoints.TALKSTER_API_USER_GET_DATA, chat.getReceiverID()), UserAccount.getInstance().getUserJWT().getAccessToken());
                 }
             }
             else if(apiUrl.equals(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS))
             {
                 if(responseCode != 200)
                     throw new UserUnauthorizedException("Unexpected response " + response);
-                String responseBody = response.body().string();
-                Chat[] chats = new Gson().fromJson(responseBody, Chat[].class);
-                List<Chat> chatList = new ArrayList<>(Arrays.asList(chats));
 
-                runOnUiThread (() -> iChatListener.updateChatList(chatList));
+                String responseBody = response.body().string();
+
+                UserChatsDTO userChatsDTO = new Gson().fromJson(responseBody, UserChatsDTO.class);
+
+                ArrayList<PrivateChat> chatList = userChatsDTO.getPrivateChats();
+                ArrayList<GroupChat> groupChatList = userChatsDTO.getGroupChats();
+
+                runOnUiThread (() ->
+                {
+                    for(GroupChat groupChat : groupChatList)
+                        apiStompWebSocket.addTopic(String.format(Locale.getDefault(), "/user/%d/group/message", groupChat.getId()), webSocketGroupChatSubscriber);
+
+                    iChatListener.updateChatList(chatList, groupChatList);
+                });
             }
             else if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT))
             {
                 if (responseCode != 200)
                     throw new UserUnauthorizedException("Unexpected response " + response);
 
-                userAccount = UserAccount.getInstance();
+                UserAccount userAccount = UserAccount.getInstance();
 
                 String responseBody = response.body().string();
-                Chat chat = new Gson().fromJson(responseBody, Chat.class);
-                Intent privateChatIntent = new Intent(getApplicationContext(), PrivateChatActivity.class);
+                PrivateChat chat = new Gson().fromJson(responseBody, PrivateChat.class);
 
+                Intent privateChatIntent = new Intent(getApplicationContext(), PrivateChatActivity.class);
                 privateChatIntent.putExtra(BundleExtraNames.USER_CHAT, chat);
-                privateChatIntent.putExtra(BundleExtraNames.USER_JWT, userAccount.getUserJWT());
 
                 startActivity(privateChatIntent);
             }
-            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE)) {
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_UPDATE_PROFILE))
+            {
                 if (responseCode != 200){
                     throw new UserUnauthorizedException("Unexpected response " + response);
                 }
                 runOnUiThread (() -> peoplesFragment.updateProfilePicture());
             }
-            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_DELETE_PROFILE)) {
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_FILE_DELETE_PROFILE))
+            {
                 if (responseCode != 200){
                     throw new UserUnauthorizedException("Unexpected response " + response);
                 }
                 runOnUiThread(() -> StyleableToast.makeText(this, "Profile picture deleted!", R.style.pictureRemoved).show());
                 runOnUiThread (() -> peoplesFragment.updateProfilePicture());
             }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_USER_GET_DATA))
+            {
+                if(responseCode == 401)
+                    throw new UserUnauthorizedException("TALKSTER_API_USER_GET_DATA: " + response);
+
+                if(responseCode == 404)
+                    throw new UserUnauthorizedException("TALKSTER_API_USER_GET_DATA: " + response);
+
+
+                ModelMapper modelMapper = new ModelMapper();
+                String responseBody = response.body().string();
+                UserDTO user = new Gson().fromJson(responseBody, UserDTO.class);
+
+                UserAccount.getInstance().getUser().addContact(modelMapper.map(user, User.class));
+            }
+            else if(apiUrl.contains(APIEndpoints.TALKSTER_API_GROUP_GET))
+            {
+                if(responseCode == 401)
+                    throw new UserUnauthorizedException("TALKSTER_API_USER_GET_DATA: " + response);
+
+                if(responseCode == 404)
+                    throw new UserUnauthorizedException("TALKSTER_API_USER_GET_DATA: " + response);
+
+                String responseBody = response.body().string();
+                GroupChat groupChat = new Gson().fromJson(responseBody, GroupChat.class);
+
+                runOnUiThread (() -> {
+                    iChatListener.addChat(groupChat);
+                    apiStompWebSocket.addTopic(String.format(Locale.getDefault(), "/user/%d/group/message", groupChat.getId()), webSocketGroupChatSubscriber);
+                });
+            }
         }
         catch (IOException | UserUnauthorizedException e) { e.printStackTrace(); }
-        catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster", "Failed to parse: " + exception.getMessage()); }
+        catch (IllegalStateException | JsonSyntaxException exception) { Log.e("Talkster " + apiUrl, "Failed to parse: " + exception.getMessage()); }
     }
 
     private void initializeBottomNavigation()
@@ -413,22 +480,23 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         bottomNavigation.setOnItemSelectedListener(item -> {
             int ID = item.getItemId();
 
-            if (ID == R.id.chatMenuID) {
+            if (ID == R.id.chatMenuID)
                 homeViewPager.setCurrentItem(0);
-            }
-            else if (ID == R.id.mapMenuID){
+
+            else if (ID == R.id.mapMenuID)
                 homeViewPager.setCurrentItem(1);
-            }
-            else if(ID == R.id.peoplesMenuID) {
+
+            else if(ID == R.id.peoplesMenuID)
                 homeViewPager.setCurrentItem(2);
-            }
+
             return true;
         });
     }
 
     public void selectNavigationButton(int currentPosition)
     {
-        switch (currentPosition){
+        switch (currentPosition)
+        {
             case 0:
                 bottomNavigation.setSelectedItemId(R.id.chatMenuID);
                 break;
@@ -438,27 +506,28 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             case 2:
                 bottomNavigation.setSelectedItemId(R.id.peoplesMenuID);
                 break;
-
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 101) {
+
+        if (resultCode == Activity.RESULT_OK && requestCode == 101)
+        {
             Uri uri = data.getData();
             sendProfileImage(uri);
-
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
-        } else {
-            //Toast.makeText(this, "Request code:"+requestCode+" result code:"+resultCode, Toast.LENGTH_SHORT).show();
         }
+        else if (resultCode == ImagePicker.RESULT_ERROR)
+            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+
     }
 
     private void sendProfileImage(Uri uri)
     {
-        userAccount = UserAccount.getInstance();
+        UserAccount userAccount = UserAccount.getInstance();
 
         FileContent fileContent = new FileContent();
         APIHandler<FileContent, HomeActivity> apiHandler = new APIHandler<>(this);
@@ -482,10 +551,6 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
     public void onMessageReceived(String messageRAW) { iChatListener.onMessageReceived(messageRAW); }
 
     @Override
-    @Deprecated
-    public void onSendPrivateMessage(Message message) { }
-
-    @Override
     public void onMapMessageReceived(String locationRAW) { iMapGPSPositionUpdate.onMapGPSPositionUpdate(locationRAW); }
 
     @Override
@@ -503,4 +568,14 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
         peoplesFragment.onThemeChanged();
 
     }
+
+    @Override
+    public void onGroupChatCreated(long groupChatID)
+    {
+        APIHandler<EmptyDTO, HomeActivity> apiHandler = new APIHandler<>(this);
+        apiHandler.apiGET(String.format(Locale.getDefault(), "%s/%d", APIEndpoints.TALKSTER_API_GROUP_GET, groupChatID), UserAccount.getInstance().getUserJWT().getAccessToken());
+    }
+
+    @Override
+    public void onGroupChatMessageReceived(String messageRAW) { chatsFragment.onGroupChatMessageReceived(messageRAW); }
 }

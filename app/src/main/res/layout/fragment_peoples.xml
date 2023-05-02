@@ -12,37 +12,42 @@
         android:id="@+id/leftPager"
         android:layout_width="32dp"
         android:layout_height="0dp"
-        android:layout_marginTop="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+
+    <View
+        android:id="@+id/toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:background="?attr/actionBarDefault" />
+
+    <TextView
+        android:id="@+id/toolbarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:gravity="center"
+        android:text="@string/appname"
+        android:textColor="?attr/actionBarDefaultTitle"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <RelativeLayout
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="88dp"
-        android:background="?attr/actionBarDefault"
+    <ImageButton
+        android:id="@+id/settingsButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="6dp"
+        android:background="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/toolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="31dp"
-            android:gravity="center"
-            android:text="@string/appname"
-            android:textColor="?attr/actionBarDefaultTitle"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/menu_32"
+        app:tint="?attr/actionBarDefaultTitle" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profileImageView"
@@ -95,13 +100,12 @@
 
         <TextView
             android:id="@+id/firstNameView"
+            style="@style/SettingsBlockText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="48dp"
             android:text="First name"
-            android:textColor="@color/previewMainText"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -159,13 +163,12 @@
 
         <TextView
             android:id="@+id/lastNameView"
+            style="@style/SettingsBlockText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="48dp"
             android:text="Last name"
-            android:textColor="@color/previewMainText"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -226,29 +229,33 @@
     <EditText
         android:id="@+id/mailEditText"
         style="@style/LoginMailEditText"
-        android:inputType="textEmailAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="48dp"
+        android:autofillHints="E-mail"
         android:ems="10"
         android:hint="e-mail"
-        android:autofillHints="E-mail"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@+id/addFriendButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toBottomOf="@+id/addFriendTitle" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/addFriendTitle"
+        style="@style/SettingsHeaderTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:textColor="@color/previewMainText"
-        android:textSize="18sp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
         android:text="Add Friends"
-        app:layout_constraintStart_toStartOf="@+id/mailEditText"
-        app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
+        app:layout_constraintBottom_toTopOf="@+id/mailEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageEditButton"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
         android:id="@+id/addFriendButton"
@@ -256,14 +263,16 @@
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
+        android:drawableRight="@drawable/person_add_24"
+        android:drawablePadding="0dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="48dp"
         android:text="Add Friend"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:drawableRight="@drawable/person_add_24"
-        android:drawablePadding="0dp"
-        android:paddingRight="48dp"
-        android:paddingLeft="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline7"
         app:layout_constraintEnd_toEndOf="@+id/mailEditText"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/mailEditText"
         app:layout_constraintTop_toBottomOf="@+id/mailEditText" />
 
@@ -272,19 +281,19 @@
         android:id="@+id/profileView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/mediaChooserLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/toolbar" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mediaChooserLayout"
         android:layout_width="0dp"
         android:layout_height="96dp"
         android:background="@drawable/drawable_rounded_top"
-        android:visibility="visible"
         android:elevation="5dp"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent">
@@ -349,6 +358,86 @@
             app:srcCompat="@drawable/close_24"
             app:tint="@android:color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/biographyText"
+        style="@style/SettingsBlockSubtext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:maxHeight="100dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/biographyEditButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/mailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/usernameText" />
+
+    <TextView
+        android:id="@+id/usernameText"
+        style="@style/SettingsBlockSubtext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="username"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/biographyText"
+        app:layout_constraintEnd_toStartOf="@+id/usernameEditButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/mailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/addFriendButton" />
+
+    <TextView
+        android:id="@+id/biographyTitle"
+        style="@style/SettingsHeaderTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/biography"
+        app:layout_constraintBottom_toTopOf="@+id/biographyText"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/usernameEditButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/drawable_button_gradient_round"
+        app:layout_constraintBottom_toBottomOf="@+id/usernameText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/usernameText"
+        app:srcCompat="@drawable/edit_24"
+        app:tint="@android:color/white" />
+
+    <TextView
+        android:id="@+id/usernameTitle"
+        style="@style/SettingsHeaderTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/username"
+        app:layout_constraintBottom_toTopOf="@+id/usernameText"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/biographyEditButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/drawable_button_gradient_round"
+        app:layout_constraintBottom_toBottomOf="@+id/biographyText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/biographyText"
+        app:srcCompat="@drawable/edit_24"
+        app:tint="@android:color/white" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

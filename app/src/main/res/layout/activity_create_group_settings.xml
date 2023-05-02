@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/windowBackgroundWhite"
+    tools:context=".activities.CreateGroupSettingsActivity">
+
+    <View
+        android:id="@+id/toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:background="?attr/actionBarDefault"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/toolbarBackIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/arrow_back_24"
+        app:tint="@android:color/white" />
+
+    <TextView
+        android:id="@+id/toolbarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:gravity="center"
+        android:text="@string/new_group"
+        android:textColor="?attr/actionBarDefaultTitle"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toEndOf="@+id/toolbarBackIcon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/settingsBlock1"
+        style="@style/SettingsBlock"
+        android:layout_marginTop="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <TextView
+            android:id="@+id/headerText1"
+            style="@style/SettingsHeaderTextView"
+            android:text="@string/new_group" />
+
+        <LinearLayout
+            style="@style/SettingsBlockItem"
+            android:orientation="horizontal"
+            android:layout_below="@+id/headerText1">
+
+            <EditText
+                android:id="@+id/groupNameInput"
+                style="@style/SettingsBlockInput.Biography"
+                android:layout_weight="1"
+                android:maxLength="70"
+                android:inputType="textMultiLine"
+                android:padding="8dp"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
+                android:hint="@string/enter_group_name" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/settingsBlock3"
+        style="@style/SettingsBlock"
+        android:paddingEnd="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsBlock1">
+
+        <TextView
+            android:id="@+id/headerText2"
+            style="@style/SettingsHeaderTextView"
+            android:text="@string/group_members_count" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contactsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/headerText2"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:listitem="@layout/component_contacts" />
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/continueButton"
+        style="@style/wfButton"
+        android:background="@drawable/drawable_button_gradient_round"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:srcCompat="@drawable/arrow_forward_24"
+        app:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

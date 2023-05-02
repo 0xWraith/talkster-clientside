@@ -1,7 +1,7 @@
-package com.client.talkster.api;
+package com.client.talkster.api.websocket.listeners;
 
 import android.app.Activity;
-import com.client.talkster.interfaces.IChatWebSocketHandler;
+import com.client.talkster.interfaces.chat.IChatWebSocketHandler;
 
 import rx.Subscriber;
 import ua.naiksoftware.stomp.client.StompMessage;

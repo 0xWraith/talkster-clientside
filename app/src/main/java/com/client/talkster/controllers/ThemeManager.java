@@ -1,25 +1,31 @@
 package com.client.talkster.controllers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.SwitchCompat;
 
+import com.client.talkster.MyApplication;
 import com.client.talkster.R;
 import com.client.talkster.classes.theme.ButtonElements;
 import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.classes.theme.ToolbarElements;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
+import com.client.talkster.interfaces.theme.IThemeManagerActivityListener;
 import com.client.talkster.utils.Utils;
 import com.client.talkster.utils.enums.EThemeType;
 import com.client.talkster.utils.exceptions.ThemeNotFoundException;
@@ -36,17 +42,20 @@ public class ThemeManager
     private static Theme currentTheme = null;
     private static final List<Theme> themes = new ArrayList<>();
     private static final HashMap<String, Integer> themeColor = new HashMap<>();
+
+    private static final HashMap<String, Integer> themeDrawable = new HashMap<>();
     private static final List<IThemeManagerActivityListener> listeners = new ArrayList<>();
 
+    private static final int[] DRAWABLES = {R.attr.inputBackground};
 
     private static GradientDrawable roundedButtonGradient;
     private static GradientDrawable standardButtonGradient;
 
+    private static GradientDrawable senderChatBubbleGradient;
+    private static GradientDrawable receiverChatBubbleGradient;
+
     public static void applyTheme(Context context, Theme theme)
     {
-        if(currentTheme == null)
-            prevTheme = theme;
-
         currentTheme = theme;
         notifyListeners();
 
@@ -112,6 +121,39 @@ public class ThemeManager
         themeColor.put("navBarIcon", MaterialColors.getColor(context, R.attr.navBarIcon, Color.BLACK));
         themeColor.put("navBarTabActiveIcon", MaterialColors.getColor(context, R.attr.navBarTabActiveIcon, Color.BLACK));
         themeColor.put("navBarTabUnactiveIcon", MaterialColors.getColor(context, R.attr.navBarTabUnactiveIcon, Color.BLACK));
+        themeColor.put("radioBackground", MaterialColors.getColor(context, R.attr.radioBackground, Color.BLACK));
+        themeColor.put("radioBackgroundChecked", MaterialColors.getColor(context, R.attr.radioBackgroundChecked, Color.BLACK));
+        themeColor.put("switchTrack", MaterialColors.getColor(context, R.attr.switchTrack, Color.BLACK));
+        themeColor.put("switchTrackChecked", MaterialColors.getColor(context, R.attr.switchTrackChecked, Color.BLACK));
+        themeColor.put("checkboxBackground", MaterialColors.getColor(context, R.attr.checkboxBackground, Color.BLACK));
+        themeColor.put("checkboxBackgroundChecked", MaterialColors.getColor(context, R.attr.checkboxBackgroundChecked, Color.BLACK));
+
+        themeColor.put("dialogBackground", MaterialColors.getColor(context, R.attr.dialogBackground, Color.BLACK));
+        themeColor.put("errorColor", MaterialColors.getColor(context, R.attr.errorColor, Color.RED));
+
+        //Fetches an array of the resource attributes
+        @SuppressLint("ResourceType")
+        TypedArray a = context.getTheme().obtainStyledAttributes(DRAWABLES);
+        try {
+            // Get the integer value associated with the attribute by Index in DRAWABLES
+            themeDrawable.put("inputBackground", a.getResourceId(0, 0));
+        } finally {
+            a.recycle();
+        }
+
+
+
+        loadChatColors(context);
+        loadButtonColors(context);
+        loadSettingsColors(context);
+
+        refreshButtonGradient(context);
+        refreshChatBubblesGradient(context);
+    }
+
+    private static void loadChatColors(Context context)
+    {
+
         themeColor.put("chat_backgroundImage", R.attr.chat_backgroundImage);
         themeColor.put("chat_name", MaterialColors.getColor(context, R.attr.chat_name, Color.BLACK));
         themeColor.put("chat_message", MaterialColors.getColor(context, R.attr.chat_message, Color.BLACK));
@@ -133,19 +175,10 @@ public class ThemeManager
         themeColor.put("chat_outTimeText", MaterialColors.getColor(context, R.attr.chat_outTimeText, Color.BLACK));
         themeColor.put("chat_TextCursor", MaterialColors.getColor(context, R.attr.chat_TextCursor, Color.BLACK));
         themeColor.put("chat_TextCursorSelection", MaterialColors.getColor(context, R.attr.chat_TextCursorSelection, Color.BLACK));
-        themeColor.put("radioBackground", MaterialColors.getColor(context, R.attr.radioBackground, Color.BLACK));
-        themeColor.put("radioBackgroundChecked", MaterialColors.getColor(context, R.attr.radioBackgroundChecked, Color.BLACK));
-        themeColor.put("switchTrack", MaterialColors.getColor(context, R.attr.switchTrack, Color.BLACK));
-        themeColor.put("switchTrackChecked", MaterialColors.getColor(context, R.attr.switchTrackChecked, Color.BLACK));
-        themeColor.put("checkboxBackground", MaterialColors.getColor(context, R.attr.checkboxBackground, Color.BLACK));
-        themeColor.put("checkboxBackgroundChecked", MaterialColors.getColor(context, R.attr.checkboxBackgroundChecked, Color.BLACK));
 
-        themeColor.put("dialogBackground", MaterialColors.getColor(context, R.attr.dialogBackground, Color.BLACK));
-        themeColor.put("errorColor", MaterialColors.getColor(context, R.attr.errorColor, Color.BLACK));
-
-        loadButtonColors(context);
-        loadSettingsColors(context);
-        refreshButtonGradient(context);
+        themeColor.put("chat_barIconColor", MaterialColors.getColor(context, R.attr.chat_barIconColor, Color.BLACK));
+        themeColor.put("chat_barIconColorActive", MaterialColors.getColor(context, R.attr.chat_barIconColorActive, Color.BLACK));
+        themeColor.put("chat_barBackground", MaterialColors.getColor(context, R.attr.chat_barBackground, Color.BLACK));
     }
 
     private static void loadButtonColors(Context context)
@@ -157,6 +190,20 @@ public class ThemeManager
         themeColor.put("button_BackgroundGradient2", MaterialColors.getColor(context, R.attr.button_BackgroundGradient2, Color.BLACK));
         themeColor.put("button_BackgroundGradient3", MaterialColors.getColor(context, R.attr.button_BackgroundGradient3, Color.BLACK));
     }
+
+    private static void refreshChatBubblesGradient(Context context)
+    {
+        int pxRadius = Utils.convertDPToPx(context, 15);
+
+        receiverChatBubbleGradient = new GradientDrawable();
+        senderChatBubbleGradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[] { getColor("chat_outBubbleGradient1"), /*getColor("chat_outBubbleGradient2"),*/ getColor("chat_outBubbleGradient3") });
+
+        receiverChatBubbleGradient.setColor(getColor("chat_inBubble"));
+        senderChatBubbleGradient.setCornerRadii(new float[] { pxRadius, pxRadius, pxRadius, pxRadius, 0, 0, pxRadius, pxRadius });
+        receiverChatBubbleGradient.setCornerRadii(new float[] { pxRadius, pxRadius, pxRadius, pxRadius, pxRadius, pxRadius, 0, 0 });
+
+    }
+
 
     private static void refreshButtonGradient(Context context)
     {
@@ -186,9 +233,12 @@ public class ThemeManager
     {
         return themeColor.getOrDefault(key, Color.BLACK);
     }
+    public static int getDrawable(String key) { return themeDrawable.getOrDefault(key, null); }
 
     public static GradientDrawable getRoundedButtonGradient() { return roundedButtonGradient; }
     public static GradientDrawable getStandardButtonGradient() { return standardButtonGradient; }
+    public static GradientDrawable getSenderChatBubbleGradient() { return senderChatBubbleGradient; }
+    public static GradientDrawable getReceiverChatBubbleGradient() { return receiverChatBubbleGradient; }
 
     public static void changeButtonsColor(ButtonElements buttonElements)
     {
@@ -227,7 +277,6 @@ public class ThemeManager
         button.setColorFilter(ThemeManager.getColor("button_textColor"));
         button.setBackground(ThemeManager.getStandardButtonGradient());
     }
-
     public static void changeStandardButtonColor(Button button)
     {
         if(button == null)
@@ -253,6 +302,21 @@ public class ThemeManager
 
         button.setTextColor(ThemeManager.getColor("button_textColor"));
         button.setBackground(ThemeManager.getRoundedButtonGradient());
+    }
+
+    public static void changeSwitchColor(SwitchCompat switchCompat)
+    {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_enabled, android.R.attr.state_checked },
+                new int[] { android.R.attr.state_enabled, -android.R.attr.state_checked }
+        };
+        int[] colors = new int[] {
+                ThemeManager.getColor("switchTrackChecked"),
+                ThemeManager.getColor("switchTrack")
+        };
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        switchCompat.setTrackTintList(colorStateList);
+        switchCompat.setThumbTintList(colorStateList);
     }
 
     public static void changeToolbarColor(ToolbarElements toolbarElements)
@@ -293,6 +357,13 @@ public class ThemeManager
             settingsBlock.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
 
+    public static void changeInputColor(List<EditText> inputs) {
+        for (EditText input : inputs) {
+            input.setBackground(MyApplication.getAppContext().getResources().getDrawable(ThemeManager.getDrawable("inputBackground")));
+            input.setTextColor(ThemeManager.getColor("settings_color"));
+        }
+    }
+
     public static void changeColorState(BottomNavigationView bottomNavigation)
     {
         int[] colors = new int[] {
@@ -302,7 +373,7 @@ public class ThemeManager
 
         ColorStateList newColorStateList = new ColorStateList(new int[][] { new int[] { -android.R.attr.state_checked }, new int[] { android.R.attr.state_checked } }, colors);
         bottomNavigation.setItemIconTintList(newColorStateList);
-        bottomNavigation.setBackgroundColor(ThemeManager.getColor("actionBarDefault"));
+        bottomNavigation.setBackgroundColor(ThemeManager.getColor("navBarBackground"));
     }
 
     public static Drawable getThemeImage(Context context)

@@ -5,7 +5,6 @@
     android:id="@+id/homeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
     android:background="?attr/windowBackgroundWhite"
     tools:context=".HomeActivity">
 
@@ -13,7 +12,7 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="?attr/actionBarDefault"
+        android:background="?attr/navBarBackground"
         app:itemIconTint="@color/menu_item_state"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"

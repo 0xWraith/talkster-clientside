@@ -1,9 +1,4 @@
-package com.client.talkster.classes;
-
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
+package com.client.talkster.classes.chat.message;
 
 import com.client.talkster.utils.enums.MessageType;
 
@@ -49,42 +44,9 @@ public class Message implements Serializable
                 "ID=" + id +
                 ", chatID=" + chatID +
                 ", senderID=" + senderID +
-                ", receiverID=" + receiverID +
                 ", messageType=" + messageType +
                 ", messageContent='" + messageContent + '\'' +
                 ", messageTimestamp='" + messageTimestamp + '\'' +
                 '}';
     }
-
-    /*@Override
-    public int describeContents() { return 0; }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel parcel, int i)
-    {
-        parcel.writeLong(id);
-        parcel.writeLong(chatID);
-        parcel.writeLong(senderID);
-        parcel.writeLong(receiverID);
-        parcel.writeString(messageType.name());
-        parcel.writeString(messageContent);
-        parcel.writeString(messageTimestamp);
-    }
-
-    private Message(Parcel in)
-    {
-        id = in.readLong();
-        chatID = in.readLong();
-        senderID = in.readLong();
-        receiverID = in.readLong();
-        messageType = MessageType.valueOf(in.readString());
-        messageContent = in.readString();
-        messageTimestamp = in.readString();
-    }
-
-    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>()
-    {
-        public Message[] newArray(int size) { return new Message[size]; }
-        public Message createFromParcel(Parcel in) { return new Message(in); }
-    };*/
 }

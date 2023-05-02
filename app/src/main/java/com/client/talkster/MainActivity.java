@@ -1,22 +1,18 @@
 package com.client.talkster;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.client.talkster.classes.User;
 import com.client.talkster.classes.UserAccount;
-import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.Theme;
 import com.client.talkster.controllers.IntroductionScreenActivity;
 import com.client.talkster.controllers.OfflineActivity;
@@ -24,7 +20,6 @@ import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.VerifiedUserDTO;
 import com.client.talkster.interfaces.IAPIResponseHandler;
 import com.client.talkster.interfaces.IMainActivityScreen;
-import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.UserAccountManager;
 import com.client.talkster.utils.Utils;
 import com.client.talkster.utils.enums.EThemeType;
@@ -34,6 +29,7 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 
+import io.reactivex.plugins.RxJavaPlugins;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -41,21 +37,21 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
 {
     private final int SPLASH_DISPLAY_LENGTH = 750;
 
-    private UserJWT userJWT;
-
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        RxJavaPlugins.setErrorHandler(e -> { e.printStackTrace(); });
         createApplicationThemes();
         setTheme(ThemeManager.getCurrentThemeStyle());
 
         super.onCreate(savedInstanceState);
 
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
+
         UserAccountManager.getAccount(this);
     }
 
@@ -137,42 +133,47 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
     {
         Theme theme;
 
-        theme = new Theme("Dark Forest",
-                EThemeType.THEME_NIGHT,
-                R.style.Theme_Talkster_First,
-                Color.parseColor("#099877"),
-                Color.parseColor("#222023"),
-                Color.parseColor("#8FA457"),
-                Color.parseColor("#4FA149"),
-                Color.parseColor("#35A07B"),
-                R.drawable.bg_chat_forest_blur);
+        if(ThemeManager.getThemes().size() == 0) 
+        {
 
-        ThemeManager.addTheme(theme);
+            theme = new Theme("Dark Forest",
+                    EThemeType.THEME_NIGHT,
+                    R.style.Theme_Talkster_First,
+                    R.color.theme1_color,
+                    R.color.theme1_in_bubble,
+                    R.color.theme1_out_bubble1,
+                    R.color.theme1_out_bubble2,
+                    R.color.theme1_out_bubble3,
+                    R.drawable.bg_chat_forest_blur);
 
-        theme = new Theme("Dark Amethyst",
-                EThemeType.THEME_NIGHT,
-                R.style.Theme_Talkster_Second,
-                Color.parseColor("#c992eb"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#5b57a4"),
-                Color.parseColor("#ba78dd"),
-                R.drawable.bg_chat_dark_amethyst);
+            ThemeManager.addTheme(theme);
 
-        ThemeManager.addTheme(theme);
+            theme = new Theme("Dark Amethyst",
+                    EThemeType.THEME_NIGHT,
+                    R.style.Theme_Talkster_Second,
+                    R.color.theme2_color,
+                    R.color.theme2_in_bubble,
+                    R.color.theme2_out_bubble1,
+                    R.color.theme2_out_bubble2,
+                    R.color.theme2_out_bubble3,
+                    R.drawable.bg_chat_dark_amethyst);
 
 
-        theme = new Theme("Light Amethyst",
-                EThemeType.THEME_DAY,
-                R.style.Theme_Talkster_Third,
-                Color.parseColor("#a7637b"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#55405e"),
-                Color.parseColor("#5b57a4"),
-                Color.parseColor("#ba78dd"),
-                R.drawable.bg_chat_light_amethyst);
+            ThemeManager.addTheme(theme);
 
-        ThemeManager.addTheme(theme);
+
+            theme = new Theme("Light Amethyst",
+                    EThemeType.THEME_DAY,
+                    R.style.Theme_Talkster_Third,
+                    R.color.theme3_color,
+                    R.color.theme3_in_bubble,
+                    R.color.theme3_out_bubble1,
+                    R.color.theme3_out_bubble2,
+                    R.color.theme3_out_bubble3,
+                    R.drawable.bg_chat_light_amethyst);
+
+            ThemeManager.addTheme(theme);
+        }
 
         try
         {
@@ -182,5 +183,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivityScre
         catch (IllegalStateException | ThemeNotFoundException exception) { theme = ThemeManager.getThemes().get(0); }
 
         ThemeManager.applyTheme(this, theme);
+        ThemeManager.reloadThemeColors(this);
     }
 }

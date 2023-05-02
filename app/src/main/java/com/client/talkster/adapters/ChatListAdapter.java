@@ -1,6 +1,7 @@
 package com.client.talkster.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +13,22 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.client.talkster.R;
-import com.client.talkster.classes.Chat;
-import com.client.talkster.classes.Message;
+import com.client.talkster.classes.User;
+import com.client.talkster.classes.chat.Chat;
+import com.client.talkster.classes.chat.GroupChat;
+import com.client.talkster.classes.chat.message.Message;
+import com.client.talkster.classes.chat.PrivateChat;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.interfaces.IRecyclerViewItemClickListener;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
+import com.client.talkster.utils.enums.EChatType;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder> implements IThemeManagerFragmentListener
 {
@@ -53,7 +59,69 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     {
 
         Chat chat = chatList.get(position);
+
+        holder.chatMuteIcon.setVisibility(chat.isMuted() ? View.VISIBLE : View.GONE);
+
+        if(chat.getType() == EChatType.PRIVATE_CHAT)
+            privateChatBind(holder, (PrivateChat) chat);
+        else
+            groupChatBind(holder, (GroupChat) chat);
+    }
+
+    private void groupChatBind(ChatViewHolder holder, GroupChat chat)
+    {
+        holder.userNameText.setText(chat.getGroupName());
+        holder.userAvatarImage.setImageResource(R.drawable.group_chat);
+
+        if(chat.getMessages().size() == 0)
+        {
+            holder.chatPreviewText.setText(R.string.group_created_chat_message);
+            holder.chatPreviewText.setTextColor(ThemeManager.getColor("chat_messageAction"));
+
+            return;
+        }
+
+        Message lastMessage = chat.getMessages().get(chat.getMessages().size() - 1);
+
+        switch (lastMessage.getMessageType())
+        {
+            case TEXT_MESSAGE:
+            {
+                User sender = chat.getGroupMembers().stream().filter(user -> user.getId() == lastMessage.getSenderID()).findFirst().orElse(null);
+
+                if(sender == null)
+                {
+                    holder.chatPreviewText.setText("No user");
+                    holder.chatPreviewText.setTextColor(ThemeManager.getColor("chat_messageAction"));
+                    return;
+                }
+
+                holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.previewSecondaryText));
+                holder.chatPreviewText.setText(String.format(Locale.getDefault(), "%s: %s", sender.getFirstname(), lastMessage.getMessageContent()));
+                break;
+            }
+            case AUDIO_MESSAGE:
+            {
+                holder.chatPreviewText.setText(R.string.audio_message);
+                holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aurora_4));
+                break;
+            }
+            case MEDIA_MESSAGE:
+            {
+                holder.chatPreviewText.setText(R.string.photo);
+                holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aurora_4));
+                break;
+            }
+        }
+    }
+
+    private void privateChatBind(ChatViewHolder holder, PrivateChat chat)
+    {
+
         viewHashMap.put(chat.getReceiverID(), holder);
+
+        Log.d("ChatListAdapter", "privateChatBind: " + chat);
+        Log.d("ChatListAdapter", "privateChatBind: " + chat.getReceiverID() + " " + chat.getOwnerID());
 
         if(chat.getReceiverID() == chat.getOwnerID())
         {
@@ -66,8 +134,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             holder.userAvatarImage.setImageBitmap(fileUtils.getProfilePicture(chat.getReceiverID()));
             holder.userNameText.setText(chat.getReceiverName());
         }
-
-        holder.chatMuteIcon.setVisibility(chat.isMuted() ? View.VISIBLE : View.GONE);
 
         if(chat.getMessages().size() > 0)
         {
@@ -97,7 +163,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             return;
         }
         holder.chatPreviewText.setText(context.getString(R.string.empty_chat, chat.getReceiverFirstname()));
-        holder.chatPreviewText.setTextColor(ContextCompat.getColor(context, R.color.aquamarine_dark));
+        holder.chatPreviewText.setTextColor(ThemeManager.getColor("chat_messageAction"));
     }
 
     @Override
@@ -128,7 +194,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             chatMuteIcon = itemView.findViewById(R.id.muteIcon);
             userNameText = itemView.findViewById(R.id.userNameText);
             chatPreviewText = itemView.findViewById(R.id.chatPreviewText);
-            userAvatarImage = itemView.findViewById(R.id.circularBackground);
+            userAvatarImage = itemView.findViewById(R.id.userAvatarImage);
 
             userNameText.setTextColor(ThemeManager.getColor("chat_name"));
             chatMuteIcon.setColorFilter(ThemeManager.getColor("chat_muteIcon"));

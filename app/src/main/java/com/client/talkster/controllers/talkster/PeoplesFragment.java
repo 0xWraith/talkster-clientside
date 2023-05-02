@@ -1,6 +1,10 @@
 package com.client.talkster.controllers.talkster;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -9,58 +13,75 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.client.talkster.ChangeBiographyActivity;
+import com.client.talkster.ChangeLoginActivity;
 import com.client.talkster.HomeActivity;
 import com.client.talkster.MyApplication;
 import com.client.talkster.R;
+import com.client.talkster.SettingsActivity;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
-import com.client.talkster.api.APIStompWebSocket;
 import com.client.talkster.classes.User;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ButtonElements;
+import com.client.talkster.classes.theme.SettingsElements;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.ChatCreateDTO;
 import com.client.talkster.dto.NameDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
 import com.client.talkster.utils.FileUtils;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.material.imageview.ShapeableImageView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PeoplesFragment extends Fragment implements IFragmentActivity, IThemeManagerFragmentListener
 {
     private boolean FRAGMENT_CREATED = false;
 
+    private FileUtils fileUtils;
     private ButtonElements buttonElements;
     private ToolbarElements toolbarElements;
+    private SettingsElements settingsElements;
     private ConstraintLayout peoplesLayout;
-
-    private UserJWT userJWT;
-    private User user;
-    private Button galleryButton, cameraButton, addFriendButton, deleteButton;
-    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton;
-    private ImageButton lastNameEditButton, lastNameSaveButton;
-    private ImageView profileImageView;
+    private ShapeableImageView profileImageView;
     private View profileView, leftPager;
+    private TextView firstNameView, lastNameView, usernameText, biographyText;
+    private ImageButton lastNameEditButton, lastNameSaveButton, settingsButton;
     private EditText firstNameEditText, lastNameEditText, mailEditText;
-    private TextView firstNameView, lastNameView;
+    private Button galleryButton, cameraButton, addFriendButton, deleteButton;
+    private ImageButton imageEditButton, closeMediaButton, firstNameEditButton, firstNameSaveButton, usernameEditButton, biographyEditButton;
     private ConstraintLayout mediaChooserLayout, firstNameLayout, firstNameEditLayout, lastNameLayout, lastNameEditLayout;
-    private FileUtils fileUtils;
-    public APIStompWebSocket apiStompWebSocket;
 
+    private List<EditText> inputs = new ArrayList<>();
     private final int MIN_DISTANCE = 300;
     private float x1,x2;
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA
+    };
+    private final String[] ALLOWED_TYPES = {
+            "image/png",
+            "image/jpg",
+            "image/jpeg"
+    };
 
-    public PeoplesFragment(UserJWT userJWT, User user) { this.userJWT = userJWT; this.user = user;}
+
+    public PeoplesFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -68,7 +89,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         super.onCreate(savedInstanceState);
 
         FRAGMENT_CREATED = true;
-        fileUtils = new FileUtils(userJWT);
+        fileUtils = new FileUtils();
     }
 
     @Override
@@ -83,8 +104,12 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     @Override
     public void getUIElements(View view)
     {
+        User user = UserAccount.getInstance().getUser();
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
         buttonElements = new ButtonElements();
         toolbarElements = new ToolbarElements();
+        settingsElements = new SettingsElements();
 
         toolbarElements.setToolbar(view.findViewById(R.id.toolbar));
         toolbarElements.setToolbarTitle(view.findViewById(R.id.toolbarTitle));
@@ -99,6 +124,11 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         closeMediaButton = view.findViewById(R.id.closeMediaButton);
         mediaChooserLayout = view.findViewById(R.id.mediaChooserLayout);
         profileView = view.findViewById(R.id.profileView);
+        settingsButton = view.findViewById(R.id.settingsButton);
+        usernameText = view.findViewById(R.id.usernameText);
+        biographyText = view.findViewById(R.id.biographyText);
+        usernameEditButton = view.findViewById(R.id.usernameEditButton);
+        biographyEditButton = view.findViewById(R.id.biographyEditButton);
         
         firstNameLayout = view.findViewById(R.id.firstNameLayout);
         firstNameEditLayout = view.findViewById(R.id.firstNameEditLayout);
@@ -115,17 +145,36 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         firstNameEditText = view.findViewById(R.id.firstNameEditText);
         lastNameEditText = view.findViewById(R.id.lastNameEditText);
 
+        mailEditText = view.findViewById(R.id.mailEditText);
+
         buttonElements.addButton(addFriendButton, false);
         buttonElements.addImageButton(imageEditButton, true);
         buttonElements.addImageButton(firstNameEditButton, true);
         buttonElements.addImageButton(firstNameSaveButton, true);
         buttonElements.addImageButton(lastNameEditButton, true);
         buttonElements.addImageButton(lastNameSaveButton, true);
+        buttonElements.addImageButton(usernameEditButton, true);
+        buttonElements.addImageButton(biographyEditButton, true);
 
+        toolbarElements.addToolbarIcon(settingsButton);
+
+        settingsElements.addHeaderText(view.findViewById(R.id.addFriendTitle));
+        settingsElements.addHeaderText(view.findViewById(R.id.usernameTitle));
+        settingsElements.addHeaderText(view.findViewById(R.id.biographyTitle));
+        settingsElements.addSettingsSubText(usernameText);
+        settingsElements.addSettingsSubText(biographyText);
+        settingsElements.addSettingsText(firstNameView);
+        settingsElements.addSettingsText(lastNameView);
+
+        inputs.add(firstNameEditText);
+        inputs.add(lastNameEditText);
+        inputs.add(mailEditText);
 
         firstNameView.setText(user.getFirstname());
         firstNameEditText.setText(user.getFirstname());
+
         String lastname = user.getLastname();
+
         if (lastname.isBlank()){
             lastNameView.setText(R.string.last_name_placeholder);
             lastNameView.setTextColor(getResources().getColor(R.color.previewSecondaryText));
@@ -136,13 +185,24 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
             lastNameEditText.setText(lastname);
         }
 
-        mailEditText = view.findViewById(R.id.mailEditText);
-
         leftPager = view.findViewById(R.id.leftPager);
 
         initPager();
 
-        addFriendButton.setOnClickListener(view1 -> {
+        settingsButton.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), SettingsActivity.class);
+        startActivity(intent);});
+
+        usernameEditButton.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), ChangeLoginActivity.class);
+            startActivity(intent);});
+
+        biographyEditButton.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), ChangeBiographyActivity.class);
+            startActivity(intent);});
+
+        addFriendButton.setOnClickListener(view1 ->
+        {
             ChatCreateDTO chatCreateDTO = new ChatCreateDTO();
             MyApplication.hideKeyboard((AppCompatActivity) getActivity());
             APIHandler<ChatCreateDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
@@ -153,7 +213,18 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         });
 
         imageEditButton.setOnClickListener(view1 -> {
-            mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
+            int permReadExt = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            int permWriteExt = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int permCamera = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+
+            if (permReadExt != PackageManager.PERMISSION_GRANTED
+                    && permWriteExt != PackageManager.PERMISSION_GRANTED
+                    && permCamera != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, 1);
+            }
+            else {
+                mediaChooserLayout.animate().translationY(-(mediaChooserLayout.getHeight())).setDuration(250);
+            }
         });
 
         closeMediaButton.setOnClickListener(view1 -> {
@@ -173,6 +244,7 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
             mediaChooserLayout.animate().translationY(0).setDuration(250);
             ImagePicker.Companion.with(getActivity())
                     .galleryOnly()
+                    .galleryMimeTypes(ALLOWED_TYPES)
                     .cropSquare()
                     .maxResultSize(256,256)
                     .start(101);
@@ -243,6 +315,9 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
     public void onResume(){
         super.onResume();
         updateProfilePicture();
+        User user = UserAccount.getInstance().getUser();
+        usernameText.setText("@"+user.getUsername());
+        biographyText.setText(user.getBiography());
     }
 
     @Override
@@ -253,15 +328,26 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
 
         ThemeManager.changeButtonsColor(buttonElements);
         ThemeManager.changeToolbarColor(toolbarElements);
+        ThemeManager.changeSettingsColor(settingsElements);
+        ThemeManager.changeInputColor(inputs);
+
+        if (lastNameView.getText() == getResources().getString(R.string.last_name_placeholder)){
+            lastNameView.setTextColor(ThemeManager.getColor("settings_subText"));
+        }
 
         peoplesLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
     }
     
-    public void updateProfilePicture(){
-        profileImageView.setImageBitmap(fileUtils.getProfilePicture(user.getId()));
+    public void updateProfilePicture() {
+        Bitmap profile = fileUtils.getProfilePicture(UserAccount.getInstance().getUser().getId());
+        profileImageView.setImageBitmap(profile);
+        UserAccount.getInstance().getUser().setAvatar(profile);
     }
 
-    private void updateUserName(){
+    private void updateUserName()
+    {
+        User user = UserAccount.getInstance().getUser();
+
         MyApplication.hideKeyboard((AppCompatActivity) getActivity());
         String first = firstNameEditText.getText().toString();
         String last = lastNameEditText.getText().toString();
@@ -275,16 +361,16 @@ public class PeoplesFragment extends Fragment implements IFragmentActivity, IThe
         firstNameView.setText(first);
         if (!last.isBlank()){
             lastNameView.setText(last);
-            lastNameView.setTextColor(getResources().getColor(R.color.previewMainText));
+            lastNameView.setTextColor(ThemeManager.getColor("settings_text"));
         } else {
             lastNameView.setText(R.string.last_name_placeholder);
-            lastNameView.setTextColor(getResources().getColor(R.color.previewSecondaryText));
+            lastNameView.setTextColor(ThemeManager.getColor("settings_subText"));
             lastNameEditText.setText("");
         }
         NameDTO nameDTO = new NameDTO();
         APIHandler<NameDTO, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
         nameDTO.setFirstName(first);
         nameDTO.setLastName(last);
-        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_USER_UPDATE_NAME, nameDTO, userJWT.getAccessToken());
+        apiHandler.apiPUT(APIEndpoints.TALKSTER_API_USER_UPDATE_NAME, nameDTO, UserAccount.getInstance().getUserJWT().getAccessToken());
     }
 }

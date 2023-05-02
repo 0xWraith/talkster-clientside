@@ -1,18 +1,24 @@
 package com.client.talkster.controllers.talkster;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -22,14 +28,14 @@ import com.client.talkster.adapters.LocationAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
 import com.client.talkster.classes.TalksterMapIcon;
+import com.client.talkster.classes.UserAccount;
 import com.client.talkster.classes.UserJWT;
 import com.client.talkster.classes.theme.ToolbarElements;
 import com.client.talkster.controllers.ThemeManager;
 import com.client.talkster.dto.LocationDTO;
 import com.client.talkster.interfaces.IFragmentActivity;
 import com.client.talkster.interfaces.IMapGPSPositionUpdate;
-import com.client.talkster.interfaces.IThemeManagerActivityListener;
-import com.client.talkster.interfaces.IThemeManagerFragmentListener;
+import com.client.talkster.interfaces.theme.IThemeManagerFragmentListener;
 import com.client.talkster.utils.BundleExtraNames;
 import com.client.talkster.utils.FileUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,36 +49,58 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MapFragment extends Fragment implements IFragmentActivity, OnMapReadyCallback, IMapGPSPositionUpdate, IThemeManagerFragmentListener
 {
 
+    private boolean FRAGMENT_CREATED = false;
+
+    private float x1,x2;
+    private boolean setLocation = false;
+    private final int MIN_DISTANCE = 300;
+    private final float ZOOM_LEVEL = 15.0f;
+
+    private Bundle mapViewBundle = null;
     private ToolbarElements toolbarElements;
+    private LocationAdapter userLastLocation;
+    private HashMap<Long, String> usernames = new HashMap<>();
+    private HashMap<Long, Marker> userMarkers = new HashMap<>();
 
     private ImageView toolbarLogoIcon;
 
-    private ConstraintLayout mapLayout;
     private GoogleMap map;
-    private UserJWT userJWT;
     private MapView mapView;
-    private final float ZOOM_LEVEL = 15.0f;
-    private boolean setLocation = false;
-    private Bundle mapViewBundle = null;
-    private LocationAdapter userLastLocation;
     private Marker userMarker;
-    private ImageButton plusButton, minusButton;
+    private EditText searchEditText;
+    private ConstraintLayout mapLayout;
     private View rightPager, leftPager;
-    private final int MIN_DISTANCE = 300;
-    private float x1,x2;
-    private HashMap<Long, Marker> userMarkers = new HashMap<>();
+    private ImageButton plusButton, minusButton;
+    private List<EditText> inputs = new ArrayList<>();
+
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     public MapFragment() { }
 
-    public MapFragment(UserJWT userJWT) { this.userJWT = userJWT; }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
+    public void onCreate(Bundle savedInstanceState)
+    {
+        FRAGMENT_CREATED = true;
+
+        super.onCreate(savedInstanceState);
+        int permCoarseLoc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        int permFineLoc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (permCoarseLoc != PackageManager.PERMISSION_GRANTED
+                || permFineLoc != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, 1);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -125,6 +153,9 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         toolbarElements.setToolbar(view.findViewById(R.id.toolbar));
         toolbarElements.addToolbarIcon(toolbarMenuIcon);
 
+        searchEditText = view.findViewById(R.id.toolbarInput);
+        inputs.add(searchEditText);
+
         initPager();
 
         plusButton.setOnClickListener(view1 -> {
@@ -142,6 +173,37 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
                 zoom = map.getMinZoomLevel();
             map.animateCamera( CameraUpdateFactory.zoomTo(zoom) );
         });
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+                if(charSequence.length() == 0)
+                {
+                    userMarkers.forEach((aLong, marker) -> marker.setVisible(true));
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(userMarker.getPosition(), ZOOM_LEVEL));
+                    return;
+                }
+
+                usernames.forEach((aLong, s) -> {
+
+                    Marker marker = userMarkers.getOrDefault(aLong, null);
+
+                    if(marker == null)
+                        return;
+
+                    marker.setVisible(s.toLowerCase().contains(charSequence.toString().toLowerCase()));
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM_LEVEL));
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) { }
+        });
+
     }
 
     @Override
@@ -195,9 +257,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
 
         map.setOnInfoWindowClickListener(marker -> {
             long id = (long) marker.getTag();
-            Log.d("MapFragment", "onInfoWindowClick: " + id);
             APIHandler<Object, FragmentActivity> apiHandler = new APIHandler<>(getActivity());
-            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, userJWT.getAccessToken());
+            apiHandler.apiGET(APIEndpoints.TALKSTER_API_CHAT_GET_CHAT+"/"+id, UserAccount.getInstance().getUserJWT().getAccessToken());
         });
 
         setLocation = true;
@@ -237,10 +298,13 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             setLocation = false;
         }
 
-        if(userMarker != null) {
+        if(userMarker != null)
             userMarker.setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
-        }
-        else {
+
+        else
+        {
+            UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
             userMarker = map.addMarker(new TalksterMapIcon("You", new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, userJWT.getID()).getMarkerOptions());
             userMarker.setTag(userJWT.getID());
         }
@@ -253,6 +317,7 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             return;
 
         long id = 0;
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
         LocationDTO locationDTO = new Gson().fromJson(locationRAW, LocationDTO.class);
         LocationAdapter locationAdapter = new LocationAdapter(locationDTO);
 
@@ -261,7 +326,8 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
         if(id == userJWT.getID())
             return;
 
-        if(userMarkers.containsKey(id)) {
+        if(userMarkers.containsKey(id))
+        {
             userMarkers.get(id).setPosition(new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()));
             userMarkers.get(id).setTitle(locationDTO.getUsername());
         }
@@ -269,15 +335,22 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
             userMarkers.put(id, map.addMarker(new TalksterMapIcon(locationDTO.getUsername(), new LatLng(locationAdapter.getLatitude(), locationAdapter.getLongitude()), userJWT, id).getMarkerOptions()));
             userMarkers.get(id).setTag(id);
         }
+
+        usernames.put(id, locationDTO.getUsername());
     }
 
-    public void updateMarkerIcons(){
-        FileUtils fileUtils = new FileUtils(userJWT);
+    public void updateMarkerIcons()
+    {
+        UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+
+        FileUtils fileUtils = new FileUtils();
         Bitmap bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(userJWT.getID()));
-        if (userMarker != null) {
+
+        if (userMarker != null)
             userMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
-        }
-        for (Long id : userMarkers.keySet()){
+
+        for (Long id : userMarkers.keySet())
+        {
             bitmap = FileUtils.getMarker(fileUtils.getProfilePicture(id));
             userMarkers.get(id).setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
         }
@@ -328,9 +401,14 @@ public class MapFragment extends Fragment implements IFragmentActivity, OnMapRea
     @Override
     public void onThemeChanged()
     {
+        if(!FRAGMENT_CREATED)
+            return;
+
         ThemeManager.changeToolbarColor(toolbarElements);
 
         toolbarLogoIcon.setColorFilter(ThemeManager.getColor("actionBarDefaultIcon"));
         mapLayout.setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
+        searchEditText.setCompoundDrawableTintList(ColorStateList.valueOf(ThemeManager.getColor("settings_subText")));
+        ThemeManager.changeInputColor(inputs);
     }
 }

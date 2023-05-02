@@ -9,5 +9,7 @@ public enum MessageType implements Serializable
     AUDIO_MESSAGE,
     CLEAR_CHAT_HISTORY,
     DELETE_CHAT,
-    MUTE_CHAT
+    MUTE_CHAT,
+    BLOCK_CHAT,
+    UNBLOCK_CHAT
 }

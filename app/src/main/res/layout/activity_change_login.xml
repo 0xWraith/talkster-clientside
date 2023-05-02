@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/windowBackgroundGray"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChangeLoginActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbar"
+        style="@style/Toolbar"
+        android:layout_height="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/toolbarBackButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/arrow_back_24"
+            app:tint="?attr/actionBarDefaultIcon" />
+
+        <TextView
+            android:id="@+id/toolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:gravity="center"
+            android:text="@string/username"
+            android:textColor="?attr/actionBarDefaultTitle"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/toolbarBackButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/toolbarAcceptButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_check"
+            app:tint="?attr/actionBarDefaultIcon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/settingsBlock1"
+        style="@style/SettingsBlock"
+        android:layout_marginTop="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <TextView
+            android:id="@+id/headerText1"
+            style="@style/SettingsHeaderTextView"
+            android:text="@string/username" />
+
+        <LinearLayout
+            android:id="@+id/settingsMailBlock"
+            style="@style/SettingsBlockItem"
+            android:orientation="horizontal"
+            android:layout_below="@+id/headerText1">
+
+            <TextView
+                style="@style/SettingsBlockText"
+                android:text="@string/at"/>
+
+            <EditText
+                android:id="@+id/loginEditText"
+                style="@style/SettingsBlockInput"
+                android:layout_weight="1"
+                android:inputType="textPersonName"
+                android:hint="@string/username_lowercase" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        style="@style/SettingsBlock"
+        android:background="@color/transparent"
+        android:layout_marginTop="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsBlock1">
+
+        <TextView
+            android:id="@+id/usernameResultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/username_checking"
+            android:textColor="?attr/settings_actionTextColor"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/infoBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/usernameResultText"
+            android:layout_marginTop="10dp"
+            android:text="@string/you_can_choose_a_username_on_talkster_if_you_do_other_people_will_be_able_to_find_you_by_searching_for_your_username_you_can_also_share_your_username_with_friends_to_make_it_easier_for_them_to_find_you"
+            android:textColor="?attr/settings_subText"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/infoBlock"
+            android:layout_marginTop="10dp"
+            android:text="You can use A-Z, a-z, 0-9 and underscores. Minimum length is 5 characters."
+            android:textColor="?attr/settings_subText"
+            android:textSize="14sp"/>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

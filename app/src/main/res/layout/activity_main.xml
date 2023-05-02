@@ -15,7 +15,7 @@
         android:layout_marginBottom="72dp"
         android:gravity="center"
         android:text="Wraith &amp; Kleeat"
-        android:textColor="?attr/actionBarDefaultSubtitle"
+        android:textColor="?attr/settings_text"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,24 +27,25 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="By"
-        android:textColor="@color/previewSecondaryText"
+        android:textColor="?attr/settings_text"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="@+id/textView4"
         app:layout_constraintStart_toStartOf="@+id/textView4" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/logoView"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:background="@drawable/talkster_logo"
         android:contentDescription="@string/logotype"
+        android:src="@drawable/talkster_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.33" />
+        app:layout_constraintVertical_bias="0.33"
+        app:tint="?attr/settings_text" />
 
     <TextView
         android:id="@+id/textView"
@@ -52,19 +53,20 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/splashScreenUnderLogo"
-        android:textColor="?attr/actionBarDefaultSubtitle"
+        android:textColor="?attr/settings_subText"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView4"
-        app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+        app:layout_constraintEnd_toEndOf="@+id/logoTextView"
+        app:layout_constraintStart_toStartOf="@+id/logoTextView"
+        app:layout_constraintTop_toBottomOf="@+id/logoTextView" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/logoTextView"
         android:layout_width="200dp"
         android:layout_height="50dp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView3"
-        app:layout_constraintStart_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3"
-        app:srcCompat="@drawable/talkster_text" />
+        android:src="@drawable/talkster_text"
+        app:tint="?attr/settings_text"
+        app:layout_constraintEnd_toEndOf="@+id/logoView"
+        app:layout_constraintStart_toStartOf="@+id/logoView"
+        app:layout_constraintTop_toBottomOf="@+id/logoView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

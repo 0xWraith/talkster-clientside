@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/erie_black"
+    android:background="?attr/windowBackgroundWhite"
     tools:context=".controllers.IntroductionScreenActivity">
 
     <TextView
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Talkster has no limits on the size of your media and chats"
-        android:textColor="@color/previewSecondaryText"
+        android:textColor="?attr/settings_subText"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/imageView5"
         app:layout_constraintStart_toStartOf="@+id/imageView5"
@@ -25,7 +25,8 @@
         app:layout_constraintBottom_toTopOf="@+id/imageView5"
         app:layout_constraintEnd_toEndOf="@+id/imageView5"
         app:layout_constraintStart_toStartOf="@+id/imageView5"
-        app:srcCompat="@drawable/talkster_logo" />
+        android:src="@drawable/talkster_logo"
+        app:tint="?attr/settings_text" />
 
     <Button
         android:id="@+id/startMessagingButton"
@@ -50,6 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/talkster_text" />
+        android:src="@drawable/talkster_text"
+        app:tint="?attr/settings_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
