@@ -345,7 +345,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
             if(apiUrl.contains(APIEndpoints.TALKSTER_API_CHAT_GET_NEW_CHAT))
             {
                 String responseBody = response.body().string();
-                Chat chat = new Gson().fromJson(responseBody, Chat.class);
+                PrivateChat chat = new Gson().fromJson(responseBody, PrivateChat.class);
                 runOnUiThread (() -> iChatListener.addChat(chat));
             }
             else if(apiUrl.equals(APIEndpoints.TALKSTER_API_CHAT_GET_CHATS_INFO))

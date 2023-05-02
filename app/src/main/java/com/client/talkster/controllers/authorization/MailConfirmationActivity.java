@@ -93,6 +93,7 @@ public class MailConfirmationActivity extends AppCompatActivity implements IActi
         secretCode = "";
         currentInputField = 0;
         runOnUiThread(() -> codeInput[currentInputField].requestFocus());
+        runOnUiThread(() -> StyleableToast.makeText(this, "Wrong OTP!", R.style.customToast).show());
     }
 
     public void clearInput() {

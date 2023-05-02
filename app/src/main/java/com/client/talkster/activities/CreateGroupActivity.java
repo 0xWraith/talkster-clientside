@@ -20,6 +20,8 @@ import com.client.talkster.utils.BundleExtraNames;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.muddz.styleabletoast.StyleableToast;
+
 public class CreateGroupActivity extends AppCompatActivity implements IActivity
 {
 
@@ -82,8 +84,10 @@ public class CreateGroupActivity extends AppCompatActivity implements IActivity
 
         continueButton.setOnClickListener(v ->
         {
-            if(selectedContacts.size() == 0)
+            if(selectedContacts.size() == 0) {
+                StyleableToast.makeText(this, "No contacts in the group!", R.style.customToast).show();
                 return;
+            }
 
             Intent intent = new Intent(this, CreateGroupSettingsActivity.class);
             intent.putExtra(BundleExtraNames.CREATE_GROUP_MEMBER_LIST, selectedContacts);
