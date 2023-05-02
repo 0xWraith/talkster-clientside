@@ -34,6 +34,7 @@ public abstract class Chat implements Serializable
         return messages == null ? messages = new ArrayList<>() : messages;
     }
 
+
     public void setId(long id) { this.id = id; }
     public void setType(EChatType type) { this.type = type; }
     public void setMuteTime(long muteTime) { this.muteTime = muteTime; }

@@ -1,5 +1,7 @@
 package com.client.talkster;
 
+import static com.client.talkster.utils.enums.EPrivateChatAction.BLOCK_CHAT;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -72,6 +74,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
+import io.github.muddz.styleabletoast.StyleableToast;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -188,6 +191,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         chatSendButton.setOnClickListener(view ->
         {
             String message = chatInputText.getText().toString().trim();
+            if (chat.getIsBlocked()) {
+                chatInputText.setText("");
+                StyleableToast.makeText(this, "Blocked", R.style.customToast).show();
+                return;
+            }
             sendMessage(message, MessageType.TEXT_MESSAGE);
         });
 
@@ -481,9 +489,11 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
         else if (resultCode == Activity.RESULT_OK && requestCode == 6) {
             boolean isDeleted = data.getBooleanExtra("isDeleted", false);
             boolean isCleared = data.getBooleanExtra("isCleared", false);
+            boolean isBlocking = data.getBooleanExtra("isBlocking", false);
             chat = (PrivateChat) data.getSerializableExtra(BundleExtraNames.USER_CHAT);
             if (isDeleted) {finish(); return;}
             if (isCleared) {clearChats();}
+            chat.setBlocking(isBlocking);
             updateChatMuteUI();
         }
     }
@@ -641,6 +651,16 @@ public class PrivateChatActivity extends AppCompatActivity implements IActivity,
                         case DELETE_CHAT:
                         {
                             finish();
+                            break;
+                        }
+                        case BLOCK_CHAT:
+                        {
+                            chat.setBlocked(true);
+                            break;
+                        }
+                        case UNBLOCK_CHAT:
+                        {
+                            chat.setBlocked(false);
                             break;
                         }
                     }

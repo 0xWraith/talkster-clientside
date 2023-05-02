@@ -296,11 +296,36 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/blockUserBlock"
+                    style="@style/SettingsBlockItem.Icon"
+                    android:layout_below="@+id/muteForBlock"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/blockUserIcon"
+                        style="@style/SettingsBlockIcon"
+                        android:src="@drawable/block_24" />
+
+                    <TextView
+                        android:id="@+id/blockUserText"
+                        style="@style/SettingsBlockText"
+                        android:text="@string/block_user" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/blockUserSwitch"
+                        style="@style/switchStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/clearHistoryBlock"
                     style="@style/SettingsBlockItem.Icon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@+id/muteForBlock"
+                    android:layout_below="@+id/blockUserBlock"
                     android:orientation="horizontal">
 
                     <ImageView

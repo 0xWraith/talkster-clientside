@@ -30,7 +30,6 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.client.talkster.activities.settings.PrivacySettingsActivity;
 import com.client.talkster.adapters.ThemeListAdapter;
 import com.client.talkster.api.APIEndpoints;
 import com.client.talkster.api.APIHandler;
@@ -66,14 +65,14 @@ import okhttp3.Response;
 public class ChatSettingsActivity extends AppCompatActivity implements IActivity, IAPIResponseHandler, IThemeManagerActivityListener
 {
     private PrivateChat chat;
-    private boolean isDeleted = false, isCleared = false;
+    private boolean isDeleted = false, isCleared = false, isBlocking;
     private boolean BLOCK_TOUCH = false;
     private ToolbarElements toolbarElements;
     private SettingsElements settingsElements;
     private ThemeListAdapter themeAdapter;
     private ImageView themeTransitionImage, profileImage;
     private ConstraintLayout chatSettingsLayout;
-    private SwitchCompat mapTrackerSwitch;
+    private SwitchCompat mapTrackerSwitch, blockUserSwitch;
 
     private LinearLayout unmuteBlock, muteForeverBlock, muteForBlock, clearHistoryBlock, deleteChatBlock;
     private TextView profileText;
@@ -99,12 +98,14 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
             return;
 
         chat = (PrivateChat) bundle.get(BundleExtraNames.USER_CHAT);
+        isBlocking = chat.getIsBlocking();
     }
 
     private void sendResult() {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("isDeleted", isDeleted);
         resultIntent.putExtra("isCleared", isCleared);
+        resultIntent.putExtra("isBlocking", isBlocking);
         resultIntent.putExtra(BundleExtraNames.USER_CHAT, chat);
         setResult(RESULT_OK, resultIntent);
         finish();
@@ -143,6 +144,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         chatSettingsLayout = findViewById(R.id.chatSettingsLayout);
         themeTransitionImage = findViewById(R.id.themeTransitionImage);
         mapTrackerSwitch = findViewById(R.id.mapTrackerSwitch);
+        blockUserSwitch = findViewById(R.id.blockUserSwitch);
 
         unmuteBlock = findViewById(R.id.unmuteBlock);
         muteForeverBlock = findViewById(R.id.muteForeverBlock);
@@ -180,6 +182,10 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         settingsElements.addSettingsBlock(findViewById(R.id.settingsBlock2));
         settingsElements.addSettingsIcon(findViewById(R.id.positionIcon));
         settingsElements.addSettingsText(findViewById(R.id.positionText));
+        settingsElements.addSettingsIcon(findViewById(R.id.blockUserIcon));
+        settingsElements.addSettingsText(findViewById(R.id.blockUserText));
+
+        blockUserSwitch.setChecked(chat.getIsBlocking());
 
         profileText.setText(chat.getReceiverName());
         profileImage.setImageBitmap(FileUtils.circleCrop(new FileUtils().getProfilePicture(chat.getReceiverID())));
@@ -218,6 +224,20 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
             apiHandler.apiPUT(String.format("%s/%b", APIEndpoints.TALKSTER_API_USER_UPDATE_MAP_TRACKER, isChecked), new EmptyDTO(), UserAccount.getInstance().getUserJWT().getAccessToken());
 
             startService(intent);
+        });
+
+        blockUserSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
+        {
+            if (!isChecked) {
+                UserJWT userJWT = UserAccount.getInstance().getUserJWT();
+                APIHandler<PrivateChatActionDTO, ChatSettingsActivity> apiHandler = new APIHandler<>(this);
+                apiHandler.apiPOST(APIEndpoints.TALKSTER_API_CHAT_ACTION, new PrivateChatActionDTO(EPrivateChatAction.UNBLOCK_CHAT, chat.getId(), userJWT.getID(), chat.getReceiverID(), false), userJWT.getAccessToken());
+                isBlocking = false;
+            }
+            else {
+                isBlocking = true;
+                showActionDialog(EPrivateChatAction.BLOCK_CHAT);
+            }
         });
 
         themeAdapter = new ThemeListAdapter(this, new IRecyclerViewItemClickListener()
@@ -366,7 +386,13 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         confirmCheckBox = dialog.findViewById(R.id.confirmCheckBox);
         confirmationTextView = dialog.findViewById(R.id.confirmationTextView);
 
-        cancelButton.setOnClickListener(view -> dialog.dismiss());
+        cancelButton.setOnClickListener(view -> {
+            dialog.dismiss();
+            if (action == EPrivateChatAction.BLOCK_CHAT) {
+                blockUserSwitch.setChecked(false);
+                isBlocking = false;
+            }
+        });
 
         apiHandler = new APIHandler<>(this);
 
@@ -390,6 +416,12 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
             confirmCheckBox.setText(String.format(getString(R.string.delete_chat_both), chat.getReceiverName()));
             confirmationTextView.setText(String.format(getString(R.string.delete_chat_confirm), chat.getReceiverName()));
         }
+        else if(action == EPrivateChatAction.BLOCK_CHAT)
+        {
+            confirmButton.setText(R.string.block_user);
+            confirmationTextView.setText(String.format(getString(R.string.block_user_confirm), chat.getReceiverName()));
+            confirmCheckBox.setVisibility(View.INVISIBLE);
+        }
 
         dialog.show();
         return true;
@@ -409,6 +441,7 @@ public class ChatSettingsActivity extends AppCompatActivity implements IActivity
         ThemeManager.changeToolbarColor(toolbarElements);
         ThemeManager.changeSettingsColor(settingsElements);
         ThemeManager.changeSwitchColor(mapTrackerSwitch);
+        ThemeManager.changeSwitchColor(blockUserSwitch);
         findViewById(R.id.profileBlock).setBackgroundColor(ThemeManager.getColor("windowBackgroundWhite"));
         profileText.setTextColor(ThemeManager.getColor("navBarText"));
     }

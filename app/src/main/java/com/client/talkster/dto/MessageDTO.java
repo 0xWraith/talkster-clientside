@@ -70,6 +70,10 @@ public class MessageDTO implements Parcelable
 
         else if(action == EPrivateChatAction.MUTE_CHAT)
             setmessagetype(MessageType.MUTE_CHAT);
+        else if(action == EPrivateChatAction.BLOCK_CHAT)
+            setmessagetype(MessageType.BLOCK_CHAT);
+        else if(action == EPrivateChatAction.UNBLOCK_CHAT)
+            setmessagetype(MessageType.UNBLOCK_CHAT);
     }
 
     private MessageDTO(Parcel in)
