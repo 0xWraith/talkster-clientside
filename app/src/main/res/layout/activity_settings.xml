@@ -289,7 +289,7 @@
                 style="@style/SettingsBlock"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settingsBlock3">
+                app:layout_constraintTop_toBottomOf="@+id/settingsBlock2">
 
                 <TextView
                     android:id="@+id/headerText3"

@@ -70,8 +70,8 @@
 
     <color name="theme3_color">#a7637b</color>
     <color name="theme3_in_bubble">#55405e</color>
-    <color name="theme3_out_bubble1">#55405e</color>
-    <color name="theme3_out_bubble2">#5b57a4</color>
-    <color name="theme3_out_bubble3">#ba78dd</color>
+    <color name="theme3_out_bubble1">#9C86A5</color>
+    <color name="theme3_out_bubble2">#9892FF</color>
+    <color name="theme3_out_bubble3">#E3AFFF</color>
 
 </resources>

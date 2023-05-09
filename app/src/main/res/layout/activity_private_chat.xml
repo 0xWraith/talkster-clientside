@@ -211,7 +211,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/chatInputText"
         app:layout_constraintEnd_toEndOf="@+id/chatInputView"
         app:srcCompat="@drawable/send_24"
-        app:tint="@android:color/white" />
+        app:tint="?attr/chat_barIconColor" />
 
     <ImageButton
         android:id="@+id/mediaButton"

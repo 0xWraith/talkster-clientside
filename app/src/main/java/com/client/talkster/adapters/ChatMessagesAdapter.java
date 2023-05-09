@@ -332,7 +332,7 @@ public class ChatMessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 e.printStackTrace();
             }
             MediaScannerConnection.scanFile(context, new String[] { file.getPath() }, new String[] { "image/jpeg" }, null);
-            ((Activity)context).runOnUiThread(() -> StyleableToast.makeText(context.getApplicationContext(), "Image Downloaded!", R.style.customToast).show());
+            ((Activity)context).runOnUiThread(() -> StyleableToast.makeText(context, "Image Downloaded!", R.style.customToast).show());
         }
     }
 }

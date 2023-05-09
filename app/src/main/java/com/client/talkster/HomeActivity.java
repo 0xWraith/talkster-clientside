@@ -166,6 +166,7 @@ public class HomeActivity extends AppCompatActivity implements IActivity, IAPIRe
 
     private void initializeSocketConnection()
     {
+
         long userId = UserAccount.getInstance().getUser().getId();
         apiStompWebSocket = APIStompWebSocket.getInstance();
 

@@ -400,9 +400,9 @@
         <item name="chat_inBubble">#222023</item>
         <item name="chat_inBubbleSelected">#6E4352</item>
         <item name="chat_outBubble">#FFFFFF</item>
-        <item name="chat_outBubbleGradient1">#55405e</item>
-        <item name="chat_outBubbleGradient2">#6E4352</item>
-        <item name="chat_outBubbleGradient3">#6E4352</item>
+        <item name="chat_outBubbleGradient1">@color/theme3_out_bubble1</item>
+        <item name="chat_outBubbleGradient2">@color/theme3_out_bubble2</item>
+        <item name="chat_outBubbleGradient3">@color/theme3_out_bubble3</item>
         <item name="chat_outBubbleSelected">#FFFFFF</item>
         <item name="chat_messageTextIn">#fafafa</item>
         <item name="chat_messageTextOut">#FFFFFF</item>
